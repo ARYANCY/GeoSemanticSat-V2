@@ -1,0 +1,4 @@
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/publish/linux-x64~/GeoSemanticSat.UI.pdb
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/publish/linux-x64~/GeoSemanticSat.Core.pdb
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/publish/linux-x64~/GeoSemanticSat.Engine.pdb
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/publish/linux-x64~/GeoSemanticSat.UI

@@ -1,0 +1,16 @@
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Engine/bin/Release/net10.0/GeoSemanticSat.Engine.deps.json
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Engine/bin/Release/net10.0/GeoSemanticSat.Engine.dll
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Engine/bin/Release/net10.0/GeoSemanticSat.Engine.pdb
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Engine/bin/Release/net10.0/GeoSemanticSat.Core.dll
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Engine/bin/Release/net10.0/GeoSemanticSat.Core.pdb
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Engine/obj/Release/net10.0/GeoSemanticSat.Engine.csproj.AssemblyReference.cache
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Engine/obj/Release/net10.0/GeoSemanticSat.Engine.GeneratedMSBuildEditorConfig.editorconfig
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Engine/obj/Release/net10.0/GeoSemanticSat.Engine.AssemblyInfoInputs.cache
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Engine/obj/Release/net10.0/GeoSemanticSat.Engine.AssemblyInfo.cs
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Engine/obj/Release/net10.0/GeoSemanticSat.Engine.csproj.CoreCompileInputs.cache
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Engine/obj/Release/net10.0/GeoSemanticSat.Engine.sourcelink.json
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Engine/obj/Release/net10.0/GeoSeman.620777BA.Up2Date
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Engine/obj/Release/net10.0/GeoSemanticSat.Engine.dll
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Engine/obj/Release/net10.0/refint/GeoSemanticSat.Engine.dll
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Engine/obj/Release/net10.0/GeoSemanticSat.Engine.pdb
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Engine/obj/Release/net10.0/ref/GeoSemanticSat.Engine.dll

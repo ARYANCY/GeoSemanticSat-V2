@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "M5Ggp2pzza0=",
+  "success": true,
+  "projectFilePath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj",
+  "expectedPackageFiles": [
+    "/home/non_qualities/.nuget/packages/microsoft.net.illink.tasks/10.0.11/microsoft.net.illink.tasks.10.0.11.nupkg.sha512",
+    "/home/non_qualities/.nuget/packages/microsoft.netcore.app.runtime.linux-x64/10.0.11/microsoft.netcore.app.runtime.linux-x64.10.0.11.nupkg.sha512",
+    "/home/non_qualities/.nuget/packages/microsoft.aspnetcore.app.runtime.linux-x64/10.0.11/microsoft.aspnetcore.app.runtime.linux-x64.10.0.11.nupkg.sha512"
+  ],
+  "logs": []
+}

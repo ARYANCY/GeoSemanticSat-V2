@@ -1,0 +1,1936 @@
+﻿{
+  "type": "FeatureCollection",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.21600000000001,
+              28.6036
+            ],
+            [
+              77.2176,
+              28.6036
+            ],
+            [
+              77.2176,
+              28.6052
+            ],
+            [
+              77.21600000000001,
+              28.6052
+            ],
+            [
+              77.21600000000001,
+              28.6036
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "29a1ee7afd8e4b66afb2003cd0ef7fd5",
+        "tileId": "S2_20240320_T3",
+        "changeType": "Clearance",
+        "confidence": 0.98,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "Vegetation loss / land clearance: \u0394NDVI_adj=-0.309, \u0394BSI=0.522",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.4053,
+        "DeltaNDBI": 0.4221,
+        "DeltaNDWI": 0.1713,
+        "DeltaBSI": 0.5217,
+        "DeltaGradient": 0.055
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.2176,
+              28.6036
+            ],
+            [
+              77.2192,
+              28.6036
+            ],
+            [
+              77.2192,
+              28.6052
+            ],
+            [
+              77.2176,
+              28.6052
+            ],
+            [
+              77.2176,
+              28.6036
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "64d57951161d4db8837bf401af0caff5",
+        "tileId": "S2_20240320_T3",
+        "changeType": "Clearance",
+        "confidence": 0.98,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "Vegetation loss / land clearance: \u0394NDVI_adj=-0.309, \u0394BSI=0.522",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.4053,
+        "DeltaNDBI": 0.4221,
+        "DeltaNDWI": 0.1713,
+        "DeltaBSI": 0.5217,
+        "DeltaGradient": 0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.2064,
+              28.602
+            ],
+            [
+              77.208,
+              28.602
+            ],
+            [
+              77.208,
+              28.6036
+            ],
+            [
+              77.2064,
+              28.6036
+            ],
+            [
+              77.2064,
+              28.602
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "6a948b6a0c5b4da7952f78099aa45588",
+        "tileId": "S2_20240320_T3",
+        "changeType": "Clearance",
+        "confidence": 0.98,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "Vegetation loss / land clearance: \u0394NDVI_adj=-0.412, \u0394BSI=0.614",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.508,
+        "DeltaNDBI": 0.4951,
+        "DeltaNDWI": 0.1516,
+        "DeltaBSI": 0.6142,
+        "DeltaGradient": 0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.208,
+              28.602
+            ],
+            [
+              77.20960000000001,
+              28.602
+            ],
+            [
+              77.20960000000001,
+              28.6036
+            ],
+            [
+              77.208,
+              28.6036
+            ],
+            [
+              77.208,
+              28.602
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "361f36db381d4f86b312a1d891666fce",
+        "tileId": "S2_20240320_T3",
+        "changeType": "Clearance",
+        "confidence": 0.98,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "Vegetation loss / land clearance: \u0394NDVI_adj=-0.412, \u0394BSI=0.614",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.508,
+        "DeltaNDBI": 0.4951,
+        "DeltaNDWI": 0.1516,
+        "DeltaBSI": 0.6142,
+        "DeltaGradient": 0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.2176,
+              28.602
+            ],
+            [
+              77.2192,
+              28.602
+            ],
+            [
+              77.2192,
+              28.6036
+            ],
+            [
+              77.2176,
+              28.6036
+            ],
+            [
+              77.2176,
+              28.602
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "daeb8ef61a6d4144aab3831d66331faa",
+        "tileId": "S2_20240320_T3",
+        "changeType": "Clearance",
+        "confidence": 0.98,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "Vegetation loss / land clearance: \u0394NDVI_adj=-0.309, \u0394BSI=0.522",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.4053,
+        "DeltaNDBI": 0.4221,
+        "DeltaNDWI": 0.1713,
+        "DeltaBSI": 0.5217,
+        "DeltaGradient": 0.055
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.2064,
+              28.6004
+            ],
+            [
+              77.208,
+              28.6004
+            ],
+            [
+              77.208,
+              28.602
+            ],
+            [
+              77.2064,
+              28.602
+            ],
+            [
+              77.2064,
+              28.6004
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "82b069ec3a444653bc92704af53de099",
+        "tileId": "S2_20240320_T3",
+        "changeType": "Clearance",
+        "confidence": 0.98,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "Vegetation loss / land clearance: \u0394NDVI_adj=-0.412, \u0394BSI=0.614",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.508,
+        "DeltaNDBI": 0.4951,
+        "DeltaNDWI": 0.1516,
+        "DeltaBSI": 0.6142,
+        "DeltaGradient": 0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.208,
+              28.6004
+            ],
+            [
+              77.20960000000001,
+              28.6004
+            ],
+            [
+              77.20960000000001,
+              28.602
+            ],
+            [
+              77.208,
+              28.602
+            ],
+            [
+              77.208,
+              28.6004
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "72bfa350356d4d3d832764aa5f7f6ab1",
+        "tileId": "S2_20240320_T3",
+        "changeType": "Clearance",
+        "confidence": 0.98,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "Vegetation loss / land clearance: \u0394NDVI_adj=-0.412, \u0394BSI=0.614",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.508,
+        "DeltaNDBI": 0.4951,
+        "DeltaNDWI": 0.1516,
+        "DeltaBSI": 0.6142,
+        "DeltaGradient": 0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.21600000000001,
+              28.602
+            ],
+            [
+              77.2176,
+              28.602
+            ],
+            [
+              77.2176,
+              28.6036
+            ],
+            [
+              77.21600000000001,
+              28.6036
+            ],
+            [
+              77.21600000000001,
+              28.602
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "0c6123c4d9404ce09a6f3ff06a39b541",
+        "tileId": "S2_20240320_T3",
+        "changeType": "Construction",
+        "confidence": 0.9615,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "New structural signature: \u0394NDBI=0.422, \u0394Grad=0.107",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.4053,
+        "DeltaNDBI": 0.4221,
+        "DeltaNDWI": 0.1713,
+        "DeltaBSI": 0.5217,
+        "DeltaGradient": 0.1068
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.21600000000001,
+              28.6052
+            ],
+            [
+              77.2176,
+              28.6052
+            ],
+            [
+              77.2176,
+              28.6068
+            ],
+            [
+              77.21600000000001,
+              28.6068
+            ],
+            [
+              77.21600000000001,
+              28.6052
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "92e6c90a60e9401cb2c505f66bf00f23",
+        "tileId": "S2_20240320_T3",
+        "changeType": "Construction",
+        "confidence": 0.9051,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "New structural signature: \u0394NDBI=0.254, \u0394Grad=0.134",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.236,
+        "DeltaNDBI": 0.2543,
+        "DeltaNDWI": 0.1335,
+        "DeltaBSI": 0.3222,
+        "DeltaGradient": 0.1336
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.2192,
+              28.602
+            ],
+            [
+              77.2208,
+              28.602
+            ],
+            [
+              77.2208,
+              28.6036
+            ],
+            [
+              77.2192,
+              28.6036
+            ],
+            [
+              77.2192,
+              28.602
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "7d051d50c70f4054ab67299bc6eaea61",
+        "tileId": "S2_20240320_T3",
+        "changeType": "Construction",
+        "confidence": 0.9051,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "New structural signature: \u0394NDBI=0.254, \u0394Grad=0.134",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.236,
+        "DeltaNDBI": 0.2543,
+        "DeltaNDWI": 0.1335,
+        "DeltaBSI": 0.3222,
+        "DeltaGradient": 0.1336
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.20320000000001,
+              28.592399999999998
+            ],
+            [
+              77.2048,
+              28.592399999999998
+            ],
+            [
+              77.2048,
+              28.594
+            ],
+            [
+              77.20320000000001,
+              28.594
+            ],
+            [
+              77.20320000000001,
+              28.592399999999998
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "a5ff6da10671425ab8a5734ec39b19a3",
+        "tileId": "S2_20240320_T3",
+        "changeType": "WaterExtentVariation",
+        "confidence": 0.8993,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 192,
+        "processingNotes": "Water expansion / inundation: \u0394NDWI=0.373",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.1519,
+        "DeltaNDBI": 0.006,
+        "DeltaNDWI": 0.3733,
+        "DeltaBSI": 0.108,
+        "DeltaGradient": -0.0016
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.20320000000001,
+              28.590799999999998
+            ],
+            [
+              77.2048,
+              28.590799999999998
+            ],
+            [
+              77.2048,
+              28.592399999999998
+            ],
+            [
+              77.20320000000001,
+              28.592399999999998
+            ],
+            [
+              77.20320000000001,
+              28.590799999999998
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "2fd3af2c5e6b4fd195fc8e0438fdab0c",
+        "tileId": "S2_20240320_T3",
+        "changeType": "WaterExtentVariation",
+        "confidence": 0.8993,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 192,
+        "processingNotes": "Water expansion / inundation: \u0394NDWI=0.373",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.1519,
+        "DeltaNDBI": 0.006,
+        "DeltaNDWI": 0.3733,
+        "DeltaBSI": 0.108,
+        "DeltaGradient": -0.0067
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.2176,
+              28.6052
+            ],
+            [
+              77.2192,
+              28.6052
+            ],
+            [
+              77.2192,
+              28.6068
+            ],
+            [
+              77.2176,
+              28.6068
+            ],
+            [
+              77.2176,
+              28.6052
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "a54a6af0dda840d6b22b901a09d66848",
+        "tileId": "S2_20240320_T3",
+        "changeType": "Construction",
+        "confidence": 0.8957,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "New structural signature: \u0394NDBI=0.254, \u0394Grad=0.110",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.236,
+        "DeltaNDBI": 0.2543,
+        "DeltaNDWI": 0.1335,
+        "DeltaBSI": 0.3222,
+        "DeltaGradient": 0.11
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.2192,
+              28.6036
+            ],
+            [
+              77.2208,
+              28.6036
+            ],
+            [
+              77.2208,
+              28.6052
+            ],
+            [
+              77.2192,
+              28.6052
+            ],
+            [
+              77.2192,
+              28.6036
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "1abdc9d754034fa3b7e45f8945e8de75",
+        "tileId": "S2_20240320_T3",
+        "changeType": "Construction",
+        "confidence": 0.8957,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "New structural signature: \u0394NDBI=0.254, \u0394Grad=0.110",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.236,
+        "DeltaNDBI": 0.2543,
+        "DeltaNDWI": 0.1335,
+        "DeltaBSI": 0.3222,
+        "DeltaGradient": 0.11
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.2064,
+              28.6036
+            ],
+            [
+              77.208,
+              28.6036
+            ],
+            [
+              77.208,
+              28.6052
+            ],
+            [
+              77.2064,
+              28.6052
+            ],
+            [
+              77.2064,
+              28.6036
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "27da4be518f147d99aa2f734b161cd34",
+        "tileId": "S2_20240320_T3",
+        "changeType": "Construction",
+        "confidence": 0.8955,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "New structural signature: \u0394NDBI=0.189, \u0394Grad=0.175",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.177,
+        "DeltaNDBI": 0.1887,
+        "DeltaNDWI": 0.1097,
+        "DeltaBSI": 0.2456,
+        "DeltaGradient": 0.175
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.208,
+              28.6036
+            ],
+            [
+              77.20960000000001,
+              28.6036
+            ],
+            [
+              77.20960000000001,
+              28.6052
+            ],
+            [
+              77.208,
+              28.6052
+            ],
+            [
+              77.208,
+              28.6036
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "2fd0c35a434743d4a2302c9c817e12ef",
+        "tileId": "S2_20240320_T3",
+        "changeType": "Construction",
+        "confidence": 0.8955,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "New structural signature: \u0394NDBI=0.189, \u0394Grad=0.175",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.177,
+        "DeltaNDBI": 0.1887,
+        "DeltaNDWI": 0.1097,
+        "DeltaBSI": 0.2456,
+        "DeltaGradient": 0.175
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.2048,
+              28.602
+            ],
+            [
+              77.2064,
+              28.602
+            ],
+            [
+              77.2064,
+              28.6036
+            ],
+            [
+              77.2048,
+              28.6036
+            ],
+            [
+              77.2048,
+              28.602
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "4ca32aa986ba4c0ebacfaa1f40d7c725",
+        "tileId": "S2_20240320_T3",
+        "changeType": "Construction",
+        "confidence": 0.8955,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "New structural signature: \u0394NDBI=0.189, \u0394Grad=0.175",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.177,
+        "DeltaNDBI": 0.1887,
+        "DeltaNDWI": 0.1097,
+        "DeltaBSI": 0.2456,
+        "DeltaGradient": 0.175
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.20960000000001,
+              28.602
+            ],
+            [
+              77.2112,
+              28.602
+            ],
+            [
+              77.2112,
+              28.6036
+            ],
+            [
+              77.20960000000001,
+              28.6036
+            ],
+            [
+              77.20960000000001,
+              28.602
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "6ab3352278a34ef6afc0cd7ad18c62b9",
+        "tileId": "S2_20240320_T3",
+        "changeType": "Construction",
+        "confidence": 0.8955,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "New structural signature: \u0394NDBI=0.189, \u0394Grad=0.175",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.177,
+        "DeltaNDBI": 0.1887,
+        "DeltaNDWI": 0.1097,
+        "DeltaBSI": 0.2456,
+        "DeltaGradient": 0.175
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.2048,
+              28.6004
+            ],
+            [
+              77.2064,
+              28.6004
+            ],
+            [
+              77.2064,
+              28.602
+            ],
+            [
+              77.2048,
+              28.602
+            ],
+            [
+              77.2048,
+              28.6004
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "1a34ffe538bf43238fa204a7e6494482",
+        "tileId": "S2_20240320_T3",
+        "changeType": "Construction",
+        "confidence": 0.8955,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "New structural signature: \u0394NDBI=0.189, \u0394Grad=0.175",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.177,
+        "DeltaNDBI": 0.1887,
+        "DeltaNDWI": 0.1097,
+        "DeltaBSI": 0.2456,
+        "DeltaGradient": 0.175
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.20960000000001,
+              28.6004
+            ],
+            [
+              77.2112,
+              28.6004
+            ],
+            [
+              77.2112,
+              28.602
+            ],
+            [
+              77.20960000000001,
+              28.602
+            ],
+            [
+              77.20960000000001,
+              28.6004
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "b373c629fec946169e88f5673b3f07cd",
+        "tileId": "S2_20240320_T3",
+        "changeType": "Construction",
+        "confidence": 0.8955,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "New structural signature: \u0394NDBI=0.189, \u0394Grad=0.175",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.177,
+        "DeltaNDBI": 0.1887,
+        "DeltaNDWI": 0.1097,
+        "DeltaBSI": 0.2456,
+        "DeltaGradient": 0.175
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.2064,
+              28.5988
+            ],
+            [
+              77.208,
+              28.5988
+            ],
+            [
+              77.208,
+              28.6004
+            ],
+            [
+              77.2064,
+              28.6004
+            ],
+            [
+              77.2064,
+              28.5988
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "464f953a156f4892a37efdc731a7992e",
+        "tileId": "S2_20240320_T3",
+        "changeType": "Construction",
+        "confidence": 0.8955,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "New structural signature: \u0394NDBI=0.189, \u0394Grad=0.175",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.177,
+        "DeltaNDBI": 0.1887,
+        "DeltaNDWI": 0.1097,
+        "DeltaBSI": 0.2456,
+        "DeltaGradient": 0.175
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.208,
+              28.5988
+            ],
+            [
+              77.20960000000001,
+              28.5988
+            ],
+            [
+              77.20960000000001,
+              28.6004
+            ],
+            [
+              77.208,
+              28.6004
+            ],
+            [
+              77.208,
+              28.5988
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "71b9f7edd9d14eb687debdf93bd5eace",
+        "tileId": "S2_20240320_T3",
+        "changeType": "Construction",
+        "confidence": 0.8955,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "New structural signature: \u0394NDBI=0.189, \u0394Grad=0.175",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.177,
+        "DeltaNDBI": 0.1887,
+        "DeltaNDWI": 0.1097,
+        "DeltaBSI": 0.2456,
+        "DeltaGradient": 0.175
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.2128,
+              28.594
+            ],
+            [
+              77.2144,
+              28.594
+            ],
+            [
+              77.2144,
+              28.5956
+            ],
+            [
+              77.2128,
+              28.5956
+            ],
+            [
+              77.2128,
+              28.594
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "4482a9902fbd40bbbb9ec44eefaf8f37",
+        "tileId": "S2_20240320_T3",
+        "changeType": "Construction",
+        "confidence": 0.8918,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "New structural signature: \u0394NDBI=0.215, \u0394Grad=0.140",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.2123,
+        "DeltaNDBI": 0.2145,
+        "DeltaNDWI": 0.1203,
+        "DeltaBSI": 0.2831,
+        "DeltaGradient": 0.14
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.2144,
+              28.594
+            ],
+            [
+              77.21600000000001,
+              28.594
+            ],
+            [
+              77.21600000000001,
+              28.5956
+            ],
+            [
+              77.2144,
+              28.5956
+            ],
+            [
+              77.2144,
+              28.594
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "de7f888ef96b43e3a8bd23cc94729b93",
+        "tileId": "S2_20240320_T3",
+        "changeType": "Construction",
+        "confidence": 0.8918,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "New structural signature: \u0394NDBI=0.215, \u0394Grad=0.140",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.2123,
+        "DeltaNDBI": 0.2145,
+        "DeltaNDWI": 0.1203,
+        "DeltaBSI": 0.2831,
+        "DeltaGradient": 0.14
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.21600000000001,
+              28.594
+            ],
+            [
+              77.2176,
+              28.594
+            ],
+            [
+              77.2176,
+              28.5956
+            ],
+            [
+              77.21600000000001,
+              28.5956
+            ],
+            [
+              77.21600000000001,
+              28.594
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "ea96d0736708409c9fc31647db9e0f87",
+        "tileId": "S2_20240320_T3",
+        "changeType": "Construction",
+        "confidence": 0.8918,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "New structural signature: \u0394NDBI=0.215, \u0394Grad=0.140",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.2123,
+        "DeltaNDBI": 0.2145,
+        "DeltaNDWI": 0.1203,
+        "DeltaBSI": 0.2831,
+        "DeltaGradient": 0.14
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.2176,
+              28.594
+            ],
+            [
+              77.2192,
+              28.594
+            ],
+            [
+              77.2192,
+              28.5956
+            ],
+            [
+              77.2176,
+              28.5956
+            ],
+            [
+              77.2176,
+              28.594
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "2afc3f2e63034fa09023c458aa775b1f",
+        "tileId": "S2_20240320_T3",
+        "changeType": "Construction",
+        "confidence": 0.8918,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "New structural signature: \u0394NDBI=0.215, \u0394Grad=0.140",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.2123,
+        "DeltaNDBI": 0.2145,
+        "DeltaNDWI": 0.1203,
+        "DeltaBSI": 0.2831,
+        "DeltaGradient": 0.14
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.2192,
+              28.594
+            ],
+            [
+              77.2208,
+              28.594
+            ],
+            [
+              77.2208,
+              28.5956
+            ],
+            [
+              77.2192,
+              28.5956
+            ],
+            [
+              77.2192,
+              28.594
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "d417f2929732477d928bc257ad796d95",
+        "tileId": "S2_20240320_T3",
+        "changeType": "Construction",
+        "confidence": 0.8918,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "New structural signature: \u0394NDBI=0.215, \u0394Grad=0.140",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.2123,
+        "DeltaNDBI": 0.2145,
+        "DeltaNDWI": 0.1203,
+        "DeltaBSI": 0.2831,
+        "DeltaGradient": 0.14
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.2208,
+              28.594
+            ],
+            [
+              77.22240000000001,
+              28.594
+            ],
+            [
+              77.22240000000001,
+              28.5956
+            ],
+            [
+              77.2208,
+              28.5956
+            ],
+            [
+              77.2208,
+              28.594
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "61b3e32aa7a742a1a11eb5f493f8ef0e",
+        "tileId": "S2_20240320_T3",
+        "changeType": "Construction",
+        "confidence": 0.8843,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "New structural signature: \u0394NDBI=0.183, \u0394Grad=0.153",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.1759,
+        "DeltaNDBI": 0.1825,
+        "DeltaNDWI": 0.1141,
+        "DeltaBSI": 0.243,
+        "DeltaGradient": 0.1531
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.20320000000001,
+              28.589199999999998
+            ],
+            [
+              77.2048,
+              28.589199999999998
+            ],
+            [
+              77.2048,
+              28.590799999999998
+            ],
+            [
+              77.20320000000001,
+              28.590799999999998
+            ],
+            [
+              77.20320000000001,
+              28.589199999999998
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "2a193af08541401a926192be097fb68a",
+        "tileId": "S2_20240320_T3",
+        "changeType": "WaterExtentVariation",
+        "confidence": 0.8438,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-03-20T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 192,
+        "processingNotes": "Water expansion / inundation: \u0394NDWI=0.234",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.1093,
+        "DeltaNDBI": 0.0462,
+        "DeltaNDWI": 0.2345,
+        "DeltaBSI": 0.1153,
+        "DeltaGradient": 0.0066
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.2128,
+              28.5956
+            ],
+            [
+              77.2144,
+              28.5956
+            ],
+            [
+              77.2144,
+              28.5972
+            ],
+            [
+              77.2128,
+              28.5972
+            ],
+            [
+              77.2128,
+              28.5956
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "59ff1d4c484d4a2a81616c869c648eb7",
+        "tileId": "S2_20240320_T3",
+        "changeType": "RoadDevelopment",
+        "confidence": 0.77,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-04-25T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "Linear infrastructure development: \u0394Grad=0.140, \u0394Reflectance=0.170",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.1638,
+        "DeltaNDBI": 0.1719,
+        "DeltaNDWI": 0.1121,
+        "DeltaBSI": 0.2296,
+        "DeltaGradient": 0.14
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.2144,
+              28.5956
+            ],
+            [
+              77.21600000000001,
+              28.5956
+            ],
+            [
+              77.21600000000001,
+              28.5972
+            ],
+            [
+              77.2144,
+              28.5972
+            ],
+            [
+              77.2144,
+              28.5956
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "fa76c12041d045e88b51a053146ddecd",
+        "tileId": "S2_20240320_T3",
+        "changeType": "RoadDevelopment",
+        "confidence": 0.77,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-04-25T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "Linear infrastructure development: \u0394Grad=0.140, \u0394Reflectance=0.170",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.1638,
+        "DeltaNDBI": 0.1719,
+        "DeltaNDWI": 0.1121,
+        "DeltaBSI": 0.2296,
+        "DeltaGradient": 0.14
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.21600000000001,
+              28.5956
+            ],
+            [
+              77.2176,
+              28.5956
+            ],
+            [
+              77.2176,
+              28.5972
+            ],
+            [
+              77.21600000000001,
+              28.5972
+            ],
+            [
+              77.21600000000001,
+              28.5956
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "c6e864e97fe440d093c227b975405a9c",
+        "tileId": "S2_20240320_T3",
+        "changeType": "RoadDevelopment",
+        "confidence": 0.77,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-04-25T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "Linear infrastructure development: \u0394Grad=0.140, \u0394Reflectance=0.170",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.1638,
+        "DeltaNDBI": 0.1719,
+        "DeltaNDWI": 0.1121,
+        "DeltaBSI": 0.2296,
+        "DeltaGradient": 0.14
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.2176,
+              28.5956
+            ],
+            [
+              77.2192,
+              28.5956
+            ],
+            [
+              77.2192,
+              28.5972
+            ],
+            [
+              77.2176,
+              28.5972
+            ],
+            [
+              77.2176,
+              28.5956
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "5cc2db2034194ba0908bdcf4ab4cfce1",
+        "tileId": "S2_20240320_T3",
+        "changeType": "RoadDevelopment",
+        "confidence": 0.77,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-04-25T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "Linear infrastructure development: \u0394Grad=0.140, \u0394Reflectance=0.170",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.1638,
+        "DeltaNDBI": 0.1719,
+        "DeltaNDWI": 0.1121,
+        "DeltaBSI": 0.2296,
+        "DeltaGradient": 0.14
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.2192,
+              28.5956
+            ],
+            [
+              77.2208,
+              28.5956
+            ],
+            [
+              77.2208,
+              28.5972
+            ],
+            [
+              77.2192,
+              28.5972
+            ],
+            [
+              77.2192,
+              28.5956
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "199e134b9c9647f7b9c81964b0493397",
+        "tileId": "S2_20240320_T3",
+        "changeType": "RoadDevelopment",
+        "confidence": 0.77,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-04-25T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "Linear infrastructure development: \u0394Grad=0.140, \u0394Reflectance=0.170",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.1638,
+        "DeltaNDBI": 0.1719,
+        "DeltaNDWI": 0.1121,
+        "DeltaBSI": 0.2296,
+        "DeltaGradient": 0.14
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.2208,
+              28.5956
+            ],
+            [
+              77.22240000000001,
+              28.5956
+            ],
+            [
+              77.22240000000001,
+              28.5972
+            ],
+            [
+              77.2208,
+              28.5972
+            ],
+            [
+              77.2208,
+              28.5956
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "changeId": "c4f9f0d70af14c3586b5412f231e120a",
+        "tileId": "S2_20240320_T3",
+        "changeType": "RoadDevelopment",
+        "confidence": 0.7678,
+        "timestampT1": "2024-01-10T10:30:00Z",
+        "timestampT2": "2024-03-20T10:30:00Z",
+        "earliestObservation": "2024-04-25T10:30:00Z",
+        "areaSqMeters": 25600,
+        "affectedPixels": 256,
+        "processingNotes": "Linear infrastructure development: \u0394Grad=0.136, \u0394Reflectance=0.153",
+        "confirmedByAnalyst": false,
+        "rejectedByAnalyst": false,
+        "analystNotes": "",
+        "provenance": {
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:generatedAtTime": "2026-09-04T17:27:13Z",
+          "prov:primarySource": "S2_20240320_T3"
+        },
+        "DeltaNDVI": -0.1395,
+        "DeltaNDBI": 0.1505,
+        "DeltaNDWI": 0.108,
+        "DeltaBSI": 0.2029,
+        "DeltaGradient": 0.1356
+      }
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/obj/Debug/net10.0/GeoSemanticSat.Engine.csproj.AssemblyReference.cache
+/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/obj/Debug/net10.0/GeoSemanticSat.Engine.GeneratedMSBuildEditorConfig.editorconfig
+/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/obj/Debug/net10.0/GeoSemanticSat.Engine.AssemblyInfoInputs.cache
+/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/obj/Debug/net10.0/GeoSemanticSat.Engine.AssemblyInfo.cs
+/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/obj/Debug/net10.0/GeoSemanticSat.Engine.csproj.CoreCompileInputs.cache
+/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/bin/Debug/net10.0/GeoSemanticSat.Engine.deps.json
+/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/bin/Debug/net10.0/GeoSemanticSat.Engine.dll
+/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/bin/Debug/net10.0/GeoSemanticSat.Engine.pdb
+/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/bin/Debug/net10.0/GeoSemanticSat.Core.dll
+/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/bin/Debug/net10.0/GeoSemanticSat.Core.pdb
+/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/obj/Debug/net10.0/GeoSeman.620777BA.Up2Date
+/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/obj/Debug/net10.0/GeoSemanticSat.Engine.dll
+/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/obj/Debug/net10.0/refint/GeoSemanticSat.Engine.dll
+/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/obj/Debug/net10.0/GeoSemanticSat.Engine.pdb
+/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/obj/Debug/net10.0/ref/GeoSemanticSat.Engine.dll

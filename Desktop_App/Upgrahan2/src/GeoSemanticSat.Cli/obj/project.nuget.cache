@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "DXKFnKzp6QY=",
+  "success": true,
+  "projectFilePath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Cli/GeoSemanticSat.Cli.csproj",
+  "expectedPackageFiles": [
+    "/home/non_qualities/.nuget/packages/microsoft.ml.onnxruntime/1.20.1/microsoft.ml.onnxruntime.1.20.1.nupkg.sha512",
+    "/home/non_qualities/.nuget/packages/microsoft.ml.onnxruntime.managed/1.20.1/microsoft.ml.onnxruntime.managed.1.20.1.nupkg.sha512"
+  ],
+  "logs": []
+}

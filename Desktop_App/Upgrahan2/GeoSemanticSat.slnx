@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/GeoSemanticSat.Cli/GeoSemanticSat.Cli.csproj" />
+    <Project Path="src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj" />
+    <Project Path="src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj" />
+    <Project Path="src/GeoSemanticSat.Tests/GeoSemanticSat.Tests.csproj" />
+    <Project Path="src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj" />
+  </Folder>
+</Solution>

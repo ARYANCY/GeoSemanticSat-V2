@@ -1,0 +1,6 @@
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/publish/win-x64/GeoSemanticSat.UI.pdb
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/publish/win-x64/onnxruntime.lib
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/publish/win-x64/onnxruntime_providers_shared.lib
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/publish/win-x64/GeoSemanticSat.Core.pdb
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/publish/win-x64/GeoSemanticSat.Engine.pdb
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/publish/win-x64/GeoSemanticSat.UI.exe
