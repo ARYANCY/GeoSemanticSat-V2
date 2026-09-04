@@ -1,0 +1,1 @@
+"""Offline satellite intelligence backend."""

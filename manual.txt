@@ -1,0 +1,17 @@
+SIH 26227 OFFLINE BACKEND MANUAL
+================================
+Purpose: location-centred satellite ingestion, timelines, retrieval, change evidence, reviews and provenance for Northeast India, fully offline after staging.
+
+Architecture: FastAPI REST API; SQLAlchemy tables for locations, sources, observations, runs, embeddings, events and reviews; local GeoTIFF storage. SQLite is the zero-service demo default. Production: set DATABASE_URL=postgresql+psycopg://satintel:password@db:5432/satintel, use PostGIS Geometry geometry/footprint columns with GIST indexes, and retain sensor/date/source indexes. docker-compose.yml provides API and PostGIS service definitions.
+
+Install/offline: copy .env.example to .env. On a connected staging system download wheels, Docker images, datasets and licensed model weights; transfer them to the air-gapped system. Run pip install --no-index --find-links WHEELHOUSE -r requirements.txt, then uvicorn app.main:app --host 0.0.0.0 --port 8000. Set OFFLINE_MODE=true. No Hugging Face, cloud, maps or external inference is called.
+
+Models: stage RemoteCLIP at models/remoteclip/weights.pt and implement a licensed local adapter matching the image/text embedding boundary. Stage Prithvi/Clay under models/ and configure EO_MODEL_NAME and EO_MODEL_WEIGHTS_PATH. The included histogram image embedding supports testable image similarity only and must never be represented as semantic AI. Text search returns 503 until RemoteCLIP is connected. Change analysis is normalized pixel-difference baseline evidence (NO_CHANGE/OTHER); it needs trained/validated change models before use for assertions.
+
+Ingestion: put .tif/.tiff files below data/. POST /api/v1/ingest: {"path":"image.tif","sensor":"Sentinel-2","acquisition_date":"2025-01-01","location_name":"Site A"}. It validates containment/CRS/size, extracts metadata, creates a location/observation/run, and adds an embedding. This is incremental. Build a FAISS acceleration index from DB embeddings with scripts/build_index.py (add/maintain it after batches).
+
+API: GET /health; GET /system/status; POST /api/v1/ingest; GET /api/v1/ingest/{id}; GET /api/v1/observations; POST /api/v1/search/image; POST /api/v1/search/text; POST /api/v1/search/hybrid; GET /api/v1/locations/{id}; GET /api/v1/locations/{id}/timeline; POST /api/v1/change/analyze; GET /api/v1/change/{id}; POST /api/v1/change/{id}/review; GET /api/v1/reviews; POST /api/v1/similar-locations; GET /api/v1/processing/{id}; GET /api/v1/change/{id}/provenance.
+
+Provenance: preserve source raster relative path, source, acquisition, sensor, CRS, preprocessing, model/version, run algorithm, before/after evidence and analyst decision. Teams must additionally record dataset licence/version, model licence/version/weight SHA256, and validation evidence.
+
+Next work: Alembic migrations; PostGIS spatial filters and AOIs; tile/windows; sensor preprocessors/masks; FAISS incremental persistence; job worker; EO/temporal adapters; evidence-fusion ranking configuration; test fixtures and trained/labelled validation. Add a change class in configuration/enums plus a trained classifier and tests—do not relabel baseline output.

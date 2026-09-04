@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Local configuration and secrets
+.env
+
+# Local satellite data, generated indexes, and staged model weights
+data/*
+!data/.gitkeep
+models/*
+!models/.gitkeep
+indexes/*
+!indexes/.gitkeep
+
+# Editors and operating systems
+.vscode/
+.idea/
+*.log
+Thumbs.db
