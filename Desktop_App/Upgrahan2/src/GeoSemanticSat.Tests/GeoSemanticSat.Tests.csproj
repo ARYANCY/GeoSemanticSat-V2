@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\GeoSemanticSat.Core\GeoSemanticSat.Core.csproj" />
     <ProjectReference Include="..\GeoSemanticSat.Engine\GeoSemanticSat.Engine.csproj" />
+    <ProjectReference Include="..\GeoSemanticSat.UI\GeoSemanticSat.UI.csproj" />
   </ItemGroup>
 
 </Project>

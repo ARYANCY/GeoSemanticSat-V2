@@ -78,7 +78,7 @@ public static class BenchmarkRunner
         var bandsToWrite = new List<SpectralBand> { SpectralBand.Red, SpectralBand.Green, SpectralBand.Blue, SpectralBand.NIR, SpectralBand.SWIR1 };
         GeoTiffWriter.WriteGeoTiff(t1Path, t1, bandsToWrite);
         GeoTiffWriter.WriteGeoTiff(t3Path, t3, bandsToWrite);
-        Console.WriteLine($"   ✓ Generated & saved GeoTIFFs: {new FileInfo(t1Path).Length / 1024} KB each with WGS84 GeoKeys.");
+        Console.WriteLine($"   [OK] Generated & saved GeoTIFFs: {new FileInfo(t1Path).Length / 1024} KB each with WGS84 GeoKeys.");
 
         // 2. Indexing & Incremental Ingestion Performance
         Console.WriteLine("\n[2/6] Evaluating Index Build & Incremental Ingestion...");
@@ -89,19 +89,19 @@ public static class BenchmarkRunner
         int patchesT1 = searchEngine.IngestTile(t1, patchSize: 32);
         stopwatch.Stop();
         long buildTimeMs = stopwatch.ElapsedMilliseconds;
-        Console.WriteLine($"   ✓ Initial Index Build: {patchesT1} patches indexed in {buildTimeMs} ms ({(double)buildTimeMs / patchesT1:F2} ms/patch).");
+        Console.WriteLine($"   [OK] Initial Index Build: {patchesT1} patches indexed in {buildTimeMs} ms ({(double)buildTimeMs / patchesT1:F2} ms/patch).");
 
         stopwatch.Restart();
         int patchesT3 = searchEngine.IngestTile(t3, patchSize: 32);
         stopwatch.Stop();
         long incrementalTimeMs = stopwatch.ElapsedMilliseconds;
-        Console.WriteLine($"   ✓ Incremental Addition: {patchesT3} patches added in {incrementalTimeMs} ms without rebuilding existing index!");
+        Console.WriteLine($"   [OK] Incremental Addition: {patchesT3} patches added in {incrementalTimeMs} ms without rebuilding existing index!");
 
         string indexPath = Path.Combine(outputDir, "vector_index.bin");
         index.SaveIndex(indexPath);
         long indexSizeBytes = new FileInfo(indexPath).Length;
         double bytesPerPatch = (double)indexSizeBytes / index.Count;
-        Console.WriteLine($"   ✓ Storage Footprint: {indexSizeBytes / 1024.0:F2} KB total ({bytesPerPatch:F1} bytes/patch for {index.Count} patches).");
+        Console.WriteLine($"   [OK] Storage Footprint: {indexSizeBytes / 1024.0:F2} KB total ({bytesPerPatch:F1} bytes/patch for {index.Count} patches).");
 
         // 3. Semantic Retrieval Evaluation
         Console.WriteLine("\n[3/6] Evaluating Semantic & Multimodal Retrieval Latency & Relevance...");
@@ -127,7 +127,7 @@ public static class BenchmarkRunner
         queryLatencies.Sort();
         double p50 = queryLatencies[queryLatencies.Count / 2];
         double p95 = queryLatencies[(int)(queryLatencies.Count * 0.95)];
-        Console.WriteLine($"   ✓ Retrieval Latency: P50 = {p50:F1} µs, P95 = {p95:F1} µs (Sub-millisecond query execution!)");
+        Console.WriteLine($"   [OK] Retrieval Latency: P50 = {p50:F1} µs, P95 = {p95:F1} µs (Sub-millisecond query execution!)");
 
         // 4. Multi-Temporal Change Detection & False-Alarm Suppression
         Console.WriteLine("\n[4/6] Evaluating Change Detection & False-Alarm Suppression (T1 -> T3)...");
@@ -159,9 +159,9 @@ public static class BenchmarkRunner
         double recall = Math.Min(1.0, (double)tp / (groundTruthZones * 4)); // each 40x40 zone has multiple 16x16 patches
         double f1 = (precision + recall) > 0 ? 2 * (precision * recall) / (precision + recall) : 0;
 
-        Console.WriteLine($"   ✓ Detection Completed in {changeDetectionMs} ms. Found {changes.Count} change candidates.");
-        Console.WriteLine($"   ✓ Precision: {precision * 100:F1}%, Recall: {recall * 100:F1}%, F1-Score: {f1:F2}");
-        Console.WriteLine($"   ✓ False Alarms Rejected: Cloud/shadow edge = 100%, Seasonal NDVI phenology = 100%, 1-px Jitter = 100%.");
+        Console.WriteLine($"   [OK] Detection Completed in {changeDetectionMs} ms. Found {changes.Count} change candidates.");
+        Console.WriteLine($"   [OK] Precision: {precision * 100:F1}%, Recall: {recall * 100:F1}%, F1-Score: {f1:F2}");
+        Console.WriteLine($"   [OK] False Alarms Rejected: Cloud/shadow edge = 100%, Seasonal NDVI phenology = 100%, 1-px Jitter = 100%.");
 
         // 5. Earliest Observation Onset Estimation
         Console.WriteLine("\n[5/6] Evaluating Earliest Usable Observation Estimation across Time Series...");
@@ -170,18 +170,18 @@ public static class BenchmarkRunner
         if (constructionChange != null)
         {
             var earliest = OnsetEstimator.EstimateEarliestObservation(timeSeries, constructionChange.Bounds, ChangeType.Construction);
-            Console.WriteLine($"   ✓ Construction Target Bounds: {constructionChange.Bounds}");
-            Console.WriteLine($"   ✓ Ground-Truth Earliest Usable Observation: {t3.AcquisitionTimestamp:yyyy-MM-dd}");
-            Console.WriteLine($"   ✓ Estimated Earliest Observation:         {earliest:yyyy-MM-dd}");
+            Console.WriteLine($"   [OK] Construction Target Bounds: {constructionChange.Bounds}");
+            Console.WriteLine($"   [OK] Ground-Truth Earliest Usable Observation: {t3.AcquisitionTimestamp:yyyy-MM-dd}");
+            Console.WriteLine($"   [OK] Estimated Earliest Observation:         {earliest:yyyy-MM-dd}");
             bool onsetCorrect = earliest.Date == t3.AcquisitionTimestamp.Date;
-            Console.WriteLine($"   ✓ Earliest Observation Onset Accuracy: {(onsetCorrect ? "100% MATCH" : "DISCREPANCY")}");
+            Console.WriteLine($"   [OK] Earliest Observation Onset Accuracy: {(onsetCorrect ? "100% MATCH" : "DISCREPANCY")}");
         }
 
         // 6. Discovery & Unsupervised Clustering
         Console.WriteLine("\n[6/6] Evaluating Unsupervised Discovery & Clustering...");
         var allPatches = index.GetAllPatches();
         var clusters = SpatialSemanticClusterer.ClusterSites(allPatches, epsCosineDistance: 0.25, minPts: 2);
-        Console.WriteLine($"   ✓ Discovered {clusters.Count} spatial-semantic clusters across AOI:");
+        Console.WriteLine($"   [OK] Discovered {clusters.Count} spatial-semantic clusters across AOI:");
         foreach (var cl in clusters.Take(3))
         {
             Console.WriteLine($"      - Cluster {cl.ClusterId}: \"{cl.Label}\" with {cl.Members.Count} sites, Cohesion={cl.CohesionScore}");

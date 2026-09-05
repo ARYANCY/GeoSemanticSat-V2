@@ -162,8 +162,9 @@ public class GeoTiffReader
                 int stripBytes = s < stripByteCounts.Count ? (int)stripByteCounts[s] : (int)(fs.Length - stripOffsets[s]);
                 byte[] raw = reader.ReadBytes(stripBytes);
 
-                int rowsInStrip = Math.Min(height - currentY, stripBytes / (width * samplesPerPixel * (bitsPerSample / 8)));
-                if (rowsInStrip <= 0) rowsInStrip = 1;
+                int bytesPerSampleUnit = Math.Max(1, bitsPerSample / 8);
+                int bytesPerRow = Math.Max(1, width * samplesPerPixel * bytesPerSampleUnit);
+                int rowsInStrip = Math.Min(height - currentY, Math.Max(1, stripBytes / bytesPerRow));
 
                 int byteIndex = 0;
                 for (int y = currentY; y < currentY + rowsInStrip && y < height; y++)

@@ -4,5 +4,27 @@
              RequestedThemeVariant="Dark">
     <Application.Styles>
         <FluentTheme />
+        <!-- Sharp Military Command & Control Styling: 0 Border Radius Globally -->
+        <Style Selector="Button">
+            <Setter Property="CornerRadius" Value="0" />
+        </Style>
+        <Style Selector="TextBox">
+            <Setter Property="CornerRadius" Value="0" />
+        </Style>
+        <Style Selector="ComboBox">
+            <Setter Property="CornerRadius" Value="0" />
+        </Style>
+        <Style Selector="Border">
+            <Setter Property="CornerRadius" Value="0" />
+        </Style>
+        <Style Selector="TabItem">
+            <Setter Property="CornerRadius" Value="0" />
+        </Style>
+        <Style Selector="ListBoxItem">
+            <Setter Property="CornerRadius" Value="0" />
+        </Style>
+        <Style Selector="ProgressBar">
+            <Setter Property="CornerRadius" Value="0" />
+        </Style>
     </Application.Styles>
 </Application>
