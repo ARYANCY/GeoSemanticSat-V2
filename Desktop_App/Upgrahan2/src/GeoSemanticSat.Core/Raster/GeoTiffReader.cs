@@ -233,7 +233,7 @@ public class GeoTiffReader
         SpectralBand[] opticalOrder = platform switch
         {
             SensorPlatform.Sentinel2_Optical when samplesCount >= 4 => new[] { SpectralBand.Blue, SpectralBand.Green, SpectralBand.Red, SpectralBand.NIR, SpectralBand.SWIR1, SpectralBand.SWIR2, SpectralBand.Quality_QA },
-            SensorPlatform.Landsat_Optical when samplesCount >= 4 => new[] { SpectralBand.Blue, SpectralBand.Green, SpectralBand.Red, SpectralBand.NIR, SpectralBand.SWIR1, SpectralBand.SWIR2 },
+            SensorPlatform.Landsat8_9 when samplesCount >= 4 => new[] { SpectralBand.Blue, SpectralBand.Green, SpectralBand.Red, SpectralBand.NIR, SpectralBand.SWIR1, SpectralBand.SWIR2 },
             _ => new[] { SpectralBand.Red, SpectralBand.Green, SpectralBand.Blue, SpectralBand.NIR, SpectralBand.SWIR1, SpectralBand.SWIR2, SpectralBand.Quality_QA }
         };
 

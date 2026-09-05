@@ -3,7 +3,8 @@
         xmlns:controls="clr-namespace:GeoSemanticSat.UI.Controls"
         x:Class="GeoSemanticSat.UI.MainWindow"
         Title="GeoSemanticSat - Satellite Semantic Retrieval &amp; Multi-Temporal Change Analysis Studio"
-        Width="1420" Height="930"
+        Width="1440" Height="920"
+        MinWidth="760" MinHeight="560"
         WindowStartupLocation="CenterScreen"
         Background="#08090C"
         KeyDown="OnWindowKeyDown">
@@ -11,7 +12,8 @@
     <Grid RowDefinitions="Auto, Auto, *">
         <!-- TOP HEADER: PRODUCT & OPERATIONAL STATUS -->
         <Border Grid.Row="0" Background="#0F1015" BorderBrush="#1C1D24" BorderThickness="0,0,0,1" Padding="18,10">
-            <Grid ColumnDefinitions="Auto, *, Auto">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                <Grid MinWidth="1100" ColumnDefinitions="Auto, *, Auto">
                 <!-- Title & Agency Info -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
                     <Border Background="#1A1C24" CornerRadius="0" Width="36" Height="36" BorderBrush="#2D303E" BorderThickness="1">
@@ -53,12 +55,14 @@
                     <Button x:Name="BtnQuickBenchmark" Content="Run Benchmark" Background="#27272A" Foreground="#FAFAFA" BorderBrush="#3F3F46" BorderThickness="1" Padding="12,6" FontSize="11" FontWeight="SemiBold" CornerRadius="0" Click="OnRunBenchmarkClicked" ToolTip.Tip="Run the automated multi-temporal evaluation benchmark suite" />
                     <Button x:Name="BtnHelpGuide" Content="Help Guide" Background="#1E1E24" Foreground="#A1A1AA" BorderBrush="#2B2B32" BorderThickness="1" Padding="10,6" FontSize="11" CornerRadius="0" Click="OnHelpGuideClicked" ToolTip.Tip="View analyst scoring definitions, shortcut guide, and operational workflow manual" />
                 </StackPanel>
-            </Grid>
+                </Grid>
+            </ScrollViewer>
         </Border>
 
         <!-- OPERATIONAL MISSION WORKFLOW RIBBON -->
         <Border Grid.Row="1" Background="#0B0C10" BorderBrush="#181920" BorderThickness="0,0,0,1" Padding="16,8">
-            <Grid ColumnDefinitions="Auto, *, Auto">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                <Grid MinWidth="1100" ColumnDefinitions="Auto, *, Auto">
                 <!-- Current Workflow Phase Indicator -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="0,0,16,0">
                     <TextBlock Text="STAGE:" FontSize="10" FontWeight="Bold" Foreground="#71717A" VerticalAlignment="Center" />
@@ -82,7 +86,7 @@
                         </StackPanel>
                     </Button>
 
-                    <TextBlock Text="->" FontSize="11" Foreground="#3F3F46" VerticalAlignment="Center" />
+                    <TextBlock Text="Next" FontSize="10" Foreground="#3F3F46" VerticalAlignment="Center" />
 
                     <!-- Step 2 Button -->
                     <Button x:Name="BtnStep2" Click="OnNavigateToStepClicked" Tag="1" Background="#12141A" BorderBrush="#222530" BorderThickness="1" CornerRadius="0" Padding="10,4">
@@ -97,7 +101,7 @@
                         </StackPanel>
                     </Button>
 
-                    <TextBlock Text="->" FontSize="11" Foreground="#3F3F46" VerticalAlignment="Center" />
+                    <TextBlock Text="Next" FontSize="10" Foreground="#3F3F46" VerticalAlignment="Center" />
 
                     <!-- Step 3 Button -->
                     <Button x:Name="BtnStep3" Click="OnNavigateToStepClicked" Tag="2" Background="#12141A" BorderBrush="#222530" BorderThickness="1" CornerRadius="0" Padding="10,4">
@@ -112,7 +116,7 @@
                         </StackPanel>
                     </Button>
 
-                    <TextBlock Text="->" FontSize="11" Foreground="#3F3F46" VerticalAlignment="Center" />
+                    <TextBlock Text="Next" FontSize="10" Foreground="#3F3F46" VerticalAlignment="Center" />
 
                     <!-- Step 4 Button -->
                     <Button x:Name="BtnStep4" Click="OnNavigateToStepClicked" Tag="3" Background="#12141A" BorderBrush="#222530" BorderThickness="1" CornerRadius="0" Padding="10,4">
@@ -127,7 +131,7 @@
                         </StackPanel>
                     </Button>
 
-                    <TextBlock Text="->" FontSize="11" Foreground="#3F3F46" VerticalAlignment="Center" />
+                    <TextBlock Text="Next" FontSize="10" Foreground="#3F3F46" VerticalAlignment="Center" />
 
                     <!-- Step 5 Button -->
                     <Button x:Name="BtnStep5" Click="OnNavigateToStepClicked" Tag="4" Background="#12141A" BorderBrush="#222530" BorderThickness="1" CornerRadius="0" Padding="10,4">
@@ -145,13 +149,17 @@
 
                 <!-- Primary Unified Next Step Action -->
                 <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                    <Button x:Name="BtnNextStage" Click="OnAdvanceWorkflowClicked" Content="Continue -> Target Coordinates" Background="#2563EB" Foreground="#FFFFFF" FontWeight="Bold" FontSize="11" CornerRadius="0" Padding="14,6" />
+                    <Button x:Name="BtnNextStage" Click="OnAdvanceWorkflowClicked" Content="Continue to Target Coordinates" Background="#2563EB" Foreground="#FFFFFF" FontWeight="Bold" FontSize="11" CornerRadius="0" Padding="14,6" />
                 </StackPanel>
-            </Grid>
+                </Grid>
+            </ScrollViewer>
         </Border>
 
         <!-- MAIN OPERATIONAL STATIONS TAB CONTROL -->
-        <TabControl x:Name="MainTabControl" Grid.Row="2" Margin="10" Background="Transparent" SelectionChanged="OnMainTabSelectionChanged">
+        <TabControl x:Name="MainTabControl" Grid.Row="2" Margin="10" Background="Transparent"
+                ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                SelectionChanged="OnMainTabSelectionChanged">
 
             <!-- TAB 1: CONCEPT & SEMANTIC DISCOVERY -->
             <TabItem Header="1. Discover Concepts">
@@ -168,17 +176,17 @@
                             </Grid>
 
                             <!-- Suggested Concept Pills & Query Interpretation -->
-                            <Grid ColumnDefinitions="Auto, *, Auto">
-                                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                                    <TextBlock Text="Suggested Queries:" VerticalAlignment="Center" FontSize="11" Foreground="#71717A" FontWeight="SemiBold" />
-                                    <Button Content="Structures near river" Tag="newly built structures near a river" Click="OnQuickQueryClicked" FontSize="11" Background="#161822" Foreground="#D4D4D8" BorderBrush="#242836" BorderThickness="1" CornerRadius="0" Padding="8,3" />
-                                    <Button Content="Vehicle concentrations" Tag="large vehicle concentrations on open ground" Click="OnQuickQueryClicked" FontSize="11" Background="#161822" Foreground="#D4D4D8" BorderBrush="#242836" BorderThickness="1" CornerRadius="0" Padding="8,3" />
-                                    <Button Content="Airfield and runway" Tag="airfield runway with aircraft" Click="OnQuickQueryClicked" FontSize="11" Background="#161822" Foreground="#D4D4D8" BorderBrush="#242836" BorderThickness="1" CornerRadius="0" Padding="8,3" />
-                                    <Button Content="Land clearance" Tag="deforestation or cleared land" Click="OnQuickQueryClicked" FontSize="11" Background="#161822" Foreground="#D4D4D8" BorderBrush="#242836" BorderThickness="1" CornerRadius="0" Padding="8,3" />
-                                </StackPanel>
+                            <Grid ColumnDefinitions="*, Auto">
+                                <WrapPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="Suggested Queries:" VerticalAlignment="Center" FontSize="11" Foreground="#71717A" FontWeight="SemiBold" Margin="0,0,6,4" />
+                                    <Button Content="Structures near river" Tag="newly built structures near a river" Click="OnQuickQueryClicked" FontSize="11" Background="#161822" Foreground="#D4D4D8" BorderBrush="#242836" BorderThickness="1" CornerRadius="0" Padding="8,3" Margin="0,0,6,4" />
+                                    <Button Content="Vehicle concentrations" Tag="large vehicle concentrations on open ground" Click="OnQuickQueryClicked" FontSize="11" Background="#161822" Foreground="#D4D4D8" BorderBrush="#242836" BorderThickness="1" CornerRadius="0" Padding="8,3" Margin="0,0,6,4" />
+                                    <Button Content="Airfield and runway" Tag="airfield runway with aircraft" Click="OnQuickQueryClicked" FontSize="11" Background="#161822" Foreground="#D4D4D8" BorderBrush="#242836" BorderThickness="1" CornerRadius="0" Padding="8,3" Margin="0,0,6,4" />
+                                    <Button Content="Land clearance" Tag="deforestation or cleared land" Click="OnQuickQueryClicked" FontSize="11" Background="#161822" Foreground="#D4D4D8" BorderBrush="#242836" BorderThickness="1" CornerRadius="0" Padding="8,3" Margin="0,0,6,4" />
+                                </WrapPanel>
 
                                 <!-- AI Query Interpretation Badge -->
-                                <Border Grid.Column="2" Background="#161A28" BorderBrush="#203055" BorderThickness="1" CornerRadius="0" Padding="8,3">
+                                <Border Grid.Column="1" Background="#161A28" BorderBrush="#203055" BorderThickness="1" CornerRadius="0" Padding="8,3" VerticalAlignment="Center" Margin="8,0,0,4">
                                     <TextBlock x:Name="TxtInterpretedQuery" Text="AI Target: Physical Terrain &amp; Infrastructure Features" FontSize="11" Foreground="#93C5FD" />
                                 </Border>
                             </Grid>
@@ -187,8 +195,8 @@
 
                     <!-- Filter Bar & Render Mode Controls -->
                     <Border Grid.Row="1" Background="#101116" BorderBrush="#1C1E26" BorderThickness="1" CornerRadius="0" Padding="10" Margin="0,0,0,10">
-                        <Grid ColumnDefinitions="Auto, Auto, Auto, Auto, *">
-                            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6" Margin="0,0,14,0">
+                        <WrapPanel Orientation="Horizontal">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
                                 <TextBlock Text="Sensor:" VerticalAlignment="Center" Foreground="#A1A1AA" FontSize="11" />
                                 <ComboBox x:Name="CmbSensorFilter" SelectedIndex="0" Width="140" Background="#161822" Foreground="#FAFAFA" FontSize="11">
                                     <ComboBoxItem Content="All Platforms" />
@@ -199,7 +207,7 @@
                                 </ComboBox>
                             </StackPanel>
 
-                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,14,0">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
                                 <TextBlock Text="Visualization:" VerticalAlignment="Center" Foreground="#A1A1AA" FontSize="11" />
                                 <ComboBox x:Name="CmbRenderMode" SelectedIndex="0" Width="180" Background="#161822" Foreground="#FAFAFA" FontSize="11" SelectionChanged="OnRenderModeChanged">
                                     <ComboBoxItem Content="True Color (Natural RGB)" />
@@ -213,7 +221,7 @@
                                 </ComboBox>
                             </StackPanel>
 
-                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" Margin="0,0,14,0">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
                                 <TextBlock Text="Sort by:" VerticalAlignment="Center" Foreground="#A1A1AA" FontSize="11" />
                                 <ComboBox x:Name="CmbSortOrder" SelectedIndex="0" Width="160" Background="#161822" Foreground="#FAFAFA" FontSize="11" SelectionChanged="OnSortOrderChanged">
                                     <ComboBoxItem Content="Highest Match %" />
@@ -224,10 +232,10 @@
                             </StackPanel>
 
                             <!-- Score Clarity Guide Callout -->
-                            <StackPanel Grid.Column="4" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                                 <TextBlock Text="Semantic Match: Concept similarity  |  AI Confidence: Physical change probability" FontSize="10.5" Foreground="#71717A" />
                             </StackPanel>
-                        </Grid>
+                        </WrapPanel>
                     </Border>
 
                     <!-- Primary Split View: Interactive Geographic Map (Left 50%) + Candidate Results (Right 50%) -->
@@ -265,7 +273,10 @@
 
                         <!-- Right: Prioritized Candidate List -->
                         <Border Grid.Column="1" Background="#0C0D12" BorderBrush="#1C1E26" BorderThickness="1" CornerRadius="0" Margin="6,0,0,0">
-                            <ListBox x:Name="LstSearchResults" Background="Transparent" SelectionChanged="OnCandidateSelectionChanged">
+                            <ListBox x:Name="LstSearchResults" Background="Transparent"
+                                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                     SelectionChanged="OnCandidateSelectionChanged">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
                                         <Border Background="#12131A" BorderBrush="#1F212C" BorderThickness="1" CornerRadius="0" Padding="10" Margin="4">
@@ -313,23 +324,23 @@
                     <!-- Spatiotemporal Parameter Bar -->
                     <Border Grid.Row="0" Background="#111218" BorderBrush="#1F212C" BorderThickness="1" CornerRadius="0" Padding="12" Margin="0,0,0,10">
                         <StackPanel Spacing="8">
-                            <Grid ColumnDefinitions="*, *, *, *, Auto">
-                                <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                            <WrapPanel Orientation="Horizontal">
+                                <StackPanel Width="170">
                                     <TextBlock Text="Center Latitude (deg N):" FontSize="11" Foreground="#A1A1AA" Margin="0,0,0,2" />
                                     <TextBox x:Name="TxtSearchLat" Text="28.60500" Background="#161822" Foreground="#FAFAFA" BorderBrush="#2B2F40" CornerRadius="0" FontSize="11.5" />
                                 </StackPanel>
 
-                                <StackPanel Grid.Column="1" Margin="0,0,8,0">
+                                <StackPanel Width="170">
                                     <TextBlock Text="Center Longitude (deg E):" FontSize="11" Foreground="#A1A1AA" Margin="0,0,0,2" />
                                     <TextBox x:Name="TxtSearchLon" Text="77.20800" Background="#161822" Foreground="#FAFAFA" BorderBrush="#2B2F40" CornerRadius="0" FontSize="11.5" />
                                 </StackPanel>
 
-                                <StackPanel Grid.Column="2" Margin="0,0,8,0">
+                                <StackPanel Width="150">
                                     <TextBlock Text="Search Radius (km):" FontSize="11" Foreground="#A1A1AA" Margin="0,0,0,2" />
                                     <TextBox x:Name="TxtSearchRadius" Text="10.0" Background="#161822" Foreground="#FAFAFA" BorderBrush="#2B2F40" CornerRadius="0" FontSize="11.5" />
                                 </StackPanel>
 
-                                <StackPanel Grid.Column="3" Margin="0,0,8,0">
+                                <StackPanel Width="220">
                                     <TextBlock Text="Change Classification:" FontSize="11" Foreground="#A1A1AA" Margin="0,0,0,2" />
                                     <ComboBox x:Name="CmbChangeTypeFilter" SelectedIndex="0" HorizontalAlignment="Stretch" Background="#161822" Foreground="#FAFAFA" FontSize="11.5">
                                         <ComboBoxItem Content="All Supported Types" />
@@ -341,18 +352,18 @@
                                     </ComboBox>
                                 </StackPanel>
 
-                                <Button Grid.Column="4" x:Name="BtnExecuteSpatiotemporalSearch" Content="Search Changes"
+                                <Button x:Name="BtnExecuteSpatiotemporalSearch" Content="Search Changes"
                                         Background="#10B981" Foreground="#09090B" FontWeight="Bold" Padding="16,8" VerticalAlignment="Bottom" CornerRadius="0"
                                         Click="OnExecuteSpatiotemporalSearchClicked" />
-                            </Grid>
+                            </WrapPanel>
 
                             <!-- Preset Sector Chips -->
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <TextBlock Text="Quick Sectors:" VerticalAlignment="Center" FontSize="11" Foreground="#71717A" FontWeight="SemiBold" />
-                                <Button Content="Sector Alpha (Facility: 28.605 N, 77.208 E)" Tag="28.6050,77.2080,5.0,Construction" Click="OnPresetSectorClicked" FontSize="10.5" Background="#161822" Foreground="#D4D4D8" BorderBrush="#242836" BorderThickness="1" CornerRadius="0" Padding="8,3" />
-                                <Button Content="Sector Bravo (River: 28.592 N, 77.203 E)" Tag="28.5920,77.2030,5.0,WaterExtentVariation" Click="OnPresetSectorClicked" FontSize="10.5" Background="#161822" Foreground="#D4D4D8" BorderBrush="#242836" BorderThickness="1" CornerRadius="0" Padding="8,3" />
-                                <Button Content="Sector Charlie (Clearance: 28.604 N, 77.218 E)" Tag="28.6040,77.2180,5.0,Clearance" Click="OnPresetSectorClicked" FontSize="10.5" Background="#161822" Foreground="#D4D4D8" BorderBrush="#242836" BorderThickness="1" CornerRadius="0" Padding="8,3" />
-                            </StackPanel>
+                            <WrapPanel Orientation="Horizontal">
+                                <TextBlock Text="Quick Sectors:" VerticalAlignment="Center" FontSize="11" Foreground="#71717A" FontWeight="SemiBold" Margin="0,0,6,4" />
+                                <Button Content="Sector Alpha (Facility: 28.605 N, 77.208 E)" Tag="28.6050,77.2080,5.0,Construction" Click="OnPresetSectorClicked" FontSize="10.5" Background="#161822" Foreground="#D4D4D8" BorderBrush="#242836" BorderThickness="1" CornerRadius="0" Padding="8,3" Margin="0,0,6,4" />
+                                <Button Content="Sector Bravo (River: 28.592 N, 77.203 E)" Tag="28.5920,77.2030,5.0,WaterExtentVariation" Click="OnPresetSectorClicked" FontSize="10.5" Background="#161822" Foreground="#D4D4D8" BorderBrush="#242836" BorderThickness="1" CornerRadius="0" Padding="8,3" Margin="0,0,6,4" />
+                                <Button Content="Sector Charlie (Clearance: 28.604 N, 77.218 E)" Tag="28.6040,77.2180,5.0,Clearance" Click="OnPresetSectorClicked" FontSize="10.5" Background="#161822" Foreground="#D4D4D8" BorderBrush="#242836" BorderThickness="1" CornerRadius="0" Padding="8,3" Margin="0,0,6,4" />
+                            </WrapPanel>
                         </StackPanel>
                     </Border>
 
@@ -392,7 +403,10 @@
 
                         <!-- Right: Before & After Evidence Cards -->
                         <Border Grid.Column="1" Background="#0C0D12" BorderBrush="#1C1E26" BorderThickness="1" CornerRadius="0" Margin="6,0,0,0">
-                            <ListBox x:Name="LstSpatiotemporalResults" Background="Transparent" SelectionChanged="OnSpatiotemporalSelectionChanged">
+                            <ListBox x:Name="LstSpatiotemporalResults" Background="Transparent"
+                                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                     SelectionChanged="OnSpatiotemporalSelectionChanged">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
                                         <Border Background="#12131A" BorderBrush="#1F212C" BorderThickness="1" CornerRadius="0" Padding="10" Margin="4">
@@ -430,9 +444,9 @@
                                                 <StackPanel Grid.Column="3" Spacing="4" VerticalAlignment="Center">
                                                     <Button Content="Deep Verify" Tag="{Binding Id}" Click="OnInspectSpatiotemporalInStep3Clicked"
                                                             Background="#2563EB" Foreground="#FFFFFF" FontWeight="Bold" CornerRadius="0" Padding="8,4" FontSize="10.5" />
-                                                    <Button Content="[CONFIRM]" Tag="{Binding Id}" Click="OnConfirmChangeClicked"
+                                                    <Button Content="Confirm" Tag="{Binding Id}" Click="OnConfirmChangeClicked"
                                                             Background="#065F46" Foreground="#ECFDF5" BorderBrush="#047857" BorderThickness="1" CornerRadius="0" Padding="8,4" FontSize="10.5" />
-                                                    <Button Content="[REJECT]" Tag="{Binding Id}" Click="OnRejectChangeClicked"
+                                                    <Button Content="Reject" Tag="{Binding Id}" Click="OnRejectChangeClicked"
                                                             Background="#7F1D1D" Foreground="#FEF2F2" BorderBrush="#991B1B" BorderThickness="1" CornerRadius="0" Padding="8,4" FontSize="10.5" />
                                                 </StackPanel>
                                             </Grid>
@@ -451,14 +465,14 @@
                     
                     <!-- Spectral Mode & Calibration Controls Bar -->
                     <Border Grid.Row="0" Background="#111218" BorderBrush="#1F212C" BorderThickness="1" CornerRadius="0" Padding="10" Margin="0,0,0,8">
-                        <Grid ColumnDefinitions="Auto, *, Auto, Auto">
-                            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
+                        <WrapPanel Orientation="Horizontal">
+                            <StackPanel Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
                                 <CheckBox x:Name="ChkRrn" Content="PIF Radiometric Normalization" IsChecked="True" Foreground="#D4D4D8" FontSize="11" />
                                 <CheckBox x:Name="ChkQualityMask" Content="Cloud and Shadow Mask" IsChecked="True" Foreground="#D4D4D8" FontSize="11" />
                                 <CheckBox x:Name="ChkJitter" Content="Sub-Pixel Jitter Filter" IsChecked="True" Foreground="#D4D4D8" FontSize="11" />
                             </StackPanel>
 
-                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" Margin="0,0,12,0" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                                 <TextBlock Text="Spectral Band:" VerticalAlignment="Center" Foreground="#A1A1AA" FontSize="11" FontWeight="SemiBold" />
                                 <ComboBox x:Name="CmbChangeSpectralMode" SelectedIndex="0" Width="190" Background="#161822" Foreground="#FAFAFA" FontSize="11" SelectionChanged="OnChangeSpectralModeChanged">
                                     <ComboBoxItem Content="True Color (Natural RGB)" />
@@ -472,10 +486,10 @@
                                 </ComboBox>
                             </StackPanel>
 
-                            <Button Grid.Column="3" x:Name="BtnRunChangeDetection" Content="Compute Changes"
+                            <Button x:Name="BtnRunChangeDetection" Content="Compute Changes"
                                     Background="#10B981" Foreground="#09090B" FontWeight="Bold" Padding="14,8" VerticalAlignment="Center" CornerRadius="0" FontSize="11"
                                     Click="OnRunChangeDetectionClicked" />
-                        </Grid>
+                        </WrapPanel>
                     </Border>
 
                     <!-- Main Analysis Layout: 65% Large Visual Inspection + 35% Evidence Assessment & Verdict -->
@@ -562,8 +576,11 @@
                             </Border>
 
                             <!-- Detected Changes List Selector -->
-                            <Border Grid.Row="2" Background="#0C0D12" BorderBrush="#1C1E26" BorderThickness="1" CornerRadius="0" Padding="6" Margin="0,6,0,0" Height="140">
-                                <ListBox x:Name="LstChangeResults" Background="Transparent" SelectionChanged="OnChangeSelectionChanged">
+                            <Border Grid.Row="2" Background="#0C0D12" BorderBrush="#1C1E26" BorderThickness="1" CornerRadius="0" Padding="6" Margin="0,6,0,0" Height="130">
+                                <ListBox x:Name="LstChangeResults" Background="Transparent"
+                                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                         SelectionChanged="OnChangeSelectionChanged">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
                                             <Border Background="#12131A" BorderBrush="#1F212C" BorderThickness="1" CornerRadius="0" Padding="8,6" Margin="2">
@@ -672,14 +689,14 @@
                                             <TextBlock Text="ANALYST VERIFICATION &amp; VERDICT" FontSize="11" FontWeight="Bold" Foreground="#38BDF8" />
                                             
                                             <Grid ColumnDefinitions="*, *, *">
-                                                <Button Grid.Column="0" x:Name="BtnVerdictConfirm" Content="[CONFIRM]" Click="OnFocusedConfirmClicked" Background="#065F46" Foreground="#ECFDF5" BorderBrush="#047857" BorderThickness="1" FontWeight="Bold" CornerRadius="0" Padding="10,6" FontSize="11" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" ToolTip.Tip="Confirm this candidate into verified intelligence record (Key: C)" />
-                                                <Button Grid.Column="1" x:Name="BtnVerdictReject" Content="[REJECT]" Click="OnFocusedRejectClicked" Margin="4,0,4,0" Background="#7F1D1D" Foreground="#FEF2F2" BorderBrush="#991B1B" BorderThickness="1" FontWeight="Bold" CornerRadius="0" Padding="10,6" FontSize="11" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" ToolTip.Tip="Reject candidate as false alarm (Key: R)" />
-                                                <Button Grid.Column="2" x:Name="BtnVerdictNeedsReview" Content="[NEEDS REVIEW]" Click="OnFocusedNeedsReviewClicked" Background="#78350F" Foreground="#FEF3C7" BorderBrush="#B45309" BorderThickness="1" FontWeight="Bold" CornerRadius="0" Padding="10,6" FontSize="10" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" ToolTip.Tip="Flag for secondary analyst review (Key: N)" />
+                                                <Button Grid.Column="0" x:Name="BtnVerdictConfirm" Content="Confirm" Click="OnFocusedConfirmClicked" Background="#065F46" Foreground="#ECFDF5" BorderBrush="#047857" BorderThickness="1" FontWeight="Bold" CornerRadius="0" Padding="10,6" FontSize="11" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" ToolTip.Tip="Confirm this candidate into verified intelligence record (Key: C)" />
+                                                <Button Grid.Column="1" x:Name="BtnVerdictReject" Content="Reject" Click="OnFocusedRejectClicked" Margin="4,0,4,0" Background="#7F1D1D" Foreground="#FEF2F2" BorderBrush="#991B1B" BorderThickness="1" FontWeight="Bold" CornerRadius="0" Padding="10,6" FontSize="11" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" ToolTip.Tip="Reject candidate as false alarm (Key: R)" />
+                                                <Button Grid.Column="2" x:Name="BtnVerdictNeedsReview" Content="Needs Review" Click="OnFocusedNeedsReviewClicked" Background="#78350F" Foreground="#FEF3C7" BorderBrush="#B45309" BorderThickness="1" FontWeight="Bold" CornerRadius="0" Padding="10,6" FontSize="10" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" ToolTip.Tip="Flag for secondary analyst review (Key: N)" />
                                             </Grid>
 
                                             <TextBox x:Name="TxtAnalystNotes" Watermark="Add analyst verification notes..." FontSize="11" Background="#111218" Foreground="#FAFAFA" BorderBrush="#2B2F40" CornerRadius="0" Height="42" TextWrapping="Wrap" />
 
-                                            <Button x:Name="BtnSaveVerdictAndNext" Content="Save Verdict and Next Candidate ->" Background="#2563EB" Foreground="#FFFFFF" FontWeight="Bold" FontSize="11" CornerRadius="0" Padding="12,7" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Click="OnSaveVerdictAndNextClicked" />
+                                            <Button x:Name="BtnSaveVerdictAndNext" Content="Save Verdict and Next Candidate" Background="#2563EB" Foreground="#FFFFFF" FontWeight="Bold" FontSize="11" CornerRadius="0" Padding="12,7" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Click="OnSaveVerdictAndNextClicked" />
                                         </StackPanel>
                                     </Border>
                                 </StackPanel>
@@ -710,7 +727,9 @@
 
                         <!-- Right: Grouped Clusters List -->
                         <Border Grid.Column="1" Background="#0C0D12" BorderBrush="#1C1E26" BorderThickness="1" CornerRadius="0" Margin="6,0,0,0">
-                            <ListBox x:Name="LstClusters" Background="Transparent">
+                            <ListBox x:Name="LstClusters" Background="Transparent"
+                                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
                                         <Border Background="#12131A" BorderBrush="#1F212C" BorderThickness="1" CornerRadius="0" Padding="12" Margin="3">
@@ -744,7 +763,9 @@
 
                     <!-- Work Queue Overview & Detailed Audit Log -->
                     <Border Grid.Row="1" Background="#0C0D12" BorderBrush="#1C1E26" BorderThickness="1" CornerRadius="0">
-                        <ListBox x:Name="LstReviewQueue" Background="Transparent">
+                        <ListBox x:Name="LstReviewQueue" Background="Transparent"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Border Background="#12131A" BorderBrush="#1F212C" BorderThickness="1" CornerRadius="0" Padding="12" Margin="3">

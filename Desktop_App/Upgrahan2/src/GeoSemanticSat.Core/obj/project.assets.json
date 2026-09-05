@@ -1,87 +1,36 @@
 {
-  "version": 3,
+  "version": 4,
   "targets": {
-    "net10.0": {
-      "Microsoft.NET.ILLink.Tasks/10.0.11": {
-        "type": "package",
-        "build": {
-          "build/Microsoft.NET.ILLink.Tasks.props": {}
-        }
-      }
-    },
-    "net10.0/linux-x64": {
-      "Microsoft.NET.ILLink.Tasks/10.0.11": {
-        "type": "package",
-        "build": {
-          "build/Microsoft.NET.ILLink.Tasks.props": {}
-        }
-      }
-    }
+    "net10.0": {}
   },
-  "libraries": {
-    "Microsoft.NET.ILLink.Tasks/10.0.11": {
-      "sha512": "UUJ1mIT3dPg6sNrEVNQZBOCG4rG4PJtVkyq/MSD/6d383rz1xA2WdCA5MlQmbMBKyt9TDCs4YmT/MmrcOJPrGQ==",
-      "type": "package",
-      "path": "microsoft.net.illink.tasks/10.0.11",
-      "hasTools": true,
-      "files": [
-        ".nupkg.metadata",
-        "Icon.png",
-        "Sdk/Sdk.props",
-        "THIRD-PARTY-NOTICES.TXT",
-        "analyzers/dotnet/cs/ILLink.CodeFixProvider.dll",
-        "analyzers/dotnet/cs/ILLink.RoslynAnalyzer.dll",
-        "build/Microsoft.NET.ILLink.Analyzers.props",
-        "build/Microsoft.NET.ILLink.Tasks.props",
-        "build/Microsoft.NET.ILLink.targets",
-        "microsoft.net.illink.tasks.10.0.11.nupkg.sha512",
-        "microsoft.net.illink.tasks.nuspec",
-        "tools/net/ILLink.Tasks.deps.json",
-        "tools/net/ILLink.Tasks.dll",
-        "tools/net/Mono.Cecil.Mdb.dll",
-        "tools/net/Mono.Cecil.Pdb.dll",
-        "tools/net/Mono.Cecil.Rocks.dll",
-        "tools/net/Mono.Cecil.dll",
-        "tools/net/Sdk/Sdk.props",
-        "tools/net/build/Microsoft.NET.ILLink.Analyzers.props",
-        "tools/net/build/Microsoft.NET.ILLink.Tasks.props",
-        "tools/net/build/Microsoft.NET.ILLink.targets",
-        "tools/net/illink.deps.json",
-        "tools/net/illink.dll",
-        "tools/net/illink.runtimeconfig.json",
-        "useSharedDesignerContext.txt"
-      ]
-    }
-  },
+  "libraries": {},
   "projectFileDependencyGroups": {
-    "net10.0": [
-      "Microsoft.NET.ILLink.Tasks >= 10.0.11"
-    ]
+    "net10.0": []
   },
   "packageFolders": {
-    "/home/non_qualities/.nuget/packages/": {}
+    "C:\\Users\\aryan\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj",
+      "projectUniqueName": "C:\\Users\\aryan\\OneDrive\\Desktop\\UpaGraha\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Core\\GeoSemanticSat.Core.csproj",
       "projectName": "GeoSemanticSat.Core",
-      "projectPath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj",
-      "packagesPath": "/home/non_qualities/.nuget/packages/",
-      "outputPath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/obj/",
+      "projectPath": "C:\\Users\\aryan\\OneDrive\\Desktop\\UpaGraha\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Core\\GeoSemanticSat.Core.csproj",
+      "packagesPath": "C:\\Users\\aryan\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\aryan\\OneDrive\\Desktop\\UpaGraha\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Core\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/home/non_qualities/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\aryan\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
       ],
       "sources": {
-        "/usr/lib64/dotnet/library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net10.0": {
+          "framework": "net10.0",
           "targetAlias": "net10.0",
           "projectReferences": {}
         }
@@ -96,19 +45,12 @@
         "auditLevel": "low",
         "auditMode": "all"
       },
-      "SdkAnalysisLevel": "10.0.100"
+      "SdkAnalysisLevel": "10.0.400"
     },
     "frameworks": {
       "net10.0": {
+        "framework": "net10.0",
         "targetAlias": "net10.0",
-        "dependencies": {
-          "Microsoft.NET.ILLink.Tasks": {
-            "suppressParent": "All",
-            "target": "Package",
-            "version": "[10.0.11, )",
-            "autoReferenced": true
-          }
-        },
         "imports": [
           "net461",
           "net462",
@@ -120,22 +62,12 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "downloadDependencies": [
-          {
-            "name": "Microsoft.AspNetCore.App.Runtime.linux-x64",
-            "version": "[10.0.11, 10.0.11]"
-          },
-          {
-            "name": "Microsoft.NETCore.App.Runtime.linux-x64",
-            "version": "[10.0.11, 10.0.11]"
-          }
-        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/lib64/dotnet/sdk/10.0.111/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "C:\\Users\\aryan\\.dotnet\\sdk\\10.0.400/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.CSharp": "(,4.7.32767]",
           "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -410,11 +342,6 @@
           "System.Xml.XPath": "(,4.3.32767]",
           "System.Xml.XPath.XDocument": "(,5.0.32767]"
         }
-      }
-    },
-    "runtimes": {
-      "linux-x64": {
-        "#import": []
       }
     }
   }

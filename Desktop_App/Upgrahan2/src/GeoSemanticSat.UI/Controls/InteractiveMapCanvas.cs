@@ -184,6 +184,13 @@ public class InteractiveMapCanvas : Control
         InvalidateVisual();
     }
 
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        double w = double.IsInfinity(availableSize.Width) ? 500 : Math.Max(250, availableSize.Width);
+        double h = double.IsInfinity(availableSize.Height) ? 400 : Math.Max(250, availableSize.Height);
+        return new Size(w, h);
+    }
+
     protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
     {
         base.OnPointerWheelChanged(e);
@@ -279,7 +286,8 @@ public class InteractiveMapCanvas : Control
         foreach (var pin in _pins)
         {
             var pinPos = GeoToScreen(pin.Latitude, pin.Longitude);
-            double dist = (pinPos - screenPos).Length;
+            var delta = pinPos - screenPos;
+            double dist = Math.Sqrt((delta.X * delta.X) + (delta.Y * delta.Y));
             if (dist <= 16) return pin;
         }
         return null;
@@ -351,6 +359,12 @@ public class InteractiveMapCanvas : Control
                 if (bmp != null)
                 {
                     context.DrawImage(bmp, new Rect(0, 0, bmp.PixelSize.Width, bmp.PixelSize.Height), destRect);
+                }
+                else
+                {
+                    var tileBrush = new SolidColorBrush(Color.FromArgb(255, 13, 15, 20));
+                    var tilePen = new Pen(new SolidColorBrush(Color.FromArgb(25, 56, 189, 248)), 0.5);
+                    context.DrawRectangle(tileBrush, tilePen, destRect);
                 }
             }
         }
@@ -442,8 +456,9 @@ public class InteractiveMapCanvas : Control
 
             if (pin.Bounds != null)
             {
-                var pTopLeft = GeoToScreen(pin.Bounds.MaxLat, pin.Bounds.MinLon);
-                var pBottomRight = GeoToScreen(pin.Bounds.MinLat, pin.Bounds.MaxLon);
+                var bounds = pin.Bounds.Value;
+                var pTopLeft = GeoToScreen(bounds.MaxLat, bounds.MinLon);
+                var pBottomRight = GeoToScreen(bounds.MinLat, bounds.MaxLon);
                 var rect = new Rect(pTopLeft, pBottomRight);
 
                 var boxFill = isSelected ? new SolidColorBrush(Color.FromArgb(60, 239, 68, 68)) : new SolidColorBrush(Color.FromArgb(30, 239, 68, 68));

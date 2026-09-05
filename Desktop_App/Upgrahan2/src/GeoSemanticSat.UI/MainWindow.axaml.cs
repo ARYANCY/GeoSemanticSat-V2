@@ -1,14 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 using GeoSemanticSat.Core.ChangeDetection;
 using GeoSemanticSat.Core.Clustering;
 using GeoSemanticSat.Core.Model;
@@ -19,6 +22,7 @@ using GeoSemanticSat.Engine.Benchmark;
 using GeoSemanticSat.Engine.Embeddings;
 using GeoSemanticSat.Engine.Retrieval;
 using GeoSemanticSat.UI.Controls;
+using GeoSemanticSat.UI.Services;
 
 namespace GeoSemanticSat.UI;
 
@@ -43,8 +47,39 @@ public class SearchResultItemViewModel
     public required string Detail { get; init; }
     public required string Coordinates { get; init; }
     public required string SpectralInfo { get; init; }
-    public required ImagePatch Patch { get; init; }
+    public required TilePatch Patch { get; init; }
     public double SimilarityScore { get; init; }
+}
+
+public class SpatiotemporalResultItemViewModel
+{
+    public required string Id { get; init; }
+    public required string ChangeType { get; init; }
+    public required string TypeBadgeColor { get; init; }
+    public Bitmap? BeforePreview { get; init; }
+    public Bitmap? AfterPreview { get; init; }
+    public required string Title { get; init; }
+    public required string DistanceInfo { get; init; }
+    public required string EarliestOnsetInfo { get; init; }
+    public required string SpectralMetrics { get; init; }
+    public required ChangeRecord Record { get; init; }
+}
+
+public class ClusterListItemViewModel
+{
+    public required string Header { get; init; }
+    public required string BoundsInfo { get; init; }
+    public required string CohesionInfo { get; init; }
+}
+
+public class ReviewQueueItemViewModel
+{
+    public required string StatusBadge { get; init; }
+    public required string StatusColor { get; init; }
+    public required string Title { get; init; }
+    public required string AuditDetails { get; init; }
+    public required string ConfidenceText { get; init; }
+    public required ChangeRecord Record { get; init; }
 }
 
 public partial class MainWindow : Window
@@ -113,11 +148,11 @@ public partial class MainWindow : Window
 
         BtnNextStage.Content = currentTab switch
         {
-            0 => "Continue -> Target Coordinates",
-            1 => "Continue -> Spectral Verification",
-            2 => "Continue -> Group Facilities",
-            3 => "Continue -> Audit & Signoff",
-            _ => "Export Final Report ->"
+            0 => "Continue to Target Coordinates",
+            1 => "Continue to Spectral Verification",
+            2 => "Continue to Group Facilities",
+            3 => "Continue to Audit and Signoff",
+            _ => "Export Final Report"
         };
 
         PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(Step1Count)));
@@ -144,9 +179,21 @@ public partial class MainWindow : Window
             {
                 MapCanvasDiscover?.UpdateConnectivityStatus(e.IsOnline, e.LatencyMs);
                 MapCanvasSpatiotemporal?.UpdateConnectivityStatus(e.IsOnline, e.LatencyMs);
+                MapCanvasFacilities?.UpdateConnectivityStatus(e.IsOnline, e.LatencyMs);
             });
         };
         _ = _connectivityMonitor.CheckConnectivityAsync();
+
+        // Window size change synchronization
+        this.SizeChanged += (_, _) =>
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                MapCanvasDiscover?.InvalidateVisual();
+                MapCanvasSpatiotemporal?.InvalidateVisual();
+                MapCanvasFacilities?.InvalidateVisual();
+            });
+        };
 
         if (MapCanvasDiscover != null)
         {
@@ -253,6 +300,9 @@ public partial class MainWindow : Window
 
         // Run default change analysis to seed the change repository
         RunInitialChangeDetection();
+
+        // Run default facility clustering to seed facility map
+        OnRunClusteringClicked(null, null!);
 
         // Run default search query to populate Step 1
         TxtSearchQuery.Text = "newly built structures near a river";
@@ -500,11 +550,9 @@ public partial class MainWindow : Window
 
     private void OnSpatiotemporalSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (LstSpatiotemporalResults.SelectedItem != null)
+        if (LstSpatiotemporalResults.SelectedItem is SpatiotemporalResultItemViewModel item)
         {
-            dynamic item = LstSpatiotemporalResults.SelectedItem;
-            string id = item.Id;
-            MapCanvasSpatiotemporal?.SelectPin(id);
+            MapCanvasSpatiotemporal?.SelectPin(item.Id);
         }
     }
 
@@ -606,7 +654,7 @@ public partial class MainWindow : Window
             }
             catch { }
 
-            return new
+            return new SpatiotemporalResultItemViewModel
             {
                 Id = c.Id,
                 ChangeType = c.Type.ToString(),
@@ -616,7 +664,8 @@ public partial class MainWindow : Window
                 Title = $"Candidate Site {c.Id[..8]} | {c.Type} ({c.AreaSqMeters:N0} m2)",
                 DistanceInfo = $"Proximity: {r.DistanceKm:F2} km from query center | ({c.Center.Latitude:F4} N, {c.Center.Longitude:F4} E)",
                 EarliestOnsetInfo = $"Earliest Verified Onset: {c.EarliestObservationTimestamp:yyyy-MM-dd} UTC",
-                SpectralMetrics = $"AI Confidence: {(c.Confidence * 100):F0}% | Rank: {r.RelevanceScore:F3} | {c.ProcessingNotes}"
+                SpectralMetrics = $"AI Confidence: {(c.Confidence * 100):F0}% | Rank: {r.RelevanceScore:F3} | {c.ProcessingNotes}",
+                Record = c
             };
         }).ToList();
 
@@ -736,10 +785,10 @@ public partial class MainWindow : Window
             record.Metrics.TryGetValue("DeltaGradient", out var dGrad);
 
             // Structured Evidence Bullets
-            TxtEvidVegetation.Text = $"• Vegetation Response: {(dNdvi < -0.15 ? "Significant loss" : "Stable")} (ΔNDVI = {dNdvi:+0.000;-0.000})";
-            TxtEvidSoil.Text = $"• Bare-Soil / Built Response: {(dNdbi > 0.15 ? "High increase" : "Moderate")} (ΔNDBI = {dNdbi:+0.000;-0.000}, ΔBSI = {dBsi:+0.000;-0.000})";
-            TxtEvidPersistence.Text = $"• Multi-temporal persistence verified across passes (3.5σ CUSUM threshold exceeded)";
-            TxtEvidSpatial.Text = $"• Spatial footprint {record.AreaSqMeters:N0} m² ({record.AffectedPixels} px) without jitter";
+            TxtEvidVegetation.Text = $"Vegetation Response: {(dNdvi < -0.15 ? "Significant loss" : "Stable")} (Delta NDVI = {dNdvi:+0.000;-0.000})";
+            TxtEvidSoil.Text = $"Bare-Soil / Built Response: {(dNdbi > 0.15 ? "High increase" : "Moderate")} (Delta NDBI = {dNdbi:+0.000;-0.000}, Delta BSI = {dBsi:+0.000;-0.000})";
+            TxtEvidPersistence.Text = $"Multi-temporal persistence verified across passes (3.5 sigma CUSUM threshold exceeded)";
+            TxtEvidSpatial.Text = $"Spatial footprint {record.AreaSqMeters:N0} m2 ({record.AffectedPixels} px) without jitter";
 
             // Technical Diagnostics Drawer
             TxtFocusedDeltaNdbi.Text = $"{(dNdbi >= 0 ? "+" : "")}{dNdbi:F4}";
@@ -819,7 +868,7 @@ public partial class MainWindow : Window
         var patches = _index.GetAllPatches();
         var clusters = SpatialSemanticClusterer.ClusterSites(patches, epsCosineDistance: 0.25, minPts: 2);
 
-        LstClusters.ItemsSource = clusters.Select(c => new
+        LstClusters.ItemsSource = clusters.Select(c => new ClusterListItemViewModel
         {
             Header = $"Cluster #{c.ClusterId}: {c.Label}",
             BoundsInfo = $"Enclosing Extent: [{c.EnclosingBounds.MinLon:F4}°E to {c.EnclosingBounds.MaxLon:F4}°E, {c.EnclosingBounds.MinLat:F4}°N to {c.EnclosingBounds.MaxLat:F4}°N]",
@@ -851,7 +900,7 @@ public partial class MainWindow : Window
     private void UpdateReviewQueueList()
     {
         var items = _reviewQueue.GetAll();
-        LstReviewQueue.ItemsSource = items.Select(item => new
+        LstReviewQueue.ItemsSource = items.Select(item => new ReviewQueueItemViewModel
         {
             StatusBadge = $"[{item.Status.ToUpperInvariant()}]",
             StatusColor = item.Status switch
@@ -862,8 +911,9 @@ public partial class MainWindow : Window
                 _ => "#38BDF8"
             },
             Title = $"{item.Record.Type} - Candidate {item.Record.Id[..8]}",
-            AuditDetails = $"T1: {item.Record.TimestampT1:yyyy-MM-dd} -> T2: {item.Record.TimestampT2:yyyy-MM-dd} | Onset: {item.Record.EarliestObservationTimestamp:yyyy-MM-dd} | Notes: {item.AnalystComments}",
-            ConfidenceText = $"Confidence: {(item.Record.Confidence * 100):F0}%"
+            AuditDetails = $"T1: {item.Record.TimestampT1:yyyy-MM-dd} to T2: {item.Record.TimestampT2:yyyy-MM-dd} | Onset: {item.Record.EarliestObservationTimestamp:yyyy-MM-dd} | Notes: {item.AnalystComments}",
+            ConfidenceText = $"Confidence: {(item.Record.Confidence * 100):F0}%",
+            Record = item.Record
         }).ToList();
     }
 
@@ -1105,6 +1155,12 @@ public partial class MainWindow : Window
     private void OnMainTabSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         RefreshWorkflowUI();
+        Dispatcher.UIThread.Post(() =>
+        {
+            MapCanvasDiscover?.InvalidateVisual();
+            MapCanvasSpatiotemporal?.InvalidateVisual();
+            MapCanvasFacilities?.InvalidateVisual();
+        });
     }
 
     private void OnInspectPatchDirectToStep3Clicked(object? sender, RoutedEventArgs e)
