@@ -55,6 +55,17 @@ public static class RelevanceFeedbackReranker
             }
         }
 
+        // 4. Physical feature preservation (prevent negative variance/energy distortion)
+        // Indices 0..15 (reflectance statistics) and 64..79 (texture energy) are non-negative
+        for (int i = 0; i < Math.Min(16, dim); i++)
+        {
+            newQuery[i] = Math.Max(0.0f, newQuery[i]);
+        }
+        for (int i = 64; i < Math.Min(80, dim); i++)
+        {
+            newQuery[i] = Math.Max(0.0f, newQuery[i]);
+        }
+
         VectorIndex.VectorIndex.NormalizeInPlace(newQuery);
         return newQuery;
     }

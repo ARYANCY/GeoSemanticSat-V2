@@ -41,6 +41,7 @@ public class GeoTiffReader
         int bitsPerSample = 8;
         int samplesPerPixel = 1;
         int sampleFormat = 1; // 1 = uint, 2 = int, 3 = float
+        int compression = 1;  // 1 = Uncompressed, 5 = LZW, 8 = Deflate
         List<uint> stripOffsets = new();
         List<uint> stripByteCounts = new();
         double[]? pixelScale = null;
@@ -72,6 +73,9 @@ public class GeoTiffReader
                     break;
                 case 339: // SampleFormat
                     sampleFormat = (int)valueOrOffset;
+                    break;
+                case 259: // Compression (1 = Uncompressed, 5 = LZW, 8 = Deflate/Zip, 32946 = Deflate)
+                    compression = (int)valueOrOffset;
                     break;
                 case 273: // StripOffsets
                     stripOffsets = ReadOffsetsArray(fs, reader, isLittleEndian, valueOrOffset, count, type);
@@ -222,7 +226,16 @@ public class GeoTiffReader
         }
 
         var list = new List<SpectralBand>();
-        SpectralBand[] opticalOrder = { SpectralBand.Red, SpectralBand.Green, SpectralBand.Blue, SpectralBand.NIR, SpectralBand.SWIR1, SpectralBand.SWIR2, SpectralBand.Quality_QA };
+
+        // For Sentinel-2 4-band rasters, bands are typically B2(Blue), B3(Green), B4(Red), B8(NIR)
+        // For standard RGB 3-band rasters, bands are Red, Green, Blue
+        SpectralBand[] opticalOrder = platform switch
+        {
+            SensorPlatform.Sentinel2_Optical when samplesCount >= 4 => new[] { SpectralBand.Blue, SpectralBand.Green, SpectralBand.Red, SpectralBand.NIR, SpectralBand.SWIR1, SpectralBand.SWIR2, SpectralBand.Quality_QA },
+            SensorPlatform.Landsat_Optical when samplesCount >= 4 => new[] { SpectralBand.Blue, SpectralBand.Green, SpectralBand.Red, SpectralBand.NIR, SpectralBand.SWIR1, SpectralBand.SWIR2 },
+            _ => new[] { SpectralBand.Red, SpectralBand.Green, SpectralBand.Blue, SpectralBand.NIR, SpectralBand.SWIR1, SpectralBand.SWIR2, SpectralBand.Quality_QA }
+        };
+
         for (int i = 0; i < samplesCount && i < opticalOrder.Length; i++)
         {
             list.Add(opticalOrder[i]);

@@ -83,7 +83,10 @@ public static class RegistrationJitterFilter
         double avgBaseDiff = baseDiff / count;
         if (avgBaseDiff < 0.04) return true; // negligible difference
 
-        // Test neighbor pixel shifts in [-1, +1]
+        // Test neighbor pixel shifts in [-1, +1] with quadratic sub-pixel peak interpolation
+        double bestShiftedDiff = avgBaseDiff;
+        int bestDx = 0, bestDy = 0;
+
         for (int dy = -1; dy <= 1; dy++)
         {
             for (int dx = -1; dx <= 1; dx++)
@@ -113,12 +116,47 @@ public static class RegistrationJitterFilter
                 if (shiftedCount > 0)
                 {
                     double avgShifted = shiftedDiff / shiftedCount;
-                    // If a 1-pixel shift reduces the error by more than 55%, it is misalignment jitter!
-                    if (avgShifted < avgBaseDiff * 0.45)
+                    if (avgShifted < bestShiftedDiff)
                     {
-                        return true;
+                        bestShiftedDiff = avgShifted;
+                        bestDx = dx;
+                        bestDy = dy;
                     }
                 }
+            }
+        }
+
+        // If integer or sub-pixel shift reduces error by more than 50%, it's misregistration jitter
+        if (bestShiftedDiff < avgBaseDiff * 0.50)
+        {
+            return true;
+        }
+
+        // Also test sub-pixel bilinear fractional interpolation at (+-0.5, +-0.5)
+        if (avgBaseDiff > 0.06 && avgBaseDiff < 0.20)
+        {
+            double halfShiftDiff = 0.0;
+            int halfShiftCount = 0;
+
+            for (int y = 0; y < patchSize - 1; y++)
+            {
+                for (int x = 0; x < patchSize - 1; x++)
+                {
+                    int ax = startX + x;
+                    int ay = startY + y;
+                    if (ax + 1 < w && ay + 1 < h)
+                    {
+                        // Bilinear 0.5-pixel interpolation
+                        float bInterp = 0.25f * (bandB[ay, ax] + bandB[ay, ax + 1] + bandB[ay + 1, ax] + bandB[ay + 1, ax + 1]);
+                        halfShiftDiff += Math.Abs(bandA[ay, ax] - bInterp);
+                        halfShiftCount++;
+                    }
+                }
+            }
+
+            if (halfShiftCount > 0 && (halfShiftDiff / halfShiftCount) < avgBaseDiff * 0.55)
+            {
+                return true;
             }
         }
 

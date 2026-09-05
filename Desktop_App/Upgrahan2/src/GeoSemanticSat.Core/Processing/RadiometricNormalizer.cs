@@ -96,15 +96,9 @@ public static class RadiometricNormalizer
             return new NormalizationParams(1.0, 0.0, 1.0);
         }
 
-        // Ordinary Least Squares Linear Regression: y = m*x + c
-        double meanX = 0, meanY = 0;
-        for (int i = 0; i < xVals.Count; i++)
-        {
-            meanX += xVals[i];
-            meanY += yVals[i];
-        }
-        meanX /= xVals.Count;
-        meanY /= yVals.Count;
+        // Initial OLS Regression: y = m*x + c
+        double meanX = xVals.Average();
+        double meanY = yVals.Average();
 
         double num = 0, denom = 0;
         for (int i = 0; i < xVals.Count; i++)
@@ -118,9 +112,60 @@ public static class RadiometricNormalizer
         double slope = denom > 1e-7 ? num / denom : 1.0;
         double intercept = meanY - slope * meanX;
 
-        // Clip extreme slope anomalies
-        if (slope < 0.3 || slope > 3.0) slope = 1.0;
+        // Iteratively Reweighted Least Squares (IRLS) with Tukey Biweight to reject change outliers
+        int maxIters = 3;
+        for (int iter = 0; iter < maxIters; iter++)
+        {
+            // Compute residuals
+            var residuals = new double[xVals.Count];
+            for (int i = 0; i < xVals.Count; i++)
+            {
+                residuals[i] = Math.Abs(yVals[i] - (slope * xVals[i] + intercept));
+            }
 
-        return new NormalizationParams(slope, intercept, 0.85);
+            // Estimate robust scale (Median Absolute Deviation)
+            var sortedRes = residuals.OrderBy(r => r).ToArray();
+            double medRes = sortedRes[sortedRes.Length / 2];
+            double tuningConstant = Math.Max(0.015, 4.685 * (medRes + 1e-6));
+
+            // Weighted regression
+            double wSum = 0, wMeanX = 0, wMeanY = 0;
+            var weights = new double[xVals.Count];
+            for (int i = 0; i < xVals.Count; i++)
+            {
+                double u = residuals[i] / tuningConstant;
+                weights[i] = u < 1.0 ? Math.Pow(1.0 - u * u, 2) : 0.0;
+                wSum += weights[i];
+                wMeanX += weights[i] * xVals[i];
+                wMeanY += weights[i] * yVals[i];
+            }
+
+            if (wSum > 10)
+            {
+                wMeanX /= wSum;
+                wMeanY /= wSum;
+
+                double wNum = 0, wDenom = 0;
+                for (int i = 0; i < xVals.Count; i++)
+                {
+                    if (weights[i] <= 0) continue;
+                    double dx = xVals[i] - wMeanX;
+                    double dy = yVals[i] - wMeanY;
+                    wNum += weights[i] * dx * dy;
+                    wDenom += weights[i] * dx * dx;
+                }
+
+                if (wDenom > 1e-7)
+                {
+                    slope = wNum / wDenom;
+                    intercept = wMeanY - slope * wMeanX;
+                }
+            }
+        }
+
+        // Bound realistic gain adjustments
+        if (slope < 0.4 || slope > 2.5) slope = 1.0;
+
+        return new NormalizationParams(slope, intercept, 0.92);
     }
 }

@@ -40,11 +40,29 @@ public static class SpatialSemanticClusterer
         int[] labels = new int[n]; // 0 = unvisited, -1 = noise, > 0 = clusterId
         int currentClusterId = 0;
 
+        // Build spatial hash grid buckets for sub-millisecond neighbor candidate pruning
+        double cellSizeDegrees = Math.Max(0.1, maxSpatialDistanceKm / 111.32);
+        var spatialGrid = new Dictionary<(long, long), List<int>>();
+
+        for (int i = 0; i < n; i++)
+        {
+            long gx = (long)Math.Floor(patches[i].Bounds.Center.Longitude / cellSizeDegrees);
+            long gy = (long)Math.Floor(patches[i].Bounds.Center.Latitude / cellSizeDegrees);
+            var key = (gx, gy);
+
+            if (!spatialGrid.TryGetValue(key, out var bucket))
+            {
+                bucket = new List<int>();
+                spatialGrid[key] = bucket;
+            }
+            bucket.Add(i);
+        }
+
         for (int i = 0; i < n; i++)
         {
             if (labels[i] != 0) continue;
 
-            var neighbors = FindNeighbors(i, patches, epsCosineDistance, maxSpatialDistanceKm);
+            var neighbors = FindNeighbors(i, patches, spatialGrid, cellSizeDegrees, epsCosineDistance, maxSpatialDistanceKm);
             if (neighbors.Count < minPts)
             {
                 labels[i] = -1; // noise candidate
@@ -67,7 +85,7 @@ public static class SpatialSemanticClusterer
                         continue;
 
                     labels[neighborIdx] = currentClusterId;
-                    var subNeighbors = FindNeighbors(neighborIdx, patches, epsCosineDistance, maxSpatialDistanceKm);
+                    var subNeighbors = FindNeighbors(neighborIdx, patches, spatialGrid, cellSizeDegrees, epsCosineDistance, maxSpatialDistanceKm);
                     if (subNeighbors.Count >= minPts)
                     {
                         foreach (var sn in subNeighbors)
@@ -137,26 +155,45 @@ public static class SpatialSemanticClusterer
         return result.OrderByDescending(c => c.Members.Count).ToList();
     }
 
-    private static List<int> FindNeighbors(int targetIdx, IReadOnlyList<TilePatch> patches, double eps, double maxSpatialKm)
+    private static List<int> FindNeighbors(
+        int targetIdx,
+        IReadOnlyList<TilePatch> patches,
+        Dictionary<(long, long), List<int>> spatialGrid,
+        double cellSizeDegrees,
+        double eps,
+        double maxSpatialKm)
     {
         var neighbors = new List<int>();
         var target = patches[targetIdx];
 
-        for (int j = 0; j < patches.Count; j++)
+        long gx = (long)Math.Floor(target.Bounds.Center.Longitude / cellSizeDegrees);
+        long gy = (long)Math.Floor(target.Bounds.Center.Latitude / cellSizeDegrees);
+
+        // Search only target cell and 8 adjacent neighboring spatial cells
+        for (long dy = -1; dy <= 1; dy++)
         {
-            if (targetIdx == j) continue;
-            var other = patches[j];
-
-            // Check spatial distance
-            double spatialDistKm = target.Bounds.Center.DistanceToKm(other.Bounds.Center);
-            if (spatialDistKm > maxSpatialKm) continue;
-
-            // Check cosine distance in embedding space
-            double sim = VectorIndexStore.DotProduct(target.EmbeddingVector, other.EmbeddingVector);
-            double dist = 1.0 - sim;
-            if (dist <= eps)
+            for (long dx = -1; dx <= 1; dx++)
             {
-                neighbors.Add(j);
+                if (spatialGrid.TryGetValue((gx + dx, gy + dy), out var candidates))
+                {
+                    foreach (int j in candidates)
+                    {
+                        if (targetIdx == j) continue;
+                        var other = patches[j];
+
+                        // Spatial distance filter
+                        double spatialDistKm = target.Bounds.Center.DistanceToKm(other.Bounds.Center);
+                        if (spatialDistKm > maxSpatialKm) continue;
+
+                        // Cosine distance filter in embedding space
+                        double sim = VectorIndexStore.DotProduct(target.EmbeddingVector, other.EmbeddingVector);
+                        double dist = 1.0 - sim;
+                        if (dist <= eps)
+                        {
+                            neighbors.Add(j);
+                        }
+                    }
+                }
             }
         }
 

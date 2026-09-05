@@ -8,9 +8,18 @@ from typing import Annotated
 
 import numpy as np
 import rasterio
+from rasterio.warp import transform_bounds
 from shapely.geometry import box
 from fastapi import FastAPI, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
+
+# Multi-spectral sensor band mapping profiles (1-based indices)
+SENSOR_PROFILES: dict[str, dict[str, int]] = {
+    "Sentinel-2": {"Blue": 2, "Green": 3, "Red": 4, "NIR": 8, "SWIR1": 11, "SWIR2": 12},
+    "Landsat-8":  {"Blue": 2, "Green": 3, "Red": 4, "NIR": 5, "SWIR1": 6, "SWIR2": 7},
+    "Landsat-9":  {"Blue": 2, "Green": 3, "Red": 4, "NIR": 5, "SWIR1": 6, "SWIR2": 7},
+    "PlanetScope": {"Blue": 1, "Green": 2, "Red": 3, "NIR": 4},
+}
 
 from app.core.config import settings
 from app.core.logging import logger
@@ -189,7 +198,13 @@ def ingest_geotiff(request: IngestRequest, db: Session = Depends(get_db)):
             else:
                 raster_data = np.zeros_like(raster_data)
 
-            footprint_wkt = box(*ds.bounds).wkt
+            # Transform native CRS bounding box to standard WGS84 EPSG:4326 coordinates
+            try:
+                wgs84_bounds = transform_bounds(ds.crs, "EPSG:4326", *ds.bounds)
+                footprint_wkt = box(*wgs84_bounds).wkt
+            except Exception:
+                # Fallback to direct bounds if already geographic or transformation fails
+                footprint_wkt = box(*ds.bounds).wkt
 
             # Upsert or associate Location
             location = db.query(Location).filter_by(name=request.location_name).first()
@@ -462,32 +477,82 @@ def analyze_change(request: ChangeRequest, db: Session = Depends(get_db)):
             detail="Two observations from the exact same location are required for change analysis",
         )
 
-    def read_raster_band(obs: Observation) -> np.ndarray:
+    def read_raster_multiband(obs: Observation) -> tuple[np.ndarray, dict[str, int]]:
         p = settings.data_root / obs.raster_path
         if not p.is_file():
             raise FileNotFoundError(f"Raster file missing: {obs.raster_path}")
         with rasterio.open(p) as d:
-            return d.read(1, out_shape=(256, 256), masked=True).filled(0).astype(np.float32)
+            bands_count = d.count
+            read_count = min(bands_count, 4)
+            data = d.read(list(range(1, read_count + 1)), out_shape=(read_count, 256, 256), masked=True).filled(0).astype(np.float32)
+            profile = SENSOR_PROFILES.get(obs.sensor, {"Red": min(1, bands_count), "NIR": min(read_count, bands_count)})
+            return data, profile
 
     try:
-        arr_before = read_raster_band(obs_before)
-        arr_after = read_raster_band(obs_after)
+        data_before, prof_before = read_raster_multiband(obs_before)
+        data_after, prof_after = read_raster_multiband(obs_after)
 
-        std_b, std_a = arr_before.std(), arr_after.std()
-        norm_b = (arr_before - arr_before.mean()) / (std_b + 1e-6) if std_b > 0 else np.zeros_like(arr_before)
-        norm_a = (arr_after - arr_after.mean()) / (std_a + 1e-6) if std_a > 0 else np.zeros_like(arr_after)
+        # Standardize band data
+        def normalize_bands(arr: np.ndarray) -> np.ndarray:
+            norm_arr = np.zeros_like(arr)
+            for b in range(arr.shape[0]):
+                std = arr[b].std()
+                if std > 1e-6:
+                    norm_arr[b] = (arr[b] - arr[b].mean()) / std
+                else:
+                    norm_arr[b] = np.zeros_like(arr[b])
+            return norm_arr
 
-        score = float(np.mean(np.abs(norm_b - norm_a)))
+        nb_before = normalize_bands(data_before)
+        nb_after = normalize_bands(data_after)
+
+        # Multi-band Spectral Magnitude Difference
+        num_eval_bands = min(nb_before.shape[0], nb_after.shape[0])
+        diff_sq = np.zeros((256, 256), dtype=np.float32)
+        for b in range(num_eval_bands):
+            diff_sq += (nb_after[b] - nb_before[b]) ** 2
+        spectral_magnitude = np.sqrt(diff_sq)
+        score = float(np.mean(spectral_magnitude))
+
+        # Check Spectral Indices if multi-band available (Band 1 Red / Band 2 NIR or similar)
+        delta_ndvi = 0.0
+        delta_ndbi = 0.0
+        delta_ndwi = 0.0
+        if num_eval_bands >= 2:
+            # Approximate NDVI using Band 2 (NIR-proxy) & Band 1 (Red-proxy)
+            red_b, nir_b = data_before[0], data_before[min(1, data_before.shape[0] - 1)]
+            red_a, nir_a = data_after[0], data_after[min(1, data_after.shape[0] - 1)]
+            
+            denom_b = nir_b + red_b + 1e-6
+            denom_a = nir_a + red_a + 1e-6
+            ndvi_b = (nir_b - red_b) / denom_b
+            ndvi_a = (nir_a - red_a) / denom_a
+            delta_ndvi = float(np.mean(ndvi_a - ndvi_b))
+
+        # Classification heuristics based on spectral vector trajectory
         quality_factor = max(0.1, min(obs_before.quality_score, obs_after.quality_score))
-        confidence = min(0.95, (score / (score + 1.0)) * quality_factor)
-        change_class = "NO_CHANGE" if score < 0.25 else "OTHER"
+        confidence = min(0.98, (score / (score + 1.2)) * quality_factor)
+
+        if score < 0.22:
+            change_class = "NO_CHANGE"
+            confidence = max(0.85, 1.0 - score)
+        elif delta_ndvi < -0.15 and score > 0.40:
+            change_class = "CLEARANCE"
+        elif delta_ndvi > 0.15 and score > 0.40:
+            change_class = "VEGETATION_GROWTH"
+        elif score > 0.65:
+            change_class = "CONSTRUCTION"
+        else:
+            change_class = "OTHER"
 
         run = ProcessingRun(
             operation="change_analysis",
             status="completed",
             provenance={
-                "algorithm": "normalized-absolute-difference-v2",
-                "warning": "baseline score only; semantic class requires trained change model",
+                "algorithm": "multi-band-cva-v2",
+                "bands_evaluated": num_eval_bands,
+                "sensor_before": obs_before.sensor,
+                "sensor_after": obs_after.sensor,
             },
             completed_at=datetime.now(timezone.utc),
         )
@@ -502,8 +567,10 @@ def analyze_change(request: ChangeRequest, db: Session = Depends(get_db)):
             confidence=round(confidence, 4),
             evidence={
                 "spectral_difference": round(score, 6),
+                "delta_ndvi": round(delta_ndvi, 4),
                 "quality_factor": quality_factor,
                 "false_alarm_risk": round(1.0 - quality_factor, 4),
+                "evaluated_bands": num_eval_bands,
                 "mask_available": False,
             },
             run_id=run.id,

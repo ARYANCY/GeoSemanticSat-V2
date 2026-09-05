@@ -26,12 +26,17 @@ public record SearchFilter(
 public class VectorIndex
 {
     private readonly List<TilePatch> _patches = new();
-    private readonly object _lock = new();
+    private readonly System.Threading.ReaderWriterLockSlim _rwLock = new();
     public int VectorDimension { get; private set; }
 
     public int Count
     {
-        get { lock (_lock) return _patches.Count; }
+        get
+        {
+            _rwLock.EnterReadLock();
+            try { return _patches.Count; }
+            finally { _rwLock.ExitReadLock(); }
+        }
     }
 
     public VectorIndex(int vectorDimension = 128)
@@ -52,9 +57,14 @@ public class VectorIndex
         // Normalize vector for cosine distance
         NormalizeInPlace(patch.EmbeddingVector);
 
-        lock (_lock)
+        _rwLock.EnterWriteLock();
+        try
         {
             _patches.Add(patch);
+        }
+        finally
+        {
+            _rwLock.ExitWriteLock();
         }
     }
 
@@ -63,22 +73,39 @@ public class VectorIndex
     /// </summary>
     public void AddRange(IEnumerable<TilePatch> patches)
     {
-        foreach (var p in patches)
+        _rwLock.EnterWriteLock();
+        try
         {
-            Add(p);
+            foreach (var p in patches)
+            {
+                if (p.EmbeddingVector.Length != VectorDimension)
+                    throw new ArgumentException($"Embedding dimension mismatch. Expected {VectorDimension}, got {p.EmbeddingVector.Length}");
+                NormalizeInPlace(p.EmbeddingVector);
+                _patches.Add(p);
+            }
+        }
+        finally
+        {
+            _rwLock.ExitWriteLock();
         }
     }
 
     public IReadOnlyList<TilePatch> GetAllPatches()
     {
-        lock (_lock)
+        _rwLock.EnterReadLock();
+        try
         {
             return _patches.ToList();
+        }
+        finally
+        {
+            _rwLock.ExitReadLock();
         }
     }
 
     /// <summary>
     /// Top-K nearest neighbor search by cosine similarity with spatiotemporal filters.
+    /// Supports high-throughput concurrent parallel readers.
     /// </summary>
     public List<SearchResult> Search(float[] queryVector, int topK = 10, SearchFilter? filter = null)
     {
@@ -88,46 +115,50 @@ public class VectorIndex
         float[] normQuery = (float[])queryVector.Clone();
         NormalizeInPlace(normQuery);
 
-        List<TilePatch> candidates;
-        lock (_lock)
-        {
-            candidates = _patches.ToList();
-        }
+        var results = new List<SearchResult>();
 
-        var results = new List<SearchResult>(candidates.Count);
-
-        foreach (var patch in candidates)
+        _rwLock.EnterReadLock();
+        try
         {
-            // Apply Spatio-Temporal Filters
-            if (filter != null)
+            for (int i = 0; i < _patches.Count; i++)
             {
-                if (filter.BoundingBox.HasValue && !filter.BoundingBox.Value.Intersects(patch.Bounds))
-                    continue;
+                var patch = _patches[i];
 
-                if (filter.CenterCoordinate.HasValue && filter.RadiusKm.HasValue)
+                // Apply Spatio-Temporal Filters
+                if (filter != null)
                 {
-                    double distKm = patch.Bounds.Center.DistanceToKm(filter.CenterCoordinate.Value);
-                    if (distKm > filter.RadiusKm.Value)
+                    if (filter.BoundingBox.HasValue && !filter.BoundingBox.Value.Intersects(patch.Bounds))
+                        continue;
+
+                    if (filter.CenterCoordinate.HasValue && filter.RadiusKm.HasValue)
+                    {
+                        double distKm = patch.Bounds.Center.DistanceToKm(filter.CenterCoordinate.Value);
+                        if (distKm > filter.RadiusKm.Value)
+                            continue;
+                    }
+
+                    if (filter.StartDate.HasValue && patch.Timestamp < filter.StartDate.Value)
+                        continue;
+
+                    if (filter.EndDate.HasValue && patch.Timestamp > filter.EndDate.Value)
+                        continue;
+
+                    if (filter.Platform.HasValue && patch.Platform != filter.Platform.Value)
+                        continue;
+
+                    if (patch.QualityScore < filter.MinQuality)
                         continue;
                 }
 
-                if (filter.StartDate.HasValue && patch.Timestamp < filter.StartDate.Value)
-                    continue;
-
-                if (filter.EndDate.HasValue && patch.Timestamp > filter.EndDate.Value)
-                    continue;
-
-                if (filter.Platform.HasValue && patch.Platform != filter.Platform.Value)
-                    continue;
-
-                if (patch.QualityScore < filter.MinQuality)
-                    continue;
+                // SIMD Cosine similarity = dot product of normalized vectors
+                double sim = DotProduct(normQuery, patch.EmbeddingVector);
+                double dist = 1.0 - sim;
+                results.Add(new SearchResult(patch, Math.Clamp(sim, -1.0, 1.0), Math.Max(0.0, dist)));
             }
-
-            // SIMD Cosine similarity = dot product of normalized vectors
-            double sim = DotProduct(normQuery, patch.EmbeddingVector);
-            double dist = 1.0 - sim;
-            results.Add(new SearchResult(patch, Math.Clamp(sim, -1.0, 1.0), Math.Max(0.0, dist)));
+        }
+        finally
+        {
+            _rwLock.ExitReadLock();
         }
 
         return results.OrderByDescending(r => r.SimilarityScore).Take(topK).ToList();
@@ -182,7 +213,8 @@ public class VectorIndex
     /// </summary>
     public void SaveIndex(string filePath)
     {
-        lock (_lock)
+        _rwLock.EnterReadLock();
+        try
         {
             using var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write);
             using var bw = new BinaryWriter(fs);
@@ -215,6 +247,10 @@ public class VectorIndex
                     bw.Write(p.EmbeddingVector[i]);
                 }
             }
+        }
+        finally
+        {
+            _rwLock.ExitReadLock();
         }
     }
 

@@ -76,26 +76,38 @@ public static class OnsetEstimator
             series.Add(new ObservationPoint(tile.AcquisitionTimestamp, tile.TileId, metricAvg, isUsable));
         }
 
-        // CUSUM / Change-point detection over usable observations
+        // Robust Sequential CUSUM / Change-Point Detection over usable observations
         var usableSeries = series.Where(s => s.IsUsable).ToList();
         if (usableSeries.Count < 2)
         {
             return series.Last().Timestamp;
         }
 
-        // Search for earliest index i where difference from baseline is statistically significant
-        double baselineMetric = usableSeries[0].MetricValue;
-        double maxDelta = 0.0;
+        // Establish moving baseline statistical envelope from the initial 1/3 observations
+        int baselineCount = Math.Max(1, Math.Min(3, usableSeries.Count / 3));
+        double baselineMean = usableSeries.Take(baselineCount).Average(s => s.MetricValue);
+        double baselineVar = usableSeries.Take(baselineCount).Average(s => Math.Pow(s.MetricValue - baselineMean, 2));
+        double sigma = Math.Max(0.025, Math.Sqrt(baselineVar));
+
+        // CUSUM parameters: Slack allowance K and Decision threshold H
+        double slackK = 0.5 * sigma;
+        double thresholdH = Math.Max(0.12, 3.5 * sigma);
+
+        double cusumPos = 0.0;
+        double cusumNeg = 0.0;
         int onsetIndex = usableSeries.Count - 1;
 
         for (int i = 1; i < usableSeries.Count; i++)
         {
-            double delta = Math.Abs(usableSeries[i].MetricValue - baselineMetric);
-            if (delta > 0.15 && delta > maxDelta)
+            double val = usableSeries[i].MetricValue;
+            cusumPos = Math.Max(0.0, cusumPos + (val - baselineMean) - slackK);
+            cusumNeg = Math.Max(0.0, cusumNeg - (val - baselineMean) - slackK);
+
+            // Trigger change onset upon statistically significant cumulative deviation
+            if (cusumPos > thresholdH || cusumNeg > thresholdH)
             {
-                maxDelta = delta;
                 onsetIndex = i;
-                break; // Found earliest observation crossing change threshold
+                break;
             }
         }
 

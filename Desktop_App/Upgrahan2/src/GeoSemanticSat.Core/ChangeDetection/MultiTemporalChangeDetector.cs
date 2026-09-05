@@ -186,7 +186,10 @@ public class MultiTemporalChangeDetector
                     );
 
                     double gsd = t1.GroundSamplingDistanceMeters;
-                    double areaSqM = patchSize * patchSize * gsd * gsd;
+                    double centerLatRad = (patchBounds.MinLat + patchBounds.MaxLat) * 0.5 * (Math.PI / 180.0);
+                    double cosLatFactor = Math.Max(0.2, Math.Cos(centerLatRad));
+                    // Geodesic surface area in square meters
+                    double areaSqM = patchSize * patchSize * gsd * (gsd * cosLatFactor);
 
                     changes.Add(new ChangeRecord
                     {

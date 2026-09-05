@@ -106,16 +106,16 @@ public class QualityMaskEngine
             }
         }
 
-        // Step 2: Geometric Ray-Casting for Cloud Shadows
+        // Step 2: Geometric Ray-Casting for Cloud Shadows & Edge Dilation
         // Direction opposite to solar azimuth:
-        // Shadow Angle = (SunAzimuth + 180°) % 360°
         double shadowAngleRad = ((tile.SunAzimuthDegrees + 180.0) % 360.0) * (Math.PI / 180.0);
-        double sunElevRad = Math.Max(15.0, tile.SunElevationDegrees) * (Math.PI / 180.0);
+        double sunElevRad = Math.Max(12.0, Math.Min(85.0, tile.SunElevationDegrees)) * (Math.PI / 180.0);
 
-        // Typical cloud base altitude 1500m - 2500m. In pixels (assuming 10m GSD):
+        // Typical cloud base altitude 1500m - 3000m. In pixels (accounting for GSD):
+        double gsd = Math.Max(1.0, tile.GroundSamplingDistanceMeters);
         double avgCloudAltMeters = 2000.0;
-        double shadowDistPixels = (avgCloudAltMeters / Math.Tan(sunElevRad)) / Math.Max(1.0, tile.GroundSamplingDistanceMeters);
-        shadowDistPixels = Math.Clamp(shadowDistPixels, 5.0, 60.0);
+        double shadowDistPixels = (avgCloudAltMeters / Math.Tan(sunElevRad)) / gsd;
+        shadowDistPixels = Math.Clamp(shadowDistPixels, 4.0, 75.0);
 
         int dx = (int)Math.Round(Math.Sin(shadowAngleRad) * shadowDistPixels);
         int dy = (int)Math.Round(-Math.Cos(shadowAngleRad) * shadowDistPixels);
@@ -126,14 +126,14 @@ public class QualityMaskEngine
             {
                 if ((mask[y, x] & QualityMaskFlags.Cloud) != 0)
                 {
-                    // Cast shadow ray with a slight spread (radius 3)
-                    for (int step = -2; step <= 2; step++)
+                    // Cast shadow ray with directional spread along the solar track
+                    for (int step = -3; step <= 3; step++)
                     {
-                        int sx = x + dx + step;
-                        int sy = y + dy + step;
+                        int sx = x + dx + (int)Math.Round(step * Math.Cos(shadowAngleRad));
+                        int sy = y + dy + (int)Math.Round(step * Math.Sin(shadowAngleRad));
                         if (sx >= 0 && sx < w && sy >= 0 && sy < h)
                         {
-                            // If target pixel is dark in NIR and not already cloud
+                            // Target pixel is dark in NIR/SWIR and not thick cloud
                             if (nir[sy, sx] < ShadowNirMaxThreshold && (mask[sy, sx] & QualityMaskFlags.Cloud) == 0)
                             {
                                 mask[sy, sx] |= QualityMaskFlags.CloudShadow;
@@ -144,7 +144,23 @@ public class QualityMaskEngine
             }
         }
 
-        return mask;
+        // Step 3: Morphological Cloud Fringe Dilation (1-pixel dilation around cloud edges)
+        var dilated = (QualityMaskFlags[,])mask.Clone();
+        for (int y = 1; y < h - 1; y++)
+        {
+            for (int x = 1; x < w - 1; x++)
+            {
+                if ((mask[y, x] & QualityMaskFlags.Cloud) != 0)
+                {
+                    dilated[y - 1, x] |= QualityMaskFlags.HighHaze;
+                    dilated[y + 1, x] |= QualityMaskFlags.HighHaze;
+                    dilated[y, x - 1] |= QualityMaskFlags.HighHaze;
+                    dilated[y, x + 1] |= QualityMaskFlags.HighHaze;
+                }
+            }
+        }
+
+        return dilated;
     }
 
     /// <summary>
