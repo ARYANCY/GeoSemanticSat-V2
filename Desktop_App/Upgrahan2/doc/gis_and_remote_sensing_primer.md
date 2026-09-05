@@ -1,4 +1,4 @@
-# 🛰️ Comprehensive Primer: GIS, Remote Sensing & Earth Observation for GeoSemanticSat
+# Comprehensive Primer: GIS, Remote Sensing & Earth Observation for GeoSemanticSat
 
 This primer provides the foundational domain knowledge—spanning physics, satellite sensor design, geographic coordinates, spectral mathematics, and specific satellite constellations—necessary to fully understand what **GeoSemanticSat** does and why its algorithmic decisions were made.
 

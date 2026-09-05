@@ -13,11 +13,11 @@ We expanded **GeoSemanticSat** with visual presentation capabilities across all 
   - **False Color Infrared (NIR-Red-Green)**: Highlights healthy vegetation canopy in crimson red, waterbodies in deep dark blue/black, and urban / concrete structures in cyan/grey.
   - **NDVI Heatmap**: Normalized difference vegetation density color scale.
   - **Change Heatmap Overlay**: Baseline imagery dynamically tinted with color-coded bounding boxes and semi-transparent fills:
-    - 🔴 **Red**: Construction (New structures, facilities, pads)
-    - 🟡 **Amber**: Clearance (Vegetation loss / land clearance)
-    - 🔵 **Cyan**: Water-Extent Variation (Inundation / drying)
-    - 🟣 **Purple**: Road / Linear Infrastructure Development
-    - 🟠 **Orange**: Activity / Transient Object Concentration
+    - **Red**: Construction (New structures, facilities, pads)
+    - **Amber**: Clearance (Vegetation loss / land clearance)
+    - **Cyan**: Water-Extent Variation (Inundation / drying)
+    - **Purple**: Road / Linear Infrastructure Development
+    - **Orange**: Activity / Transient Object Concentration
 - Zero third-party native imaging libraries needed — works 100% cross-platform in Avalonia UI via `new Bitmap(stream)`.
 
 ### Avalonia UI Visual Upgrades ([`MainWindow.axaml`](file:///home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/MainWindow.axaml))
@@ -85,7 +85,7 @@ Found 10 matching change sites:
    - Now programmatically switches the UI to the **Advanced Spatiotemporal Search** tab (`MainTabControl.SelectedIndex = 1`), automatically populates the center coordinates, and runs the change query so Before/After thumbnails are displayed immediately.
 
 2. **External Dataset Ingestion**:
-   - Added the **📂 Load GeoTIFF** button in the header bar.
+   - Added the **Load GeoTIFF** button in the header bar.
    - Supports selecting multi-band `.tif` / `.tiff` files via `StorageProvider.OpenFilePickerAsync`.
    - Tiles are read by `GeoTiffReader`, tessellated into 64×64 patches, embedded with the 128-D vision model, and ingested into the live `VectorIndex`.
    - Documented in detail in [Analyst User Guide](file:///home/non_qualities/.gemini/antigravity/brain/ca4547db-a802-4004-b27f-ed018dd0f975/analyst_user_guide.md).
@@ -104,16 +104,16 @@ Found 10 matching change sites:
 
 2. **Descriptive Visualization & In-App Legends**:
    - **Render Mode Legend**: Added an explanatory guide under the visualization dropdown detailing how to interpret False Color IR (Crimson Red = Vegetation, Black = Water, Cyan = Concrete) and NDVI.
-   - **Change Classification Legend**: Added clear color badges explaining 🔴 Construction, 🟡 Clearance, 🔵 Water boundary shift, and 🟣 Road development.
+   - **Change Classification Legend**: Added clear color badges explaining Construction, Clearance, Water boundary shift, and Road development.
    - **Enhanced Comparison Views**: Added explicit timestamps and badges to Before ($T_1$) and After ($T_2$) panels.
 
 3. **Intuitive Naming & Plain-English Helper Banners**:
    - Replaced esoteric tab labels with user-centered titles:
-     - `🔍 Natural Language Search` (was "Semantic Retrieval")
-     - `🎯 Target Coordinate & Change Search` (was "Advanced Spatiotemporal Search")
-     - `🔄 Multi-Temporal Change & Heatmaps` (was "Change Analysis & Heatmap Viewer")
-     - `📍 Grouped Sites & Facilities` (was "Site Discovery & Clustering")
-     - `📋 Verification Queue & Audit Trail` (was "Analyst Workflow & Audit Trail")
+     - `Natural Language Search` (was "Semantic Retrieval")
+     - `Target Coordinate & Change Search` (was "Advanced Spatiotemporal Search")
+     - `Multi-Temporal Change & Heatmaps` (was "Change Analysis & Heatmap Viewer")
+     - `Grouped Sites & Facilities` (was "Site Discovery & Clustering")
+     - `Verification Queue & Audit Trail` (was "Analyst Workflow & Audit Trail")
    - Added top helper cards on each tab explaining in plain English what the tab does and how to use it.
 
 ---
@@ -146,8 +146,8 @@ We significantly upgraded Tab 3 (**Multi-Temporal Change & Heatmaps**) into an i
   - $\Delta\text{NDWI}$ (Normalized Difference Water Index): Tracks moisture boundary expansion or contraction.
   - $\Delta\text{Sobel}$ (Gradient Sharpness): Measures edge emergence (perimeter walls, trenches, road borders).
 - **Interactive Triage Actions**:
-  - **🎯 Pivot to Tab 2**: Automatically transfers the site's center coordinates and change type to Tab 2, immediately executing a spatiotemporal radial search.
-  - **✓ Confirm** / **✗ Reject**: Instantly updates the review queue and active learning memory.
+  - **Pivot to Tab 2**: Automatically transfers the site's center coordinates and change type to Tab 2, immediately executing a spatiotemporal radial search.
+  - **Confirm** / **Reject**: Instantly updates the review queue and active learning memory.
 
 ---
 

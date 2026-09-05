@@ -1,58 +1,73 @@
-# 🛰️ UpaGraha: Offline-First Geospatial Intelligence & Satellite Analytics Platform
+# UpaGraha: Offline-First Geospatial Intelligence & Satellite Analytics Platform
 
 [![Platform](https://img.shields.io/badge/Platform-Air--Gapped%20%7C%20Zero--Internet-blue.svg)](#)
 [![Backend](https://img.shields.io/badge/Backend-FastAPI%20%7C%20Python%203.11-green.svg)](#)
 [![Engine](https://img.shields.io/badge/Core%20Engine-.NET%2010%20%7C%20C%23-purple.svg)](#)
 [![Spatial DB](https://img.shields.io/badge/Spatial%20DB-PostgreSQL%2016%20%2B%20PostGIS%203.4-blue.svg)](#)
 [![Vector Acceleration](https://img.shields.io/badge/SIMD-AVX2%20Vector256-orange.svg)](#)
+[![Audit Standard](https://img.shields.io/badge/Provenance-W3C%20PROV--O%20GeoJSON-teal.svg)](#)
 
-**UpaGraha** is an enterprise-grade Earth Observation (EO) and geospatial intelligence (GEOINT) platform architected for **100% air-gapped, zero-internet, offline operation**. It empowers defense and intelligence analysts, disaster response forces, and environmental monitors to ingest high-resolution satellite imagery, execute sub-millisecond visual similarity searches, detect physical land-use changes, track multi-temporal onset timelines, and conduct analyst review workflows without connecting to external cloud infrastructure or map providers.
+**UpaGraha** is an enterprise-grade Earth Observation (EO) and Geospatial Intelligence (GEOINT) platform architected for **100% air-gapped, zero-internet, on-premises operation**. It empowers defense and intelligence analysts, disaster management teams, and environmental monitoring organizations to ingest high-resolution satellite imagery, execute sub-millisecond visual similarity searches, detect physical land-use changes, track multi-temporal onset timelines, and conduct analyst verification workflows without external network dependencies or third-party cloud mapping services.
 
 ---
 
-## 📑 Documentation Reference Index
+## Key Capabilities & Highlights
 
-| Document | Topic & Focus Area | Direct File Link |
+- **Air-Gapped & Sovereign Deployment**: Zero cloud or telemetry dependencies; fully self-contained on local workstations, edge appliances, or sovereign data centers.
+- **Sub-Millisecond Vector Search**: AVX2 SIMD-accelerated cosine similarity search over dense multi-spectral embedding spaces with custom binary GSSV and FAISS indices.
+- **Multi-Band Change Vector Analysis (CVA)**: True spectral magnitude and directional angle classification across multispectral bands (`Construction`, `Clearance`, `WaterExtentVariation`, `RoadDevelopment`, `ActivityConcentration`).
+- **Sequential CUSUM Change Onset Detection**: Rolling-variance statistical process control ($3.5\sigma$) that pinpoints the exact acquisition date of physical change while rejecting seasonal vegetation phenology.
+- **Sub-Pixel Orthorectification Jitter Suppression**: Quadratic parabolic peak interpolation and bilinear shifting to eliminate false alarms from $0.1 - 0.8\text{ px}$ registration jitter.
+- **Radiometric Normalization**: Pseudo-Invariant Feature (PIF) normalization using Iteratively Reweighted Least Squares (IRLS) with Tukey biweight loss to correct atmospheric and illumination variations.
+- **Spatial-Semantic Unsupervised Site Discovery**: $O(N \log N)$ Spatial Hash Grid DBSCAN clustering combining embedding cosine distance and geospatial Euclidean distance.
+- **WGS84 Ellipsoidal Surface Area Calculations**: True ground surface area computations with latitude-dependent ellipsoidal scaling ($\cos\phi$ correction).
+- **Analyst Review & Active Learning**: Interactive confirmation/rejection triage queues, Rocchio relevance feedback reranking, and tamper-evident W3C PROV-O GeoJSON audit exports.
+
+---
+
+## Documentation Reference Suite
+
+| Document | Focus Area | Description |
 | :--- | :--- | :--- |
-| **01. System Architecture** | High-level architecture, layer breakdown, sequence diagrams & air-gapped guarantees | [`documentation/01_system_architecture.md`](file:///c:/Users/aryan/OneDrive/Desktop/UpaGraha/documentation/01_system_architecture.md) |
-| **02. Algorithms & Mathematics** | CVA change detection, Sequential CUSUM onset, sub-pixel jitter filter, Tukey PIF, geodesic area | [`documentation/02_algorithms_and_mathematics.md`](file:///c:/Users/aryan/OneDrive/Desktop/UpaGraha/documentation/02_algorithms_and_mathematics.md) |
-| **03. Remote Sensing & Sensors** | Sensor band mapping (Sentinel-2, Landsat, PlanetScope), spectral indices, cloud & shadow math | [`documentation/03_remote_sensing_and_sensors.md`](file:///c:/Users/aryan/OneDrive/Desktop/UpaGraha/documentation/03_remote_sensing_and_sensors.md) |
-| **04. API Gateway Reference** | FastAPI endpoints, Pydantic schemas, request/response JSON contracts, query pagination | [`documentation/04_api_reference.md`](file:///c:/Users/aryan/OneDrive/Desktop/UpaGraha/documentation/04_api_reference.md) |
-| **05. Desktop Intelligence Engine** | GeoSemanticSat C# engine, SIMD AVX2 acceleration, GSSV binary index, Avalonia UI canvas | [`documentation/05_desktop_engine_guide.md`](file:///c:/Users/aryan/OneDrive/Desktop/UpaGraha/documentation/05_desktop_engine_guide.md) |
-| **06. Deployment & Security** | Air-gapped deployment manual, Dockerfile non-root hardening, Compose PostGIS volume wiring | [`documentation/06_deployment_and_security.md`](file:///c:/Users/aryan/OneDrive/Desktop/UpaGraha/documentation/06_deployment_and_security.md) |
-| **07. Issue Resolution & Audit** | Exhaustive technical audit of all resolved bugs, mathematical fixes, and performance upgrades | [`documentation/07_issue_resolution_and_audit.md`](file:///c:/Users/aryan/OneDrive/Desktop/UpaGraha/documentation/07_issue_resolution_and_audit.md) |
+| **01. System Architecture** | [`documentation/01_system_architecture.md`](file:///c:/Users/aryan/OneDrive/Desktop/UpaGraha/documentation/01_system_architecture.md) | High-level system architecture, component breakdown, sequence diagrams, and air-gapped deployment guarantees. |
+| **02. Algorithms & Mathematics** | [`documentation/02_algorithms_and_mathematics.md`](file:///c:/Users/aryan/OneDrive/Desktop/UpaGraha/documentation/02_algorithms_and_mathematics.md) | Mathematical formulations for CVA, Sequential CUSUM onset, sub-pixel jitter filter, Tukey PIF normalizer, and geodesic area. |
+| **03. Remote Sensing & Sensors** | [`documentation/03_remote_sensing_and_sensors.md`](file:///c:/Users/aryan/OneDrive/Desktop/UpaGraha/documentation/03_remote_sensing_and_sensors.md) | Multi-sensor band mappings (Sentinel-2, Landsat, PlanetScope, Sentinel-1 SAR), spectral indices (NDVI, NDWI, NDBI), and quality masking. |
+| **04. API Gateway Reference** | [`documentation/04_api_reference.md`](file:///c:/Users/aryan/OneDrive/Desktop/UpaGraha/documentation/04_api_reference.md) | FastAPI REST endpoints, Pydantic schemas, request/response JSON contracts, pagination, and error handling. |
+| **05. Desktop Intelligence Engine** | [`documentation/05_desktop_engine_guide.md`](file:///c:/Users/aryan/OneDrive/Desktop/UpaGraha/documentation/05_desktop_engine_guide.md) | GeoSemanticSat .NET 10 core engine, SIMD AVX2 acceleration, binary index layouts, and Avalonia desktop UI. |
+| **06. Deployment & Security** | [`documentation/06_deployment_and_security.md`](file:///c:/Users/aryan/OneDrive/Desktop/UpaGraha/documentation/06_deployment_and_security.md) | Hardened non-root Docker deployment, offline pip caching, Compose PostGIS volume wiring, and zero-trust policies. |
+| **07. Issue Resolution & Audit** | [`documentation/07_issue_resolution_and_audit.md`](file:///c:/Users/aryan/OneDrive/Desktop/UpaGraha/documentation/07_issue_resolution_and_audit.md) | Comprehensive audit of resolved bugs, mathematical fixes, concurrency guarantees, and performance optimizations. |
 
 ---
 
-## 🏛️ System Architecture Blueprint
+## System Architecture Blueprint
 
 ```mermaid
 graph TD
-    subgraph Presentation & Client Layer
-        UI["🖥️ Avalonia Desktop Studio / Web Intelligence Portal"]
-        MapCanvas["🗺️ MapLibre GL Offline WebGL Canvas"]
+    subgraph Presentation and Client Layer
+        UI["Avalonia Desktop Studio / Web Intelligence Portal"]
+        MapCanvas["MapLibre GL Offline WebGL Canvas"]
     end
 
-    subgraph Service Tier - Python Gateway
-        API["⚡ FastAPI REST Gateway (:8000)"]
-        IngestService["📥 GeoTIFF Ingestion & WGS84 Reprojection"]
-        CVAService["🔬 Multi-Band Change Vector Analysis (CVA)"]
-        Embedder["🧠 96-dim Visual Feature Extractor"]
+    subgraph Service Tier - Python Backend
+        API["FastAPI REST Gateway (:8000)"]
+        IngestService["GeoTIFF Ingestion & WGS84 Reprojection"]
+        CVAService["Multi-Band Change Vector Analysis (CVA)"]
+        Embedder["96-dim Visual Feature Extractor"]
     end
 
     subgraph High-Throughput Core - .NET C# Engine
-        Engine["⚙️ GeoSemanticSat Core Subsystem"]
-        SIMD["🚀 AVX2 SIMD Vector Acceleration"]
-        CUSUM["📈 Sequential CUSUM Onset Estimator"]
-        DBSCAN["🌐 Spatial Hash Grid DBSCAN ($O(N \log N)$)"]
-        JitterFilter["🎯 Sub-Pixel Peak Interpolation Filter"]
-        TukeyNorm["⚖️ Tukey Biweight PIF Normalizer"]
+        Engine["GeoSemanticSat Core Subsystem"]
+        SIMD["AVX2 SIMD Vector Acceleration"]
+        CUSUM["Sequential CUSUM Onset Estimator"]
+        DBSCAN["Spatial Hash Grid DBSCAN (O(N log N))"]
+        JitterFilter["Sub-Pixel Peak Interpolation Filter"]
+        TukeyNorm["Tukey Biweight PIF Normalizer"]
     end
 
-    subgraph Persistent Storage & Indexing
-        PostGIS[("🐘 PostgreSQL 16 + PostGIS 3.4")]
-        BinaryIndex[("💾 Binary GSSV / FAISS Vector Store")]
-        RasterStore[("📁 Local COG Pyramid Storage")]
+    subgraph Persistent Storage and Indexing
+        PostGIS[("PostgreSQL 16 + PostGIS 3.4")]
+        BinaryIndex[("Binary GSSV / FAISS Vector Store")]
+        RasterStore[("Local COG Pyramid Storage")]
     end
 
     UI --> API
@@ -74,22 +89,55 @@ graph TD
 
 ---
 
-## 🎯 System Capabilities & Performance Matrix
+## Repository Structure
+
+```
+UpaGraha/
+|-- documentation/                  # Comprehensive system documentation (01-07)
+|-- Unified-RSanalytics/            # Unified application workspace
+    |-- app/                        # Python FastAPI backend service
+    |   |-- api/                    # REST route controllers (search, change, ingestion, clusters)
+    |   |-- core/                   # Application config, database engine, logging
+    |   |-- models/                 # SQLAlchemy ORM models and Pydantic schemas
+    |   |-- services/               # CVA, CUSUM, feature extraction, raster processing
+    |   +-- utils/                  # Coordinate transforms, PROV-O generators
+    |-- Desktop_App/                # Native .NET 10 desktop application (GeoSemanticSat)
+    |   +-- Upgrahan2/
+    |       |-- src/
+    |       |   |-- GeoSemanticSat.Core/     # Raster I/O, SIMD index, CVA, CUSUM, DBSCAN
+    |       |   |-- GeoSemanticSat.Engine/   # Semantic search dual-encoders, ONNX runner
+    |       |   |-- GeoSemanticSat.UI/       # Avalonia XAML desktop user interface
+    |       |   |-- GeoSemanticSat.Cli/      # Headless command-line CLI tool
+    |       |   +-- GeoSemanticSat.Tests/    # xUnit automated verification test suite
+    |       +-- doc/                         # Analyst guides and architectural reports
+    |-- data/                       # Local raster storage and raw satellite acquisitions
+    |-- indexes/                    # FAISS vector indexes and binary GSSV index files
+    |-- scripts/                    # Database migrations, test data generators, benchmark scripts
+    |-- tests/                      # Python pytest automated test suite
+    |-- Dockerfile                  # Hardened non-root air-gapped container image
+    |-- docker-compose.yml          # PostGIS and Backend service orchestration
+    |-- requirements.txt            # Locked Python production dependencies
+    +-- README.md                   # Workspace overview
+```
+
+---
+
+## System Capabilities & Performance Matrix
 
 | Capability / Subsystem | Traditional System Baseline | UpaGraha Production Standard | Operational Benefit |
 | :--- | :--- | :--- | :--- |
-| **Spatial Bounding System** | Native UTM meters without reprojection | Automatic WGS84 (EPSG:4326) transformation | Perfect alignment across global GIS viewers and vector layers |
+| **Spatial Reference System** | Native UTM meters without reprojection | Automatic WGS84 (EPSG:4326) transformation | Consistent alignment across global GIS viewers and vector layers |
 | **Change Detection** | Single-band scalar difference $|I_2 - I_1|$ | Multi-Band Change Vector Analysis (CVA) | Accurate classification: `CLEARANCE`, `CONSTRUCTION`, `WATER` |
-| **Onset Date Estimation** | Single-baseline comparison ($T_i - T_0$) | Sequential CUSUM with Rolling Variance ($3.5\sigma$) | Completely immune to seasonal vegetation greening false alarms |
-| **Jitter Suppression** | Integer shift testing ($\pm 1\text{ px}$) | Sub-Pixel Quadratic Peak & Bilinear Interpolation | Eliminates false alarms from $0.1 - 0.8\text{ px}$ orthorectification jitter |
+| **Onset Date Estimation** | Single-baseline comparison ($T_i - T_0$) | Sequential CUSUM with Rolling Variance ($3.5\sigma$) | Immune to seasonal vegetation greening false alarms |
+| **Jitter Suppression** | Integer shift testing ($\pm 1\text{ px}$) | Sub-Pixel Quadratic Peak & Bilinear Interpolation | Eliminates false alarms from $0.1 - 0.8\text{ px}$ registration jitter |
 | **Radiometric Calibration** | Ordinary Least Squares (OLS) | Iteratively Reweighted Least Squares (IRLS) with Tukey | Outlier-resistant gain/bias fitting under large ground disturbances |
 | **Spatial Clustering** | Brute-force $O(N^2)$ all-pairs DBSCAN | Spatial Hash Grid pre-filtering ($O(N \log N)$) | Sub-second unsupervised cluster discovery across 100k patches |
-| **Vector Similarity** | Heap-allocated list cloning on query | Zero-allocation in-place SIMD search (`ReaderWriterLockSlim`) | $< 1.0\text{ms}$ search latency with unlimited parallel reader threads |
+| **Vector Similarity** | Heap-allocated list cloning on query | Zero-allocation in-place SIMD search (`ReaderWriterLockSlim`) | $< 1.0\text{ms}$ search latency with parallel reader threads |
 | **Surface Area Math** | Flat planar Cartesian calculation | WGS84 Ellipsoidal Geodesic Area ($\cos\phi$ corrected) | True physical area in $\text{m}^2$ / hectares across all latitudes |
 
 ---
 
-## 🔬 Core Mathematical & Algorithmic Formulations
+## Core Mathematical & Algorithmic Formulations
 
 ```
 +-------------------------------------------------------------------------------------------------------------+
@@ -106,12 +154,15 @@ graph TD
 |                                                                                                             |
 | 4. ELLIPSOIDAL GEODESIC SURFACE AREA                                                                        |
 |    Area(meters^2) = Width * Height * GSD^2 * cos(Latitude)                                                  |
+|                                                                                                             |
+| 5. ROCCHIO RELEVANCE FEEDBACK                                                                               |
+|    Q_new = alpha * Q_orig + (beta / |D_R|) * sum(d in D_R) - (gamma / |D_NR|) * sum(d in D_NR)              |
 +-------------------------------------------------------------------------------------------------------------+
 ```
 
 ---
 
-## 📡 Sensor & Spectral Band Directory
+## Sensor & Spectral Band Directory
 
 | Sensor Platform | Native Bands Configured | Spatial GSD | Primary Strategic Indices |
 | :--- | :--- | :---: | :--- |
@@ -119,10 +170,39 @@ graph TD
 | **Landsat-8/9 OLI**| B2 (Blue), B3 (Green), B4 (Red), B5 (NIR), B6 (SWIR1), B7 (SWIR2) | 30m | $\text{NDVI}, \text{NDWI}, \text{NDBI}, \text{BSI}, \text{NDSI}$ |
 | **PlanetScope** | B1 (Blue), B2 (Green), B3 (Red), B4 (NIR) | 3.0m | High-resolution tactical change detection & visual search |
 | **Sentinel-1 SAR** | C-Band (VV, VH Polarization) | 10m | All-weather structural coherence & flood boundary mapping |
+| **ISRO Bhuvan / Cartosat** | VNIR (Red, Green, Blue, NIR) | 2.5m - 23.5m | $\text{NDVI}, \text{NDWI}$, Sobel structural edge contrast |
 
 ---
 
-## 🚀 Quickstart & Air-Gapped Setup
+## REST API Gateway Reference
+
+| Method | Endpoint Path | Function & Purpose | Key Parameters / Request Body |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/health` | Service health status and database connectivity | None |
+| `POST` | `/api/v1/search/text` | Natural language semantic search across indexed imagery | `{"query": "structures near river", "top_k": 10}` |
+| `POST` | `/api/v1/search/image` | Image-to-image similarity search using patch embeddings | `{"patch_id": "...", "top_k": 10, "threshold": 0.75}` |
+| `POST` | `/api/v1/search/spatiotemporal` | Multi-criteria spatial bounding box, time window, and sensor query | `{"bbox": [min_lon, min_lat, max_lon, max_lat], "time_range": [...]}` |
+| `POST` | `/api/v1/change/detect` | Multi-temporal Change Vector Analysis (CVA) between T1 and T2 | `{"scene_t1_id": "...", "scene_t2_id": "...", "threshold": 0.15}` |
+| `POST` | `/api/v1/change/timeline` | Sequential CUSUM onset date estimation for an ROI | `{"roi_geometry": {...}, "time_series": [...]}` |
+| `POST` | `/api/v1/clusters/discover` | Unsupervised spatial-semantic clustering (DBSCAN) | `{"eps_spatial_km": 2.5, "min_samples": 3}` |
+| `POST` | `/api/v1/ingest/geotiff` | Ingest and tile external GeoTIFF files into COG and index | `{"file_path": "/data/acquisitions/scene.tif", "platform": "Sentinel2"}` |
+| `GET` | `/api/v1/audit/prov-o` | Export W3C PROV-O GeoJSON audit trail of analyst decisions | `{"session_id": "...", "format": "geojson"}` |
+
+---
+
+## Desktop Intelligence Studio (GeoSemanticSat)
+
+The native .NET 10 desktop application provides 5 operational stations designed for tactical and intelligence analysts:
+
+1. **Natural Language Search**: Free-text semantic discovery across imagery archives without prior coordinates.
+2. **Target Coordinate & Change Search**: Radial proximity and bounding box queries with side-by-side Before ($T_1$) and After ($T_2$) visual comparison.
+3. **Multi-Temporal Change & Heatmaps**: Full-tile pixel-level change detection with automated false-alarm suppression and spectral telemetry cards ($\Delta\text{NDBI}, \Delta\text{NDVI}, \Delta\text{NDWI}, \Delta\text{Sobel}$).
+4. **Grouped Sites & Facilities**: Unsupervised spatial-semantic clustering grouping related construction and clearance patches into facility complexes.
+5. **Verification Queue & Audit Trail**: Active learning relevance feedback and tamper-evident W3C PROV-O GeoJSON audit reporting.
+
+---
+
+## Quickstart & Air-Gapped Setup
 
 ### 1. Environment Configuration
 ```powershell
@@ -132,7 +212,7 @@ Copy-Item Unified-RSanalytics/.env.example Unified-RSanalytics/.env
 
 ### 2. Database & Vector Index Initialization
 ```powershell
-# Initialize database tables and spatial extensions
+# Initialize database schema and PostGIS spatial extensions
 python -m scripts.init_db
 
 # Generate synthetic multi-spectral test rasters
@@ -142,20 +222,36 @@ python -m scripts.create_sample_data
 python -m scripts.build_index
 ```
 
-### 3. Launching Services via Docker Compose
+### 3. Launching Python Analytics Service via Docker Compose
 ```powershell
 docker-compose up -d
 ```
 Verify health status at `http://127.0.0.1:8000/health`.
 
+### 4. Running the Desktop Application (.NET 10)
+```powershell
+cd Unified-RSanalytics/Desktop_App/Upgrahan2
+dotnet run --project src/GeoSemanticSat.UI
+```
+
+### 5. Running Automated Verification Tests
+```powershell
+# Run Python backend tests
+pytest -v
+
+# Run .NET engine tests
+dotnet test Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Tests
+```
+
 ---
 
-## 🛡️ Security & Air-Gapped Hardening
+## Security, Governance & Air-Gapped Hardening
 
 - **Unprivileged Execution:** Backend container executes under dedicated system user `appuser (UID 1000)`.
 - **Path Traversal Protection:** All GeoTIFF path inputs are validated via strict `Path.is_relative_to(DATA_ROOT)` containment checks.
 - **Persistent Storage:** PostGIS database volume (`postgis_data`) is attached directly to container storage.
 - **Zero Telemetry:** All third-party telemetry, automatic updates, and remote CDN fetches are disabled.
+- **Cryptographic Provenance:** Every analysis step records SHA-256 raster checksums and analyst IDs conforming to the W3C PROV-O standard.
 
 ---
 

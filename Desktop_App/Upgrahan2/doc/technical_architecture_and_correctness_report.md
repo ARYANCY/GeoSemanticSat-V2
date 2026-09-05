@@ -1,4 +1,4 @@
-# 🛰️ GeoSemanticSat: Comprehensive Technical Architecture, Algorithmic Foundations & Correctness Reasoning
+# GeoSemanticSat: Comprehensive Technical Architecture, Algorithmic Foundations & Correctness Reasoning
 
 **MoD / Indian Army (DGIS) • Problem Statement ID: 26227**  
 *Semantic Retrieval and Multi-Temporal Change Analysis of Satellite Imagery*

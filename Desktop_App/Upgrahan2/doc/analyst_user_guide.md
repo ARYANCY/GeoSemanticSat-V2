@@ -1,4 +1,4 @@
-# 🛰️ GeoSemanticSat: Analyst User Guide & Dataset Ingestion Manual
+# GeoSemanticSat: Analyst User Guide & Dataset Ingestion Manual
 
 **MoD / Indian Army (DGIS) • Problem Statement ID: 26227**  
 *Semantic Retrieval and Multi-Temporal Change Analysis of Satellite Imagery*
@@ -31,17 +31,17 @@ The interface is structured into **5 operational tabs** tailored for military an
 
 ```mermaid
 graph TD
-    A["Top Bar: 📂 Load GeoTIFF & ▶ Run Benchmark"] --> B["Tab 1: 🔍 Semantic Retrieval"]
-    A --> C["Tab 2: 🛰️ Advanced Spatiotemporal Search"]
-    A --> D["Tab 3: 🔄 Multi-Temporal Change Analysis"]
-    A --> E["Tab 4: 📍 Site Discovery & Clustering"]
-    A --> F["Tab 5: 📋 Analyst Workflow & Provenance"]
+    A["Top Bar: Load GeoTIFF & Run Benchmark"] --> B["Tab 1: Semantic Retrieval"]
+    A --> C["Tab 2: Advanced Spatiotemporal Search"]
+    A --> D["Tab 3: Multi-Temporal Change Analysis"]
+    A --> E["Tab 4: Site Discovery & Clustering"]
+    A --> F["Tab 5: Analyst Workflow & Provenance"]
     B -- "Inspect Changes" --> C
 ```
 
 ---
 
-### Tab 1: 🔍 Semantic Retrieval
+### Tab 1: Semantic Retrieval
 *Objective: Find imagery patches across massive archives using natural language descriptions or visual similarity without needing prior coordinates.*
 
 #### Controls & Buttons:
@@ -60,7 +60,7 @@ graph TD
 
 ---
 
-### Tab 2: 🛰️ Advanced Spatiotemporal Search
+### Tab 2: Advanced Spatiotemporal Search
 *Objective: Multi-criteria spatial, temporal, and semantic change verification with Before/After visual comparison.*
 
 #### Controls & Buttons:
@@ -80,7 +80,7 @@ graph TD
 
 ---
 
-### Tab 3: 🔄 Multi-Temporal Change Analysis & Heatmap Viewer
+### Tab 3: Multi-Temporal Change Analysis & Heatmap Viewer
 *Objective: Full-tile pixel-level change detection with automated false-alarm suppression.*
 
 #### Controls & Buttons:
@@ -97,7 +97,7 @@ graph TD
 
 ---
 
-### Tab 4: 📍 Site Discovery & Spatial-Semantic Clustering
+### Tab 4: Site Discovery & Spatial-Semantic Clustering
 *Objective: Discover emerging unknown sites, unlisted bases, or tactical developments by clustering related changes.*
 
 #### Controls & Buttons:
@@ -107,7 +107,7 @@ graph TD
 
 ---
 
-### Tab 5: 📋 Analyst Workflow & Provenance Audit Trail
+### Tab 5: Analyst Workflow & Provenance Audit Trail
 *Objective: Active learning model adaptation and tamper-evident provenance reporting.*
 
 #### Controls & Buttons:
@@ -126,7 +126,7 @@ graph TD
 GeoSemanticSat supports multi-spectral, multi-temporal, and multi-sensor datasets (Sentinel-2, Landsat 8/9, ISRO Bhuvan/Cartosat, PlanetScope, aerial drones).
 
 ### Method A: Direct Ingestion from the GUI
-1. In the top-right header of the application, click the green button: **📂 Load GeoTIFF**.
+1. In the top-right header of the application, click the green button: **Load GeoTIFF**.
 2. Select one or more `.tif` or `.tiff` files from your filesystem.
 3. The engine automatically:
    - Reads the TIFF headers, projection tags (EPSG:4326 WGS84 or UTM), and tiepoints via `GeoTiffReader`.

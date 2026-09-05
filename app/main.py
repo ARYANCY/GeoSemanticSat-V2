@@ -264,11 +264,18 @@ def ingest_geotiff(request: IngestRequest, db: Session = Depends(get_db)):
 
     except Exception as exc:
         db.rollback()
-        # Mark run as failed
-        run.status = "failed"
-        run.provenance = {**run.provenance, "error": str(exc)}
-        run.completed_at = datetime.now(timezone.utc)
-        db.commit()
+        try:
+            failed_run = ProcessingRun(
+                id=run.id,
+                operation="ingest",
+                status="failed",
+                provenance={**(run.provenance or {}), "error": str(exc)},
+                completed_at=datetime.now(timezone.utc),
+            )
+            db.add(failed_run)
+            db.commit()
+        except Exception:
+            db.rollback()
         logger.error(f"Ingest failed for {request.path}: {exc}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -483,9 +490,9 @@ def analyze_change(request: ChangeRequest, db: Session = Depends(get_db)):
             raise FileNotFoundError(f"Raster file missing: {obs.raster_path}")
         with rasterio.open(p) as d:
             bands_count = d.count
-            read_count = min(bands_count, 4)
+            read_count = min(bands_count, 12)
             data = d.read(list(range(1, read_count + 1)), out_shape=(read_count, 256, 256), masked=True).filled(0).astype(np.float32)
-            profile = SENSOR_PROFILES.get(obs.sensor, {"Red": min(1, bands_count), "NIR": min(read_count, bands_count)})
+            profile = SENSOR_PROFILES.get(obs.sensor, {"Red": 1, "NIR": min(2, bands_count)})
             return data, profile
 
     try:
@@ -514,14 +521,18 @@ def analyze_change(request: ChangeRequest, db: Session = Depends(get_db)):
         spectral_magnitude = np.sqrt(diff_sq)
         score = float(np.mean(spectral_magnitude))
 
-        # Check Spectral Indices if multi-band available (Band 1 Red / Band 2 NIR or similar)
+        # Check Spectral Indices using sensor profile mapping
         delta_ndvi = 0.0
         delta_ndbi = 0.0
         delta_ndwi = 0.0
         if num_eval_bands >= 2:
-            # Approximate NDVI using Band 2 (NIR-proxy) & Band 1 (Red-proxy)
-            red_b, nir_b = data_before[0], data_before[min(1, data_before.shape[0] - 1)]
-            red_a, nir_a = data_after[0], data_after[min(1, data_after.shape[0] - 1)]
+            red_idx_b = min(prof_before.get("Red", 1) - 1, data_before.shape[0] - 1)
+            nir_idx_b = min(prof_before.get("NIR", min(2, data_before.shape[0])) - 1, data_before.shape[0] - 1)
+            red_idx_a = min(prof_after.get("Red", 1) - 1, data_after.shape[0] - 1)
+            nir_idx_a = min(prof_after.get("NIR", min(2, data_after.shape[0])) - 1, data_after.shape[0] - 1)
+
+            red_b, nir_b = data_before[red_idx_b], data_before[nir_idx_b]
+            red_a, nir_a = data_after[red_idx_a], data_after[nir_idx_a]
             
             denom_b = nir_b + red_b + 1e-6
             denom_a = nir_a + red_a + 1e-6
