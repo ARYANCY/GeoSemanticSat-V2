@@ -134,6 +134,20 @@ def search_vectors(
 # Health & Status Endpoints
 # ==============================================================================
 
+@app.get("/", tags=["System"])
+def root():
+    """Root landing endpoint providing API overview and navigation links."""
+    return {
+        "service": "GeoSemanticSat Offline Satellite Intelligence API",
+        "version": "0.2.0",
+        "docs_url": "/docs",
+        "redoc_url": "/redoc",
+        "health_url": "/health",
+        "status_url": "/system/status",
+        "offline_mode": settings.offline_mode,
+    }
+
+
 @app.get("/health", response_model=HealthResponse, tags=["System"])
 def health():
     """Health check and offline mode verification."""
