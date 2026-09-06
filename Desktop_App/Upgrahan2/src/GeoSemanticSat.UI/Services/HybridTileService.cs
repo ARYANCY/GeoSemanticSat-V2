@@ -38,6 +38,15 @@ public class BasemapProvider
     public int MaxZoom { get; set; } = 19;
     public int MinZoom { get; set; } = 0;
     public bool IsSatellite { get; set; } = false;
+
+    /// <summary>
+    /// Name of the .env variable holding this provider's API key, or null when the
+    /// provider is keyless. Keys are never stored in source.
+    /// </summary>
+    public string? ApiKeyEnvVar { get; set; }
+
+    /// <summary>True when the provider cannot serve the whole globe.</summary>
+    public bool IsRegionLimited { get; set; }
 }
 
 public class PrecacheProgressEventArgs : EventArgs
@@ -95,7 +104,10 @@ public class HybridTileService : IDisposable
         UrlTemplate = "https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
         Attribution = "(C) OpenStreetMap contributors, (C) CARTO",
         MaxZoom = 19,
-        IsSatellite = false
+        IsSatellite = false,
+        // CartoDB serves an "API KEY REQUIRED" watermark tile with HTTP 200, so a missing
+        // key cannot be detected as a failure. Supply one via .env to use it.
+        ApiKeyEnvVar = "CARTO_API_KEY"
     };
 
     public static readonly BasemapProvider OpenStreetMap = new()
@@ -123,10 +135,10 @@ public class HybridTileService : IDisposable
     public static readonly BasemapProvider Sentinel2Cloudless = new()
     {
         Id = "sentinel2-cloudless",
-        Name = "Sentinel-2 Cloudless (EOX 10m)",
+        Name = "Sentinel-2 Cloudless 2024 (EOX 10m)",
         Description = "Global seamless 10-meter multi-spectral composite by EOX",
-        UrlTemplate = "https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2023/default/g/{z}/{y}/{x}.jpg",
-        Attribution = "Sentinel-2 Cloudless - https://s2maps.eu by EOX IT Services GmbH",
+        UrlTemplate = "https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2024_3857/default/g/{z}/{y}/{x}.jpg",
+        Attribution = "EOxCloudless https://cloudless.eox.at by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2024). CC BY-NC-SA 4.0, non-commercial use only",
         MaxZoom = 16,
         IsSatellite = true
     };
@@ -134,12 +146,14 @@ public class HybridTileService : IDisposable
     public static readonly BasemapProvider UsgsImagery = new()
     {
         Id = "usgs-imagery",
-        Name = "USGS The National Map",
-        Description = "Public domain USGS high-resolution imagery and terrain",
+        Name = "USGS Imagery (United States only)",
+        Description = "Public domain USGS imagery. UNITED STATES COVERAGE ONLY - returns no tiles outside the US",
         UrlTemplate = "https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}",
         Attribution = "USGS The National Map / US Department of the Interior",
         MaxZoom = 16,
-        IsSatellite = true
+        IsSatellite = true,
+        // Verified: Delhi returns HTTP 404, Denver returns 200. US coverage only.
+        IsRegionLimited = true
     };
 
     public static readonly IReadOnlyList<BasemapProvider> AvailableProviders = new List<BasemapProvider>
@@ -163,9 +177,31 @@ public class HybridTileService : IDisposable
 
     public string LocalCacheDirectory { get; set; }
     public MapTileMode Mode { get; set; } = MapTileMode.Auto;
-    public BasemapProvider ActiveProvider { get; set; } = CartoDark;
+    private BasemapProvider _activeProvider = EsriSatellite;
+
+    /// <summary>
+    /// Default is ESRI satellite imagery: the only free, keyless provider with global
+    /// coverage and no watermark. CartoDB returns HTTP 200 for its "API KEY REQUIRED"
+    /// watermark tile, so the app cannot detect that failure.
+    /// </summary>
+    public BasemapProvider ActiveProvider
+    {
+        get => _activeProvider;
+        set
+        {
+            if (ReferenceEquals(_activeProvider, value)) return;
+            _activeProvider = value;
+            LastProviderError = null;
+        }
+    }
 
     public event Action? TileAvailable;
+
+    /// <summary>Raised when a basemap provider returns a non-success status.</summary>
+    public event EventHandler<string>? ProviderFailed;
+
+    /// <summary>Most recent provider failure, or null while the basemap is healthy.</summary>
+    public string? LastProviderError { get; private set; }
     public event EventHandler<PrecacheProgressEventArgs>? PrecacheProgress;
 
     public HybridTileService(string? customCacheDir = null, int maxMemoryCacheCount = 256)
@@ -202,7 +238,11 @@ public class HybridTileService : IDisposable
     /// </summary>
     public Bitmap? GetTile(int z, int x, int y)
     {
-        string key = $"{ActiveProvider.Id}_{z}_{x}_{y}";
+        // Snapshot the provider ONCE. Reading ActiveProvider again inside the async fetch
+        // let a mid-flight basemap switch write one provider's tiles into another
+        // provider's cache folder, and the poisoned entry then persisted on disk.
+        var provider = ActiveProvider;
+        string key = $"{provider.Id}_{z}_{x}_{y}";
 
         // 1. Check L1 Memory Cache
         if (_l1MemoryCache.TryGetValue(key, out var cachedBitmap))
@@ -212,7 +252,7 @@ public class HybridTileService : IDisposable
         }
 
         // 2. Check L2 Disk Cache
-        string diskPath = GetDiskCachePath(ActiveProvider.Id, z, x, y);
+        string diskPath = GetDiskCachePath(provider.Id, z, x, y);
         if (File.Exists(diskPath))
         {
             try
@@ -233,14 +273,14 @@ public class HybridTileService : IDisposable
         {
             if (_activeRequests.TryAdd(key, true))
             {
-                _ = FetchTileWithRetryAsync(z, x, y, key, diskPath);
+                _ = FetchTileWithRetryAsync(provider, z, x, y, key, diskPath);
             }
         }
 
         return null;
     }
 
-    private async Task FetchTileWithRetryAsync(int z, int x, int y, string key, string diskPath)
+    private async Task FetchTileWithRetryAsync(BasemapProvider provider, int z, int x, int y, string key, string diskPath)
     {
         int maxRetries = 2;
         int delayMs = 150;
@@ -251,13 +291,33 @@ public class HybridTileService : IDisposable
             {
                 await _downloadThrottle.WaitAsync();
 
-                string url = ActiveProvider.UrlTemplate
+                string url = provider.UrlTemplate
                     .Replace("{z}", z.ToString())
                     .Replace("{x}", x.ToString())
                     .Replace("{y}", y.ToString());
 
+                // Keys come from .env, never from source. Every default provider is
+                // keyless, so this is a no-op unless one is configured.
+                if (!string.IsNullOrEmpty(provider.ApiKeyEnvVar))
+                {
+                    string? apiKey = EnvironmentConfig.Get(provider.ApiKeyEnvVar);
+                    if (!string.IsNullOrEmpty(apiKey))
+                    {
+                        url += (url.Contains('?') ? "&" : "?") + "api_key=" + Uri.EscapeDataString(apiKey);
+                    }
+                }
+
                 using var response = await HttpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
-                if (response.IsSuccessStatusCode)
+                if (!response.IsSuccessStatusCode)
+                {
+                    // A 404 does not throw, so the old loop retried the same failing request
+                    // three times and gave up without telling anyone. A dead basemap looked
+                    // identical to a deliberately dark one.
+                    LastProviderError = $"{provider.Name}: HTTP {(int)response.StatusCode}";
+                    ProviderFailed?.Invoke(this, LastProviderError);
+                    break;
+                }
+
                 {
                     byte[] bytes = await response.Content.ReadAsByteArrayAsync();
 

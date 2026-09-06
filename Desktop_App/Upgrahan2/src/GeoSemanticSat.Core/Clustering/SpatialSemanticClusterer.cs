@@ -63,7 +63,9 @@ public static class SpatialSemanticClusterer
             if (labels[i] != 0) continue;
 
             var neighbors = FindNeighbors(i, patches, spatialGrid, cellSizeDegrees, epsCosineDistance, maxSpatialDistanceKm);
-            if (neighbors.Count < minPts)
+            // Canonical DBSCAN counts the point itself in its own epsilon-neighbourhood.
+            // FindNeighbors excludes self, so minPts = 2 previously demanded 3 points.
+            if (neighbors.Count + 1 < minPts)
             {
                 labels[i] = -1; // noise candidate
             }
@@ -86,7 +88,7 @@ public static class SpatialSemanticClusterer
 
                     labels[neighborIdx] = currentClusterId;
                     var subNeighbors = FindNeighbors(neighborIdx, patches, spatialGrid, cellSizeDegrees, epsCosineDistance, maxSpatialDistanceKm);
-                    if (subNeighbors.Count >= minPts)
+                    if (subNeighbors.Count + 1 >= minPts)
                     {
                         foreach (var sn in subNeighbors)
                         {
@@ -169,10 +171,20 @@ public static class SpatialSemanticClusterer
         long gx = (long)Math.Floor(target.Bounds.Center.Longitude / cellSizeDegrees);
         long gy = (long)Math.Floor(target.Bounds.Center.Latitude / cellSizeDegrees);
 
-        // Search only target cell and 8 adjacent neighboring spatial cells
-        for (long dy = -1; dy <= 1; dy++)
+        // Cells are sized in DEGREES but the radius is in KILOMETRES, and a degree of
+        // longitude shrinks as cos(latitude). A fixed 3x3 search therefore covered only
+        // ~44 km of a requested 50 km at Delhi and ~25 km at 60 degrees north, silently
+        // dropping valid neighbours. Derive the cell radius per axis from the latitude.
+        double latRad = target.Bounds.Center.Latitude * Math.PI / 180.0;
+        double kmPerDegreeLon = Math.Max(1.0, 111.32 * Math.Cos(latRad));
+        const double kmPerDegreeLat = 110.57;
+
+        long lonCells = Math.Clamp((long)Math.Ceiling(maxSpatialKm / (kmPerDegreeLon * cellSizeDegrees)), 1, 4096);
+        long latCells = Math.Clamp((long)Math.Ceiling(maxSpatialKm / (kmPerDegreeLat * cellSizeDegrees)), 1, 4096);
+
+        for (long dy = -latCells; dy <= latCells; dy++)
         {
-            for (long dx = -1; dx <= 1; dx++)
+            for (long dx = -lonCells; dx <= lonCells; dx++)
             {
                 if (spatialGrid.TryGetValue((gx + dx, gy + dy), out var candidates))
                 {

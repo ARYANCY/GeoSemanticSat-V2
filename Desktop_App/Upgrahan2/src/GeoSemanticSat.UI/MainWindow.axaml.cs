@@ -84,6 +84,12 @@ public class ReviewQueueItemViewModel
 
 public partial class MainWindow : Window
 {
+    /// <summary>
+    /// Evidence score at or above which a Candidate is reported as high-confidence.
+    /// See CONTEXT.md: this is an evidence score, not a calibrated probability.
+    /// </summary>
+    private const double HighConfidenceThreshold = 0.85;
+
     private VectorIndex _index = new(128);
     private SemanticSearchEngine _searchEngine = null!;
     private ChangeSearchEngine _changeSearchEngine = new();
@@ -136,13 +142,40 @@ public partial class MainWindow : Window
         BtnStep5.IsEnabled = CanProceedToStep(4);
 
         int currentTab = MainTabControl?.SelectedIndex ?? 0;
+
+        var stageButtons = new[] { BtnStep1, BtnStep2, BtnStep3, BtnStep4, BtnStep5 };
+        for (int i = 0; i < stageButtons.Length; i++)
+        {
+            if (stageButtons[i] is not { } b) continue;
+            b.Classes.Set("current", i == currentTab);
+            b.Classes.Set("done", i < currentTab);
+        }
+
+        var stageBadges = new[] { BadgeStep1Icon, BadgeStep2Icon, BadgeStep3Icon, BadgeStep4Icon, BadgeStep5Icon };
+        var stageLabels = new[] { TxtStep1Label, TxtStep2Label, TxtStep3Label, TxtStep4Label, TxtStep5Label };
+        for (int i = 0; i < stageBadges.Length; i++)
+        {
+            bool isCurrent = i == currentTab;
+            if (stageBadges[i] is { } badge)
+            {
+                badge.Background = (IBrush?)Application.Current?.FindResource(
+                    isCurrent ? "AccentBrush" : "SurfaceInsetBrush");
+            }
+            if (stageLabels[i] is { } label)
+            {
+                label.Foreground = (IBrush?)Application.Current?.FindResource(
+                    isCurrent ? "TextPrimaryBrush" : "TextMutedBrush");
+                label.FontWeight = isCurrent ? FontWeight.Bold : FontWeight.SemiBold;
+            }
+        }
+
         TxtActiveWorkflowPhase.Text = currentTab switch
         {
-            0 => "Step 1: Discover Concepts",
-            1 => "Step 2: Target Coordinates",
-            2 => "Step 3: Spectral Verification",
-            3 => "Step 4: Group Facilities",
-            4 => "Step 5: Audit & Signoff",
+            0 => "Step 1: Discover",
+            1 => "Step 2: Target",
+            2 => "Step 3: Verify",
+            3 => "Step 4: Group",
+            4 => "Step 5: Sign Off",
             _ => "Analyst Workflow"
         };
 
@@ -309,7 +342,13 @@ public partial class MainWindow : Window
         OnSearchClicked(null, null!);
 
         TxtTelemetryArchive.Text = $"{_index.Count} observations indexed";
-        TxtTelemetryCandidates.Text = $"{_detectedChanges.Count} change candidates (4 high-confidence)";
+        // Derived from the same threshold used to label a record HIGH elsewhere in this
+        // file. The "4" used to be a literal inside the string, so the app asserted a
+        // statistic that was true only by coincidence.
+        int highConfidence = _detectedChanges.Count(c => c.Confidence >= HighConfidenceThreshold);
+        TxtTelemetryCandidates.Text = _detectedChanges.Count == 0
+            ? "no candidates"
+            : $"{_detectedChanges.Count} candidates ({highConfidence} high-confidence)";
     }
 
     private void RunInitialChangeDetection()
@@ -493,14 +532,14 @@ public partial class MainWindow : Window
             }
             catch { }
 
-            string priorityLabel = r.SimilarityScore > 0.70 ? "HIGH PRIORITY" : (r.SimilarityScore > 0.45 ? "MEDIUM" : "CANDIDATE");
+            string priorityLabel = r.SimilarityScore > 0.70 ? "STRONG" : (r.SimilarityScore > 0.45 ? "MODERATE" : "WEAK");
 
             return new SearchResultItemViewModel
             {
                 PatchId = r.Patch.PatchId,
                 ImagePreview = previewBmp,
-                SimilarityBadge = $"Match #{i + 1} | {(r.SimilarityScore * 100):F1}% [{priorityLabel}]",
-                Title = $"Candidate Patch {r.Patch.PatchId[..Math.Min(8, r.Patch.PatchId.Length)]} [{r.Patch.Platform.ToString().Replace('_', ' ')}]",
+                SimilarityBadge = $"#{i + 1}  {(r.SimilarityScore * 100):F0}% match  {priorityLabel}",
+                Title = $"Result {r.Patch.PatchId[..Math.Min(8, r.Patch.PatchId.Length)]} [{r.Patch.Platform.ToString().Replace('_', ' ')}]",
                 Detail = $"Acquisition: {r.Patch.Timestamp:yyyy-MM-dd HH:mm} UTC | Sensor Quality: {(r.Patch.QualityScore * 100):F0}%",
                 Coordinates = $"Location: {r.Patch.Bounds.Center.Latitude:F5} N, {r.Patch.Bounds.Center.Longitude:F5} E",
                 SpectralInfo = $"AOI Footprint: 32x32 px (10m GSD) | Cosine Sim: {r.SimilarityScore:F3}",
@@ -520,7 +559,7 @@ public partial class MainWindow : Window
             Title = r.Title,
             Latitude = r.Patch.Bounds.Center.Latitude,
             Longitude = r.Patch.Bounds.Center.Longitude,
-            ChangeType = "Semantic Match",
+            ChangeType = "Result",
             Confidence = r.SimilarityScore,
             AreaSqM = 102400,
             Bounds = r.Patch.Bounds,
@@ -664,7 +703,7 @@ public partial class MainWindow : Window
                 Title = $"Candidate Site {c.Id[..8]} | {c.Type} ({c.AreaSqMeters:N0} m2)",
                 DistanceInfo = $"Proximity: {r.DistanceKm:F2} km from query center | ({c.Center.Latitude:F4} N, {c.Center.Longitude:F4} E)",
                 EarliestOnsetInfo = $"Earliest Verified Onset: {c.EarliestObservationTimestamp:yyyy-MM-dd} UTC",
-                SpectralMetrics = $"AI Confidence: {(c.Confidence * 100):F0}% | Rank: {r.RelevanceScore:F3} | {c.ProcessingNotes}",
+                SpectralMetrics = $"Evidence: {(c.Confidence * 100):F0}% | Rank: {r.RelevanceScore:F3} | {c.ProcessingNotes}",
                 Record = c
             };
         }).ToList();
@@ -771,8 +810,8 @@ public partial class MainWindow : Window
         {
             // Explicit AI Conclusion & Assessment
             TxtAiClassificationVerdict.Text = $"Likely {record.Type} / Ground Disturbance";
-            TxtAiConfidence.Text = $"{(record.Confidence * 100):F0}% CONFIDENCE ({(record.Confidence >= 0.85 ? "HIGH" : "MODERATE")})";
-            BadgeAiConfidence.Background = Brush.Parse(record.Confidence >= 0.85 ? "#065F46" : "#78350F");
+            TxtAiConfidence.Text = $"{(record.Confidence * 100):F0}% CONFIDENCE ({(record.Confidence >= HighConfidenceThreshold ? "HIGH" : "MODERATE")})";
+            BadgeAiConfidence.Background = Brush.Parse(record.Confidence >= HighConfidenceThreshold ? "#065F46" : "#78350F");
 
             TxtAiArea.Text = $"{record.AreaSqMeters:N0} m2 (approx {(record.AreaSqMeters / 10000.0):F2} ha)";
             TxtAiOnset.Text = $"{record.EarliestObservationTimestamp:yyyy-MM-dd}";
@@ -912,7 +951,7 @@ public partial class MainWindow : Window
             },
             Title = $"{item.Record.Type} - Candidate {item.Record.Id[..8]}",
             AuditDetails = $"T1: {item.Record.TimestampT1:yyyy-MM-dd} to T2: {item.Record.TimestampT2:yyyy-MM-dd} | Onset: {item.Record.EarliestObservationTimestamp:yyyy-MM-dd} | Notes: {item.AnalystComments}",
-            ConfidenceText = $"Confidence: {(item.Record.Confidence * 100):F0}%",
+            ConfidenceText = $"Evidence: {(item.Record.Confidence * 100):F0}%",
             Record = item.Record
         }).ToList();
     }

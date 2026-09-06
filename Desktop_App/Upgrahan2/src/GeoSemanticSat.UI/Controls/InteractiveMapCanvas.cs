@@ -86,6 +86,9 @@ public class InteractiveMapCanvas : Control
     {
         ClipToBounds = true;
         _tileService = new HybridTileService();
+        // A failed basemap used to render as an empty dark grid, indistinguishable from a
+        // deliberately dark map. Now it says so on the canvas.
+        _tileService.ProviderFailed += (_, _) => Dispatcher.UIThread.Post(InvalidateVisual);
         _tileService.TileAvailable += () => Dispatcher.UIThread.Post(InvalidateVisual);
     }
 
@@ -309,6 +312,7 @@ public class InteractiveMapCanvas : Control
 
         // 3. Draw Coordinate Grid Lines
         DrawCoordinateGrid(context, w, h);
+        DrawBasemapStatus(context, w, h);
 
         // 4. Draw Facility Clusters & Bounds
         DrawFacilityClusters(context);
@@ -368,6 +372,30 @@ public class InteractiveMapCanvas : Control
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Visible failure state for the basemap. Without this, a blocked tile server at a venue
+    /// looks exactly like a design choice, and nobody can tell the difference until someone
+    /// asks why the map is empty.
+    /// </summary>
+    private void DrawBasemapStatus(DrawingContext context, double w, double h)
+    {
+        string? error = _tileService.LastProviderError;
+        if (string.IsNullOrEmpty(error)) return;
+
+        var text = new FormattedText(
+            $"BASEMAP UNAVAILABLE  -  {error}",
+            CultureInfo.InvariantCulture, FlowDirection.LeftToRight, TypefaceSans, 12.0,
+            new SolidColorBrush(Color.Parse("#FB7185")));
+
+        double pad = 10;
+        var rect = new Rect(12, 12, text.Width + pad * 2, text.Height + pad);
+        context.DrawRectangle(
+            new SolidColorBrush(Color.FromArgb(235, 30, 12, 16)),
+            new Pen(new SolidColorBrush(Color.Parse("#FB7185")), 1.0),
+            rect);
+        context.DrawText(text, new Point(12 + pad, 12 + pad / 2));
     }
 
     private void DrawCoordinateGrid(DrawingContext context, double w, double h)
@@ -519,16 +547,16 @@ public class InteractiveMapCanvas : Control
         var legendRect = new Rect(w - 230, 10, 220, 80);
         context.DrawRectangle(new SolidColorBrush(Color.FromArgb(220, 15, 15, 18)), new Pen(new SolidColorBrush(Color.Parse("#27272A")), 1), legendRect);
 
-        var legTitle = new FormattedText("MAP SYMBOLOGY", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, TypefaceSans, 9.5, new SolidColorBrush(Color.Parse("#71717A")));
+        var legTitle = new FormattedText("LEGEND", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, TypefaceSans, 9.5, new SolidColorBrush(Color.Parse("#71717A")));
         context.DrawText(legTitle, new Point(w - 220, 16));
 
         context.DrawEllipse(new SolidColorBrush(Color.Parse("#38BDF8")), null, new Point(w - 215, 36), 4, 4);
-        context.DrawText(new FormattedText("Search Center / Selected", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, TypefaceRegular, 9.5, new SolidColorBrush(Color.Parse("#D4D4D8"))), new Point(w - 205, 30));
+        context.DrawText(new FormattedText("Result", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, TypefaceRegular, 9.5, new SolidColorBrush(Color.Parse("#D4D4D8"))), new Point(w - 205, 30));
 
         context.DrawEllipse(new SolidColorBrush(Color.Parse("#F43F5E")), null, new Point(w - 215, 52), 4, 4);
-        context.DrawText(new FormattedText("AI Detected Change", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, TypefaceRegular, 9.5, new SolidColorBrush(Color.Parse("#D4D4D8"))), new Point(w - 205, 46));
+        context.DrawText(new FormattedText("Candidate", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, TypefaceRegular, 9.5, new SolidColorBrush(Color.Parse("#D4D4D8"))), new Point(w - 205, 46));
 
         context.DrawEllipse(new SolidColorBrush(Color.Parse("#10B981")), null, new Point(w - 215, 68), 4, 4);
-        context.DrawText(new FormattedText("Verified Confirmed Site", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, TypefaceRegular, 9.5, new SolidColorBrush(Color.Parse("#D4D4D8"))), new Point(w - 205, 62));
+        context.DrawText(new FormattedText("Verified", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, TypefaceRegular, 9.5, new SolidColorBrush(Color.Parse("#D4D4D8"))), new Point(w - 205, 62));
     }
 }
