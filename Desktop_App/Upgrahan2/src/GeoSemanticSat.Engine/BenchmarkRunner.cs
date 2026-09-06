@@ -169,12 +169,24 @@ public static class BenchmarkRunner
         var constructionChange = changes.FirstOrDefault(c => c.Type == ChangeType.Construction);
         if (constructionChange != null)
         {
-            var earliest = OnsetEstimator.EstimateEarliestObservation(timeSeries, constructionChange.Bounds, ChangeType.Construction);
+            var earliest = OnsetEstimator.EstimateEarliestObservation(
+                timeSeries, constructionChange.Bounds, ChangeType.Construction, out bool onsetDetected);
+            Console.WriteLine($"   [OK] CUSUM Threshold Crossed: {(onsetDetected ? "yes" : "no - returned final usable pass")}");
             Console.WriteLine($"   [OK] Construction Target Bounds: {constructionChange.Bounds}");
             Console.WriteLine($"   [OK] Ground-Truth Earliest Usable Observation: {t3.AcquisitionTimestamp:yyyy-MM-dd}");
             Console.WriteLine($"   [OK] Estimated Earliest Observation:         {earliest:yyyy-MM-dd}");
             bool onsetCorrect = earliest.Date == t3.AcquisitionTimestamp.Date;
             Console.WriteLine($"   [OK] Earliest Observation Onset Accuracy: {(onsetCorrect ? "100% MATCH" : "DISCREPANCY")}");
+        }
+        else
+        {
+            // Previously this branch printed nothing at all, so a section that silently
+            // evaluated zero cases looked identical to one that passed.
+            var kinds = changes.Count == 0
+                ? "none"
+                : string.Join(", ", changes.Select(c => c.Type).Distinct());
+            Console.WriteLine("   [SKIP] No Construction-type change was detected, so onset estimation had nothing to evaluate.");
+            Console.WriteLine($"          Detected change types this run: {kinds}");
         }
 
         // 6. Discovery & Unsupervised Clustering

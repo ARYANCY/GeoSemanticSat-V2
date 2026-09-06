@@ -3,24 +3,45 @@ using System;
 namespace GeoSemanticSat.Core.Processing;
 
 /// <summary>
-/// Co-registration Jitter and Edge Tolerance Filter.
-/// Uses Structural Similarity (SSIM) and local gradient shift matching to prevent
-/// false change alarms caused by 1-2 pixel registration errors.
+/// Co-registration jitter and edge tolerance filter.
+/// Suppresses false change alarms caused by sub-pixel to 2-pixel registration error.
 /// </summary>
 public static class RegistrationJitterFilter
 {
     public const double SsimThresholdJitter = 0.82;
 
+    /// <summary>Outcome of the jitter test, distinguishing states the boolean conflated.</summary>
+    public enum AlignmentVerdict
+    {
+        /// <summary>The two patches differ, and the difference is not explained by a shift.</summary>
+        GenuineDifference,
+
+        /// <summary>The patches are effectively identical: nothing changed and nothing shifted.</summary>
+        NoDifference,
+
+        /// <summary>A sub-pixel or few-pixel shift explains most of the difference.</summary>
+        RegistrationJitter
+    }
+
+    /// <summary>Sub-pixel alignment estimate produced by the parabolic peak fit.</summary>
+    public readonly record struct AlignmentResult(
+        AlignmentVerdict Verdict,
+        double ShiftX,
+        double ShiftY,
+        double BaseDifference,
+        double AlignedDifference);
+
     /// <summary>
-    /// Computes local patch SSIM (Structural Similarity Index) between two patches.
-    /// Returns value between -1.0 and 1.0 (1.0 = structurally identical).
+    /// Computes local patch SSIM between two patches. Returns [-1, 1], 1 = identical.
     /// </summary>
     public static double ComputeSSIM(float[,] patchA, float[,] patchB, int size)
     {
-        double meanA = 0, meanB = 0;
         int n = size * size;
-        if (n == 0) return 1.0;
+        // A single pixel has no sample variance; the old code divided by (n - 1) = 0 and
+        // returned NaN/Infinity for size == 1.
+        if (n <= 1) return 1.0;
 
+        double meanA = 0, meanB = 0;
         for (int y = 0; y < size; y++)
         {
             for (int x = 0; x < size; x++)
@@ -48,7 +69,7 @@ public static class RegistrationJitterFilter
         varB /= (n - 1);
         covar /= (n - 1);
 
-        double c1 = 0.0001; // (k1 * L)^2
+        double c1 = 0.0001; // (k1 * L)^2 for L = 1 reflectance
         double c2 = 0.0009; // (k2 * L)^2
 
         double num = (2 * meanA * meanB + c1) * (2 * covar + c2);
@@ -58,108 +79,142 @@ public static class RegistrationJitterFilter
     }
 
     /// <summary>
-    /// Checks if a candidate change patch is actually caused by sub-pixel or 1-2 pixel registration shift.
-    /// If shifting patch B by (-1, 0, +1) pixels dramatically increases correlation (> 0.92), it is registration jitter.
+    /// True when the patch difference is explained by misregistration.
+    /// Kept for existing callers; see Analyze for the full verdict and sub-pixel offset.
     /// </summary>
     public static bool IsRegistrationJitter(float[,] bandA, float[,] bandB, int startX, int startY, int patchSize, int w, int h)
+        => Analyze(bandA, bandB, startX, startY, patchSize, w, h).Verdict == AlignmentVerdict.RegistrationJitter;
+
+    /// <summary>
+    /// Builds a 3x3 dissimilarity surface over integer shifts, locates the minimum, and
+    /// refines it to sub-pixel precision with a quadratic (parabolic) fit through the
+    /// minimum and its two neighbours along each axis. That interpolation is what the
+    /// documentation specifies and what the previous revision never implemented: it took an
+    /// integer argmin plus one fixed (+0.5, +0.5) box average.
+    ///
+    /// Every shift is scored over the SAME pixel support, so the means are comparable. The
+    /// old code averaged each shift over however many pixels happened to be in bounds, which
+    /// biased the comparison near tile edges.
+    /// </summary>
+    public static AlignmentResult Analyze(float[,] bandA, float[,] bandB, int startX, int startY, int patchSize, int w, int h)
     {
-        double baseDiff = 0.0;
-        int count = 0;
+        // Support shrunk by one pixel on every side so all nine shifts stay in bounds.
+        int x0 = Math.Max(1, startX);
+        int y0 = Math.Max(1, startY);
+        int x1 = Math.Min(w - 2, startX + patchSize - 1);
+        int y1 = Math.Min(h - 2, startY + patchSize - 1);
 
-        for (int y = 0; y < patchSize; y++)
-        {
-            for (int x = 0; x < patchSize; x++)
-            {
-                int px = startX + x;
-                int py = startY + y;
-                if (px >= 0 && px < w && py >= 0 && py < h)
-                {
-                    baseDiff += Math.Abs(bandA[py, px] - bandB[py, px]);
-                    count++;
-                }
-            }
-        }
-        if (count == 0) return false;
-        double avgBaseDiff = baseDiff / count;
-        if (avgBaseDiff < 0.04) return true; // negligible difference
+        if (x1 < x0 || y1 < y0)
+            return new AlignmentResult(AlignmentVerdict.GenuineDifference, 0, 0, 0, 0);
 
-        // Test neighbor pixel shifts in [-1, +1] with quadratic sub-pixel peak interpolation
-        double bestShiftedDiff = avgBaseDiff;
-        int bestDx = 0, bestDy = 0;
-
+        var surface = new double[3, 3];
         for (int dy = -1; dy <= 1; dy++)
         {
             for (int dx = -1; dx <= 1; dx++)
             {
-                if (dx == 0 && dy == 0) continue;
-
-                double shiftedDiff = 0.0;
-                int shiftedCount = 0;
-                for (int y = 0; y < patchSize; y++)
+                double sum = 0;
+                int n = 0;
+                for (int y = y0; y <= y1; y++)
                 {
-                    for (int x = 0; x < patchSize; x++)
+                    for (int x = x0; x <= x1; x++)
                     {
-                        int ax = startX + x;
-                        int ay = startY + y;
-                        int bx = startX + x + dx;
-                        int by = startY + y + dy;
-
-                        if (ax >= 0 && ax < w && ay >= 0 && ay < h &&
-                            bx >= 0 && bx < w && by >= 0 && by < h)
-                        {
-                            shiftedDiff += Math.Abs(bandA[ay, ax] - bandB[by, bx]);
-                            shiftedCount++;
-                        }
+                        sum += Math.Abs(bandA[y, x] - bandB[y + dy, x + dx]);
+                        n++;
                     }
                 }
-
-                if (shiftedCount > 0)
-                {
-                    double avgShifted = shiftedDiff / shiftedCount;
-                    if (avgShifted < bestShiftedDiff)
-                    {
-                        bestShiftedDiff = avgShifted;
-                        bestDx = dx;
-                        bestDy = dy;
-                    }
-                }
+                surface[dy + 1, dx + 1] = n > 0 ? sum / n : double.MaxValue;
             }
         }
 
-        // If integer or sub-pixel shift reduces error by more than 50%, it's misregistration jitter
-        if (bestShiftedDiff < avgBaseDiff * 0.50)
+        double baseDiff = surface[1, 1];
+
+        // Identical content is not misregistration, it is simply no change. Reporting it as
+        // jitter conflated two different states for the caller.
+        if (baseDiff < 0.02)
+            return new AlignmentResult(AlignmentVerdict.NoDifference, 0, 0, baseDiff, baseDiff);
+
+        int bestDx = 0, bestDy = 0;
+        double bestDiff = double.MaxValue;
+        for (int dy = -1; dy <= 1; dy++)
         {
-            return true;
-        }
-
-        // Also test sub-pixel bilinear fractional interpolation at (+-0.5, +-0.5)
-        if (avgBaseDiff > 0.06 && avgBaseDiff < 0.20)
-        {
-            double halfShiftDiff = 0.0;
-            int halfShiftCount = 0;
-
-            for (int y = 0; y < patchSize - 1; y++)
+            for (int dx = -1; dx <= 1; dx++)
             {
-                for (int x = 0; x < patchSize - 1; x++)
+                if (surface[dy + 1, dx + 1] < bestDiff)
                 {
-                    int ax = startX + x;
-                    int ay = startY + y;
-                    if (ax + 1 < w && ay + 1 < h)
-                    {
-                        // Bilinear 0.5-pixel interpolation
-                        float bInterp = 0.25f * (bandB[ay, ax] + bandB[ay, ax + 1] + bandB[ay + 1, ax] + bandB[ay + 1, ax + 1]);
-                        halfShiftDiff += Math.Abs(bandA[ay, ax] - bInterp);
-                        halfShiftCount++;
-                    }
+                    bestDiff = surface[dy + 1, dx + 1];
+                    bestDx = dx;
+                    bestDy = dy;
                 }
             }
+        }
 
-            if (halfShiftCount > 0 && (halfShiftDiff / halfShiftCount) < avgBaseDiff * 0.55)
+        // Parabolic refinement about the integer minimum. Only valid when the minimum has a
+        // neighbour on each side, i.e. it is not on the edge of the 3x3 window.
+        double subX = bestDx;
+        double subY = bestDy;
+        if (bestDx == 0)
+            subX = ParabolicOffset(surface[bestDy + 1, 0], surface[bestDy + 1, 1], surface[bestDy + 1, 2]);
+        if (bestDy == 0)
+            subY = ParabolicOffset(surface[0, bestDx + 1], surface[1, bestDx + 1], surface[2, bestDx + 1]);
+
+        // Bilinear resample of B at the refined offset gives the residual after alignment.
+        double alignedDiff = ResampledDifference(bandA, bandB, x0, y0, x1, y1, subX, subY);
+
+        // Misregistration if aligning at the refined offset removes most of the difference
+        // and the required shift is small. A genuine new object cannot be shifted away.
+        bool shiftIsSmall = Math.Sqrt(subX * subX + subY * subY) <= 2.0;
+        bool residualCollapsed = alignedDiff < baseDiff * 0.50;
+
+        var verdict = (shiftIsSmall && residualCollapsed)
+            ? AlignmentVerdict.RegistrationJitter
+            : AlignmentVerdict.GenuineDifference;
+
+        return new AlignmentResult(verdict, subX, subY, baseDiff, alignedDiff);
+    }
+
+    /// <summary>
+    /// Vertex of the parabola through (-1, left), (0, centre), (+1, right).
+    /// Offset = 0.5 * (left - right) / (left - 2*centre + right), valid for a true minimum.
+    /// </summary>
+    private static double ParabolicOffset(double left, double centre, double right)
+    {
+        double denom = left - 2.0 * centre + right;
+        if (Math.Abs(denom) < 1e-12) return 0.0;
+        return Math.Clamp(0.5 * (left - right) / denom, -1.0, 1.0);
+    }
+
+    /// <summary>Mean absolute difference with B bilinearly resampled at a fractional offset.</summary>
+    private static double ResampledDifference(float[,] bandA, float[,] bandB,
+                                              int x0, int y0, int x1, int y1,
+                                              double shiftX, double shiftY)
+    {
+        double sum = 0;
+        int n = 0;
+
+        for (int y = y0; y <= y1; y++)
+        {
+            for (int x = x0; x <= x1; x++)
             {
-                return true;
+                double sx = x + shiftX;
+                double sy = y + shiftY;
+
+                int fx = (int)Math.Floor(sx);
+                int fy = (int)Math.Floor(sy);
+                double tx = sx - fx;
+                double ty = sy - fy;
+
+                if (fx < 0 || fy < 0 || fx + 1 >= bandB.GetLength(1) || fy + 1 >= bandB.GetLength(0))
+                    continue;
+
+                double top = bandB[fy, fx] * (1 - tx) + bandB[fy, fx + 1] * tx;
+                double bottom = bandB[fy + 1, fx] * (1 - tx) + bandB[fy + 1, fx + 1] * tx;
+                double interpolated = top * (1 - ty) + bottom * ty;
+
+                sum += Math.Abs(bandA[y, x] - interpolated);
+                n++;
             }
         }
 
-        return false;
+        return n > 0 ? sum / n : double.MaxValue;
     }
 }
