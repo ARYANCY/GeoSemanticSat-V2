@@ -2,53 +2,233 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="GeoSemanticSat.UI.App"
              RequestedThemeVariant="Dark">
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://GeoSemanticSat.UI/Resources/Tokens.axaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+
     <Application.Styles>
         <FluentTheme />
-        <!-- Strict Defense Command & Control Styling: 0 Border Radius Globally Across All Controls -->
-        <Style Selector="Button">
-            <Setter Property="CornerRadius" Value="0" />
-        </Style>
-        <Style Selector="TextBox">
-            <Setter Property="CornerRadius" Value="0" />
-        </Style>
-        <Style Selector="ComboBox">
-            <Setter Property="CornerRadius" Value="0" />
+
+        <!-- Zero border radius across every control.
+             One rule, matched on the base type, replaces the fifteen
+             near-identical per-control overrides this file used to carry. -->
+        <Style Selector=":is(TemplatedControl)">
+            <Setter Property="CornerRadius" Value="{DynamicResource RadiusNone}"/>
         </Style>
         <Style Selector="Border">
-            <Setter Property="CornerRadius" Value="0" />
+            <Setter Property="CornerRadius" Value="{DynamicResource RadiusNone}"/>
         </Style>
-        <Style Selector="TabControl">
-            <Setter Property="CornerRadius" Value="0" />
+
+        <!-- ===================== TYPOGRAPHY ===================== -->
+        <Style Selector="TextBlock">
+            <Setter Property="FontFamily" Value="{DynamicResource UiFont}"/>
         </Style>
-        <Style Selector="TabItem">
-            <Setter Property="CornerRadius" Value="0" />
+
+        <!-- Uppercase micro-label. The instrument-panel voice. -->
+        <Style Selector="TextBlock.label">
+            <Setter Property="FontSize" Value="{DynamicResource FontMicro}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextFaintBrush}"/>
+            <Setter Property="LetterSpacing" Value="1.4"/>
         </Style>
-        <Style Selector="ListBox">
-            <Setter Property="CornerRadius" Value="0" />
+
+        <Style Selector="TextBlock.title">
+            <Setter Property="FontSize" Value="{DynamicResource FontTitle}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
         </Style>
-        <Style Selector="ListBoxItem">
-            <Setter Property="CornerRadius" Value="0" />
+
+        <Style Selector="TextBlock.display">
+            <Setter Property="FontSize" Value="{DynamicResource FontDisplay}"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
         </Style>
-        <Style Selector="ProgressBar">
-            <Setter Property="CornerRadius" Value="0" />
+
+        <!-- Every measurement is monospaced so columns of digits line up instead of
+             wobbling. Coordinates, timestamps, scores, identifiers. -->
+        <Style Selector="TextBlock.mono">
+            <Setter Property="FontFamily" Value="{DynamicResource MonoFont}"/>
+            <Setter Property="FontSize" Value="{DynamicResource FontMicro}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextFaintBrush}"/>
         </Style>
-        <Style Selector="Slider">
-            <Setter Property="CornerRadius" Value="0" />
+
+        <Style Selector="TextBlock.monoStrong">
+            <Setter Property="FontFamily" Value="{DynamicResource MonoFont}"/>
+            <Setter Property="FontSize" Value="{DynamicResource FontBodyLg}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
         </Style>
+
+        <!-- ===================== SURFACES ===================== -->
+        <Style Selector="Border.zone">
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource RuleBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <Style Selector="Border.card">
+            <Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource RuleBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="{DynamicResource PadCard}"/>
+        </Style>
+
+        <!-- Selection is a thick left rule, never colour alone -->
+        <Style Selector="Border.card.selected">
+            <Setter Property="Background" Value="{DynamicResource SurfaceInsetBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+            <Setter Property="BorderThickness" Value="3,1,1,1"/>
+        </Style>
+
+        <!-- ===================== BUTTONS ===================== -->
+        <Style Selector="Button">
+            <Setter Property="FontFamily" Value="{DynamicResource UiFont}"/>
+            <Setter Property="FontSize" Value="{DynamicResource FontBody}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="MinHeight" Value="34"/>
+            <Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource RuleBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.12" Easing="CubicEaseOut"/>
+                    <BrushTransition Property="BorderBrush" Duration="0:0:0.12" Easing="CubicEaseOut"/>
+                </Transitions>
+            </Setter>
+        </Style>
+
+        <Style Selector="Button:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource SurfaceInsetBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource RuleStrongBrush}"/>
+        </Style>
+
+        <Style Selector="Button.primary">
+            <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextOnAccentBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+        <Style Selector="Button.primary /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextOnAccentBrush}"/>
+        </Style>
+        <Style Selector="Button.primary:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource AccentPressedBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentPressedBrush}"/>
+        </Style>
+
+        <Style Selector="Button.verify">
+            <Setter Property="Background" Value="{DynamicResource VerifiedSurfaceBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource VerifiedBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource VerifiedBrush}"/>
+        </Style>
+        <Style Selector="Button.verify /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource VerifiedSurfaceBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource VerifiedBrush}"/>
+        </Style>
+
+        <Style Selector="Button.ghost">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
+        </Style>
+        <Style Selector="Button.ghost /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+
+        <Style Selector="Button.chip">
+            <Setter Property="Background" Value="{DynamicResource SurfaceInsetBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource RuleBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
+            <Setter Property="FontSize" Value="{DynamicResource FontMicro}"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="MinHeight" Value="0"/>
+        </Style>
+
+        <!-- ===================== STAGE RAIL =====================
+             One navigation, not two. State is carried by the underline and by
+             the number, never by colour alone. -->
+        <Style Selector="Button.stage">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource RuleBrush}"/>
+            <Setter Property="BorderThickness" Value="0,0,0,2"/>
+            <Setter Property="Padding" Value="2,0,2,10"/>
+            <Setter Property="MinHeight" Value="0"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+        </Style>
+        <Style Selector="Button.stage /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <Style Selector="Button.stage:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource RuleStrongBrush}"/>
+        </Style>
+        <Style Selector="Button.stage.current">
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+        </Style>
+        <Style Selector="Button.stage.done">
+            <Setter Property="BorderBrush" Value="{DynamicResource RuleStrongBrush}"/>
+        </Style>
+        <Style Selector="Button.stage:disabled">
+            <Setter Property="Opacity" Value="0.45"/>
+        </Style>
+
+        <!-- The old duplicated tab strip. The TabControl still switches content;
+             its header row is hidden because the stage rail already does that job. -->
+        <Style Selector="TabControl.chromeless /template/ ItemsPresenter#PART_ItemsPresenter">
+            <Setter Property="IsVisible" Value="False"/>
+        </Style>
+
+        <!-- ===================== INPUTS ===================== -->
+        <Style Selector="TextBox">
+            <Setter Property="Background" Value="{DynamicResource SurfaceSunkenBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource RuleBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="FontSize" Value="{DynamicResource FontBodyLg}"/>
+            <Setter Property="Padding" Value="14,11"/>
+            <Setter Property="MinHeight" Value="44"/>
+        </Style>
+        <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+        </Style>
+
+        <Style Selector="ComboBox">
+            <Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource RuleBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+            <Setter Property="FontSize" Value="{DynamicResource FontMicro}"/>
+            <Setter Property="MinHeight" Value="32"/>
+        </Style>
+
+        <!-- A disabled option must read as deliberately unavailable, not broken. -->
+        <Style Selector="ComboBoxItem:disabled">
+            <Setter Property="Foreground" Value="{DynamicResource TextFaintBrush}"/>
+            <Setter Property="Opacity" Value="0.55"/>
+        </Style>
+
         <Style Selector="Expander">
-            <Setter Property="CornerRadius" Value="0" />
+            <Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource RuleBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
+            <Setter Property="FontSize" Value="{DynamicResource FontMicro}"/>
         </Style>
-        <Style Selector="ToolTip">
-            <Setter Property="CornerRadius" Value="0" />
+
+        <Style Selector="ListBox">
+            <Setter Property="Background" Value="Transparent"/>
         </Style>
-        <Style Selector="FlyoutPresenter">
-            <Setter Property="CornerRadius" Value="0" />
+
+        <Style Selector="ProgressBar">
+            <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource SurfaceInsetBrush}"/>
         </Style>
-        <Style Selector="ContentPresenter">
-            <Setter Property="CornerRadius" Value="0" />
-        </Style>
-        <Style Selector="CheckBox">
-            <Setter Property="CornerRadius" Value="0" />
-        </Style>
+
     </Application.Styles>
 </Application>

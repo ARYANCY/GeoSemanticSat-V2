@@ -123,10 +123,14 @@ public static class RadiometricNormalizer
                 residuals[i] = Math.Abs(yVals[i] - (slope * xVals[i] + intercept));
             }
 
-            // Estimate robust scale (Median Absolute Deviation)
+            // Estimate robust scale from the residual MAD.
+            // sigma_hat = median(|r|) / 0.6745 makes the MAD a consistent estimator of the
+            // standard deviation under normal errors; omitting the divisor made the Tukey
+            // tuning constant ~1.48x too small and rejected far more PIF pixels than intended.
             var sortedRes = residuals.OrderBy(r => r).ToArray();
             double medRes = sortedRes[sortedRes.Length / 2];
-            double tuningConstant = Math.Max(0.015, 4.685 * (medRes + 1e-6));
+            double sigmaHat = (medRes + 1e-6) / 0.6745;
+            double tuningConstant = Math.Max(0.015, 4.685 * sigmaHat);
 
             // Weighted regression
             double wSum = 0, wMeanX = 0, wMeanY = 0;
@@ -163,9 +167,27 @@ public static class RadiometricNormalizer
             }
         }
 
-        // Bound realistic gain adjustments
-        if (slope < 0.4 || slope > 2.5) slope = 1.0;
+        // Bound realistic gain adjustments. The intercept was fitted jointly with the
+        // rejected slope, so it must be reset too - keeping it produced an affine transform
+        // that matched neither the fit nor the identity.
+        if (slope < 0.4 || slope > 2.5)
+        {
+            slope = 1.0;
+            intercept = 0.0;
+        }
 
-        return new NormalizationParams(slope, intercept, 0.92);
+        // Coefficient of determination of the final fit over the PIF sample.
+        // Previously this was returned as a hardcoded 0.92 regardless of fit quality.
+        double ssTot = 0, ssRes = 0;
+        double finalMeanY = yVals.Average();
+        for (int i = 0; i < xVals.Count; i++)
+        {
+            double predicted = slope * xVals[i] + intercept;
+            ssRes += (yVals[i] - predicted) * (yVals[i] - predicted);
+            ssTot += (yVals[i] - finalMeanY) * (yVals[i] - finalMeanY);
+        }
+        double r2 = ssTot > 1e-12 ? 1.0 - (ssRes / ssTot) : 0.0;
+
+        return new NormalizationParams(slope, intercept, r2);
     }
 }

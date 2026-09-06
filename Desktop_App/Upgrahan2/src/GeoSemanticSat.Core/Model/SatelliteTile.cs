@@ -21,6 +21,17 @@ public class SatelliteTile
 
     public float[]? EmbeddingVector { get; set; }
 
+    /// <summary>True when the band is genuinely present, not substituted by GetBandOrFallback.</summary>
+    public bool HasBand(SpectralBand band) => Bands.ContainsKey(band);
+
+    /// <summary>
+    /// True when the tile lacks NIR or SWIR, so NDVI/NDBI/NDWI/BSI cannot be computed as
+    /// defined and visible-band proxies are used instead. GetBandOrFallback silently
+    /// substitutes Red for a missing NIR, which made NDVI = (R-R)/(R+R) = 0 and NDBI = 0
+    /// for every pixel of every RGB scene, with no indication to the caller.
+    /// </summary>
+    public bool RequiresVisibleBandProxies => !HasBand(SpectralBand.NIR) || !HasBand(SpectralBand.SWIR1);
+
     public float[,] GetBandOrFallback(SpectralBand band, SpectralBand fallback)
     {
         if (Bands.TryGetValue(band, out var data)) return data;

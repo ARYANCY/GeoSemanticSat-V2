@@ -107,7 +107,16 @@ public class VectorIndex
     /// Top-K nearest neighbor search by cosine similarity with spatiotemporal filters.
     /// Supports high-throughput concurrent parallel readers.
     /// </summary>
-    public List<SearchResult> Search(float[] queryVector, int topK = 10, SearchFilter? filter = null)
+    /// <param name="minSimilarity">
+    /// Results at or below this cosine are dropped rather than ranked. A negative cosine
+    /// means the patch is the OPPOSITE of the query, vegetation when built-up was asked for,
+    /// and presenting that to an analyst as "Match #3, -40%, CANDIDATE" is worse than
+    /// returning nothing. Text search passes 0.0; image-to-image leaves it open, where an
+    /// inverse match is still information.
+    /// </param>
+    public List<SearchResult> Search(float[] queryVector, int topK = 10, SearchFilter? filter = null,
+                                     SimilarityMode mode = SimilarityMode.FullVector,
+                                     double minSimilarity = double.NegativeInfinity)
     {
         if (queryVector.Length != VectorDimension)
             throw new ArgumentException($"Query vector dimension mismatch: {queryVector.Length} vs {VectorDimension}");
@@ -150,8 +159,15 @@ public class VectorIndex
                         continue;
                 }
 
-                // SIMD Cosine similarity = dot product of normalized vectors
-                double sim = DotProduct(normQuery, patch.EmbeddingVector);
+                // FullVector: SIMD cosine over all 128 dims, correct for image-to-image.
+                // SemanticAxes: cosine over the shared axes only, correct for text-to-image,
+                // where the appearance block is populated by one side and not the other.
+                double sim = mode == SimilarityMode.SemanticAxes
+                    ? SemanticEmbeddingLayout.CosineOnSemanticAxes(normQuery, patch.EmbeddingVector)
+                    : DotProduct(normQuery, patch.EmbeddingVector);
+
+                if (sim <= minSimilarity) continue;
+
                 double dist = 1.0 - sim;
                 results.Add(new SearchResult(patch, Math.Clamp(sim, -1.0, 1.0), Math.Max(0.0, dist)));
             }

@@ -23,6 +23,20 @@ public enum QualityMaskFlags : byte
 /// </summary>
 public class QualityMaskEngine
 {
+    /// <summary>
+    /// Flags that make a pixel unusable for change analysis.
+    /// Water and HighHaze are informational and deliberately excluded: dropping Water
+    /// pixels would blind water-extent detection to exactly the pixels it exists to
+    /// measure. Callers must bit-test against this. Comparing a [Flags] enum with
+    /// != Valid treated any informational flag as invalid, which is why
+    /// MultiTemporalChangeDetector and OnsetEstimator disagreed about which pixels counted.
+    /// </summary>
+    public const QualityMaskFlags UnusableForAnalysis =
+        QualityMaskFlags.Cloud | QualityMaskFlags.CloudShadow |
+        QualityMaskFlags.Snow | QualityMaskFlags.Saturated;
+
+    public static bool IsUsable(QualityMaskFlags flags) => (flags & UnusableForAnalysis) == 0;
+
     public const float CloudBlueThreshold = 0.22f;
     public const float CloudCirrusThreshold = 0.18f;
     public const float ShadowNirMaxThreshold = 0.14f;

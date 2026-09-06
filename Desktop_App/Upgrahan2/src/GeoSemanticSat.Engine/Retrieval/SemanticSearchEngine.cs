@@ -32,7 +32,7 @@ public class SemanticSearchEngine
     public List<SearchResult> SearchByText(string textQuery, int topK = 10, SearchFilter? filter = null)
     {
         float[] queryEmbedding = TextQueryEncoder.Encode(textQuery);
-        return _index.Search(queryEmbedding, topK, filter);
+        return _index.Search(queryEmbedding, topK, filter, SimilarityMode.SemanticAxes, minSimilarity: 0.0);
     }
 
     /// <summary>
@@ -65,7 +65,9 @@ public class SemanticSearchEngine
             Platform: platform
         );
 
-        return _index.Search(queryEmbedding, topK, filter);
+        // Text present -> semantic axes; pure spatial ranking -> full vector.
+        return _index.Search(queryEmbedding, topK, filter,
+            string.IsNullOrWhiteSpace(textQuery) ? SimilarityMode.FullVector : SimilarityMode.SemanticAxes);
     }
 
     /// <summary>
@@ -91,7 +93,7 @@ public class SemanticSearchEngine
         var negEmbeds = rejectedPatches.Select(p => p.EmbeddingVector).ToList();
 
         float[] adjustedQuery = RelevanceFeedbackReranker.AdjustQueryVector(baseQuery, posEmbeds, negEmbeds);
-        return _index.Search(adjustedQuery, topK, filter);
+        return _index.Search(adjustedQuery, topK, filter, SimilarityMode.SemanticAxes, minSimilarity: 0.0);
     }
 
     /// <summary>

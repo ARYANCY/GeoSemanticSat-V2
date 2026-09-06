@@ -61,7 +61,12 @@ public static class RelevanceFeedbackReranker
         {
             newQuery[i] = Math.Max(0.0f, newQuery[i]);
         }
-        for (int i = 64; i < Math.Min(80, dim); i++)
+        // The clamp must NOT extend over the signed semantic axes. NDVI, NDWI, NDBI, BSI and
+        // the interaction axes are all signed in [-1, 1], and the text encoder deliberately
+        // emits negative weights there (a clearance query sets a negative vegetation axis).
+        // Flattening those to zero silently deleted half the query intent.
+        for (int i = SemanticEmbeddingLayout.TextureEnergy;
+             i <= SemanticEmbeddingLayout.ActivityPeaks && i < dim; i++)
         {
             newQuery[i] = Math.Max(0.0f, newQuery[i]);
         }

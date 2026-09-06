@@ -10,6 +10,7 @@
     <PackageReference Include="Avalonia.Desktop" Version="11.2.5" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.5" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.5" />
+    <PackageReference Include="LucideAvalonia" Version="1.6.2" />
   </ItemGroup>
 
   <PropertyGroup>

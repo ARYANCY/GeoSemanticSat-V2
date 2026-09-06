@@ -1,6 +1,7 @@
 using System;
 using GeoSemanticSat.Core.Model;
 using GeoSemanticSat.Core.Processing;
+using GeoSemanticSat.Core.VectorIndex;
 using VectorIndexStore = GeoSemanticSat.Core.VectorIndex.VectorIndex;
 
 namespace GeoSemanticSat.Engine.Embeddings;
@@ -74,28 +75,40 @@ public class MultiSpectralVisionEncoder
         embedding[9] = (float)Math.Sqrt(varN);
         embedding[10] = (float)Math.Sqrt(varS);
 
-        // 2. Earth Observation Spectral Indices -> [16..31]
-        // NDVI: Vegetation
-        float ndvi = (float)((meanN + meanR) > 1e-4 ? (meanN - meanR) / (meanN + meanR) : 0);
-        // NDWI: Water
-        float ndwi = (float)((meanG + meanN) > 1e-4 ? (meanG - meanN) / (meanG + meanN) : 0);
-        // NDBI: Built-up / Concrete / Structures
-        float ndbi = (float)((meanS + meanN) > 1e-4 ? (meanS - meanN) / (meanS + meanN) : 0);
-        // MNDWI: Open Water
-        float mndwi = (float)((meanG + meanS) > 1e-4 ? (meanG - meanS) / (meanG + meanS) : 0);
-        // Bare Soil Index
-        float bsi = (float)(((meanS + meanR) - (meanN + meanB)) / Math.Max(1e-4, (meanS + meanR) + (meanN + meanB)));
+        // 2. Shared semantic axes -> see SemanticEmbeddingLayout.
+        // Every value here is bounded and scale-free so it is directly comparable with the
+        // text encoder. When NIR/SWIR are absent these fall back to documented visible-band
+        // proxies instead of silently collapsing to zero for the whole scene.
+        bool hasNir = tile.HasBand(SpectralBand.NIR);
+        bool hasSwir = tile.HasBand(SpectralBand.SWIR1);
 
-        embedding[16] = ndvi;
-        embedding[17] = ndwi;
-        embedding[18] = ndbi;
-        embedding[19] = mndwi;
-        embedding[20] = bsi;
+        float ndvi = hasNir
+            ? SpectralIndices.Nd((float)meanN, (float)meanR)
+            : SpectralIndices.Nd(2f * (float)meanG, (float)(meanR + meanB));      // Excess Green
+        float ndwi = hasNir
+            ? SpectralIndices.Nd((float)meanG, (float)meanN)
+            : SpectralIndices.Nd((float)meanB, (float)meanR);                     // blue dominance
+        float ndbi = (hasSwir && hasNir)
+            ? SpectralIndices.Nd((float)meanS, (float)meanN)
+            : SpectralIndices.Nd(2f * (float)meanR, (float)(meanG + meanB));      // Excess Red
+        float mndwi = hasSwir
+            ? SpectralIndices.Nd((float)meanG, (float)meanS)
+            : ndwi;
+        float bsi = (hasSwir && hasNir)
+            ? SpectralIndices.Nd((float)(meanS + meanR), (float)(meanN + meanB))
+            : SpectralIndices.Nd((float)(meanR + meanG), 2f * (float)meanB);      // low blue = soil
 
-        // Interaction terms (e.g. structures near water: NDBI * NDWI)
-        embedding[21] = ndbi * (ndwi + 1.0f); // Structures near water / river proximity
-        embedding[22] = (1.0f - ndvi) * bsi;  // Cleared / exposed open soil
-        embedding[23] = (float)Math.Sqrt(varR + varG) * (ndbi + 1.0f); // High-contrast man-made objects
+        embedding[SemanticEmbeddingLayout.Vegetation] = ndvi;
+        embedding[SemanticEmbeddingLayout.Water] = ndwi;
+        embedding[SemanticEmbeddingLayout.BuiltUp] = ndbi;
+        embedding[SemanticEmbeddingLayout.OpenWater] = mndwi;
+        embedding[SemanticEmbeddingLayout.BareSoil] = bsi;
+
+        // Interaction axes, rescaled to [-1, 1] so they cannot dominate the semantic subspace.
+        embedding[SemanticEmbeddingLayout.StructureNearWater] = Math.Clamp(ndbi * (ndwi + 1.0f) * 0.5f, -1f, 1f);
+        embedding[SemanticEmbeddingLayout.ClearedGround] = Math.Clamp((1.0f - ndvi) * bsi * 0.5f, -1f, 1f);
+        embedding[SemanticEmbeddingLayout.ManMadeContrast] =
+            Math.Clamp((float)Math.Sqrt(varR + varG) * (ndbi + 1.0f), -1f, 1f);
 
         // 3. Spatial Gradients & Directional Structural Features -> [32..63]
         double gradSum = 0;
@@ -125,8 +138,10 @@ public class MultiSpectralVisionEncoder
         embedding[36] = (float)(gradD2 / innerCount);
 
         // Linear continuity (road / runway / perimeter)
+        // Bounded so it stays comparable with the other semantic axes: raw gradient sums are
+        // unbounded and would swamp the subspace.
         float maxLinear = (float)Math.Max(gradH, Math.Max(gradV, Math.Max(gradD1, gradD2))) / (float)innerCount;
-        embedding[37] = maxLinear;
+        embedding[SemanticEmbeddingLayout.LinearContinuity] = Math.Clamp(maxLinear, 0f, 1f);
 
         // 4. Texture & Contrast Energy (GLCM approximations) -> [64..79]
         double textureEnergy = 0;
@@ -140,8 +155,9 @@ public class MultiSpectralVisionEncoder
                 if (diff > 0.30f) highFrequencyPeaks++;
             }
         }
-        embedding[64] = (float)(textureEnergy / count);
-        embedding[65] = (float)(highFrequencyPeaks / count); // Localized clusters (vehicles, storage containers)
+        embedding[SemanticEmbeddingLayout.TextureEnergy] = Math.Clamp((float)(textureEnergy / count), 0f, 1f);
+        // Localized clusters (vehicles, storage containers); already a fraction in [0, 1].
+        embedding[SemanticEmbeddingLayout.ActivityPeaks] = (float)(highFrequencyPeaks / count);
 
         // 5. Multi-quadrant spatial distribution (spatial layout) -> [80..127]
         int halfW = patchW / 2;

@@ -21,7 +21,21 @@ public static class OnsetEstimator
     /// filtering out cloud-obscured scenes, and detecting the change-point transition.
     /// </summary>
     public static DateTime EstimateEarliestObservation(List<SatelliteTile> chronologicalTiles, BoundingBox bounds, ChangeType targetType)
+        => EstimateEarliestObservation(chronologicalTiles, bounds, targetType, out _);
+
+    /// <summary>
+    /// As above, but reports whether CUSUM actually crossed its decision threshold.
+    /// Without this the caller cannot distinguish "change detected at the final pass" from
+    /// "no change detected at all" - both previously returned the last timestamp.
+    /// </summary>
+    public static DateTime EstimateEarliestObservation(
+        List<SatelliteTile> chronologicalTiles,
+        BoundingBox bounds,
+        ChangeType targetType,
+        out bool changeDetected)
     {
+        changeDetected = false;
+
         if (chronologicalTiles.Count <= 1)
         {
             return chronologicalTiles.FirstOrDefault()?.AcquisitionTimestamp ?? DateTime.UtcNow;
@@ -97,7 +111,10 @@ public static class OnsetEstimator
         double cusumNeg = 0.0;
         int onsetIndex = usableSeries.Count - 1;
 
-        for (int i = 1; i < usableSeries.Count; i++)
+        // Start after the baseline window. Starting at i = 1 tested baseline observations
+        // against a mean they themselves defined, which could trip the threshold on the
+        // baseline's own internal scatter and report a spurious onset.
+        for (int i = baselineCount; i < usableSeries.Count; i++)
         {
             double val = usableSeries[i].MetricValue;
             cusumPos = Math.Max(0.0, cusumPos + (val - baselineMean) - slackK);
@@ -107,6 +124,7 @@ public static class OnsetEstimator
             if (cusumPos > thresholdH || cusumNeg > thresholdH)
             {
                 onsetIndex = i;
+                changeDetected = true;
                 break;
             }
         }
