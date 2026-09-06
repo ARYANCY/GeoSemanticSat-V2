@@ -1,5 +1,10 @@
 # 01. System Architecture & Engineering Blueprint
 
+> For implementation-aligned architecture and runtime boundaries, use
+> [00_developer_guide.md](00_developer_guide.md) and
+> [07_implementation_reference.md](07_implementation_reference.md). This page
+> contains historical design material and may describe planned components.
+
 **Platform:** UpaGraha Enterprise Geospatial Intelligence & Satellite Analytics Platform  
 **Operational Environment:** 100% Air-Gapped, Zero-Internet, On-Premises / Tactical Edge  
 **Document Version:** 2.0 (September 2026)

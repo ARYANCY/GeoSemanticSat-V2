@@ -1,5 +1,10 @@
 # 03. Remote Sensing & Sensor Calibration Guide
 
+> For the current implementation boundary, use
+> [07_implementation_reference.md](07_implementation_reference.md). Sensor
+> support and quality-mask behavior on this page should be treated as reference
+> material unless confirmed by the source.
+
 **Module:** Multispectral Band Mapping, Quality Masking & Earth Observation Formulas  
 **Status:** Production Standard (September 2026)
 

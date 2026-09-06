@@ -1,5 +1,10 @@
 # 06. Air-Gapped Deployment, DevOps & Security
 
+> For the actual Compose defaults and network caveats, use
+> [00_developer_guide.md](00_developer_guide.md) and
+> [07_implementation_reference.md](07_implementation_reference.md). This page
+> contains historical deployment material and may describe planned components.
+
 **Environment:** Production Offline Enclave / Defense SCIF / Tactical Field Unit  
 **Security Standard:** Hardened Non-Root Containerization & Air-Gapped Staging
 

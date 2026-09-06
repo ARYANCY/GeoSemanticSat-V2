@@ -1,5 +1,13 @@
 # UpaGraha: Offline-First Geospatial Intelligence & Satellite Analytics Platform
 
+> **Developer documentation source of truth:** start with
+> [documentation/00_developer_guide.md](documentation/00_developer_guide.md) and
+> [documentation/07_implementation_reference.md](documentation/07_implementation_reference.md).
+> Those pages are aligned with the current source tree. Some older sections in
+> this README and the topic pages describe planned or historical capabilities;
+> they must not be used as operational instructions when they conflict with the
+> implementation-aligned guide.
+
 [![Platform](https://img.shields.io/badge/Platform-Air--Gapped%20%7C%20Zero--Internet-blue.svg)](#)
 [![Backend](https://img.shields.io/badge/Backend-FastAPI%20%7C%20Python%203.11-green.svg)](#)
 [![Engine](https://img.shields.io/badge/Core%20Engine-.NET%2010%20%7C%20C%23-purple.svg)](#)
@@ -29,13 +37,14 @@
 
 | Document | Focus Area | Description |
 | :--- | :--- | :--- |
-| **01. System Architecture** | [`documentation/01_system_architecture.md`](file:///c:/Users/aryan/OneDrive/Desktop/UpaGraha/documentation/01_system_architecture.md) | High-level system architecture, component breakdown, sequence diagrams, and air-gapped deployment guarantees. |
-| **02. Algorithms & Mathematics** | [`documentation/02_algorithms_and_mathematics.md`](file:///c:/Users/aryan/OneDrive/Desktop/UpaGraha/documentation/02_algorithms_and_mathematics.md) | Mathematical formulations for CVA, Sequential CUSUM onset, sub-pixel jitter filter, Tukey PIF normalizer, and geodesic area. |
-| **03. Remote Sensing & Sensors** | [`documentation/03_remote_sensing_and_sensors.md`](file:///c:/Users/aryan/OneDrive/Desktop/UpaGraha/documentation/03_remote_sensing_and_sensors.md) | Multi-sensor band mappings (Sentinel-2, Landsat, PlanetScope, Sentinel-1 SAR), spectral indices (NDVI, NDWI, NDBI), and quality masking. |
-| **04. API Gateway Reference** | [`documentation/04_api_reference.md`](file:///c:/Users/aryan/OneDrive/Desktop/UpaGraha/documentation/04_api_reference.md) | FastAPI REST endpoints, Pydantic schemas, request/response JSON contracts, pagination, and error handling. |
-| **05. Desktop Intelligence Engine** | [`documentation/05_desktop_engine_guide.md`](file:///c:/Users/aryan/OneDrive/Desktop/UpaGraha/documentation/05_desktop_engine_guide.md) | GeoSemanticSat .NET 10 core engine, SIMD AVX2 acceleration, binary index layouts, and Avalonia desktop UI. |
-| **06. Deployment & Security** | [`documentation/06_deployment_and_security.md`](file:///c:/Users/aryan/OneDrive/Desktop/UpaGraha/documentation/06_deployment_and_security.md) | Hardened non-root Docker deployment, offline pip caching, Compose PostGIS volume wiring, and zero-trust policies. |
-| **07. Issue Resolution & Audit** | [`documentation/07_issue_resolution_and_audit.md`](file:///c:/Users/aryan/OneDrive/Desktop/UpaGraha/documentation/07_issue_resolution_and_audit.md) | Comprehensive audit of resolved bugs, mathematical fixes, concurrency guarantees, and performance optimizations. |
+| **00. Developer Guide** | [documentation/00_developer_guide.md](documentation/00_developer_guide.md) | Source-aligned architecture, stack, workflows, and capability boundaries. |
+| **01. System Architecture** | [documentation/01_system_architecture.md](documentation/01_system_architecture.md) | Architecture reference; historical material is marked in the page. |
+| **02. Algorithms & Mathematics** | [documentation/02_algorithms_and_mathematics.md](documentation/02_algorithms_and_mathematics.md) | Algorithm reference; current formulas and thresholds are in the implementation reference. |
+| **03. Remote Sensing & Sensors** | [documentation/03_remote_sensing_and_sensors.md](documentation/03_remote_sensing_and_sensors.md) | Sensor and spectral-index reference. |
+| **04. API Gateway Reference** | [documentation/04_api_reference.md](documentation/04_api_reference.md) | Endpoint reference; verify contracts against the schemas module. |
+| **05. Desktop Intelligence Engine** | [documentation/05_desktop_engine_guide.md](documentation/05_desktop_engine_guide.md) | Desktop engine and UI reference. |
+| **06. Deployment & Security** | [documentation/06_deployment_and_security.md](documentation/06_deployment_and_security.md) | Deployment reference; actual defaults are in the implementation guide. |
+| **07. Implementation Reference** | [documentation/07_implementation_reference.md](documentation/07_implementation_reference.md) | Verified formulas, algorithms, persistence model, and limitations. |
 
 ---
 

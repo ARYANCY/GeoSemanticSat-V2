@@ -1,5 +1,9 @@
 # 02. Mathematical & Algorithmic Specifications
 
+> For formulas and thresholds verified against the current source, use
+> [07_implementation_reference.md](07_implementation_reference.md). This page
+> contains historical design material and may describe planned components.
+
 **Module:** UpaGraha Advanced Mathematical Foundations & Core Remote Sensing Algorithms  
 **Status:** Validated & Implemented (September 2026)
 
