@@ -115,13 +115,33 @@ public class TextQueryEncoder
             var tokens = lower.Split(new[] { ' ', ',', '.', '-', ';' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var token in tokens)
             {
-                int hash = Math.Abs(token.GetHashCode());
-                int idx = hash % EmbeddingDimension;
+                int idx = StableHash(token) % EmbeddingDimension;
                 embedding[idx] += 0.5f;
             }
         }
 
         VectorIndexStore.NormalizeInPlace(embedding);
         return embedding;
+    }
+
+    /// <summary>
+    /// FNV-1a 32-bit hash, masked to a non-negative int.
+    /// string.GetHashCode() is randomized per process in .NET, which made out-of-lexicon
+    /// queries return a different ranking on every application launch and made persisted
+    /// indices and PROV-O provenance exports irreproducible. Masking the sign bit also
+    /// avoids the Math.Abs(int.MinValue) OverflowException the previous code could throw.
+    /// </summary>
+    public static int StableHash(string token)
+    {
+        unchecked
+        {
+            uint hash = 2166136261u;
+            foreach (char c in token)
+            {
+                hash ^= c;
+                hash *= 16777619u;
+            }
+            return (int)(hash & 0x7FFFFFFF);
+        }
     }
 }

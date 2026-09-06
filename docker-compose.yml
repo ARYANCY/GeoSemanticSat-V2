@@ -1,21 +1,46 @@
 services:
   api:
     build: .
+    container_name: rsanalytics-api
     ports:
       - "8000:8000"
+    # .env is optional: compose falls back to the defaults below when it is absent.
     env_file:
-      - .env
+      - path: .env
+        required: false
     environment:
-      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-satintel}:${POSTGRES_PASSWORD:-change-me-offline}@db:5432/${POSTGRES_DB:-satintel}
+      # ponytail: SQLite lives in a named volume, not the ./data bind mount.
+      # SQLite WAL locking is unreliable over Docker Desktop's Windows bind mounts.
+      # Switch to the postgres profile if you ever need concurrent writers.
+      DATABASE_URL: ${DATABASE_URL:-sqlite:////app/dbdata/satintel.db}
+      OFFLINE_MODE: "true"
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
     volumes:
+      # Live reload: edit app/ or scripts/ on the host, uvicorn restarts itself.
+      - ./app:/app/app
+      - ./scripts:/app/scripts
+      - ./tests:/app/tests
+      # Rasters stay host-visible so you can drop GeoTIFFs in and ingest them.
       - ./data:/app/data
       - ./models:/app/models
       - ./indexes:/app/indexes
-    depends_on:
-      - db
+      - api_db:/app/dbdata
+    command: >
+      uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health').read()"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
 
+  # Optional. app/models/entities.py uses plain SQLAlchemy columns (no PostGIS
+  # geometry types), so SQLite is sufficient for development.
+  # Start with: docker compose --profile postgres up -d
   db:
+    profiles: ["postgres"]
     image: postgis/postgis:16-3.4
+    container_name: rsanalytics-db
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-satintel}
       POSTGRES_USER: ${POSTGRES_USER:-satintel}
@@ -24,6 +49,12 @@ services:
       - postgis_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-satintel}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
+  api_db: {}
   postgis_data: {}

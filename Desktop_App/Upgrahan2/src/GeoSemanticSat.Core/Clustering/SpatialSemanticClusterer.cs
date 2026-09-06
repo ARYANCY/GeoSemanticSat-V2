@@ -202,27 +202,42 @@ public static class SpatialSemanticClusterer
 
     private static string InferClusterLabel(float[] centroid, List<TilePatch> members)
     {
-        // Infer archetype from dominant embedding features
-        // In our 128-dim multimodal space:
-        // Indices 0-15: Built-up / structural features
-        // Indices 16-31: Water / moisture features
-        // Indices 32-47: Vegetation / forestry
-        // Indices 48-63: Linear / road / runway features
-        // Indices 64-79: Transient / vehicular activity
-        double structural = 0, water = 0, vegetation = 0, linear = 0, activity = 0;
+        // Archetype scores must read the dimensions MultiSpectralVisionEncoder actually writes:
+        //   0-10  band means / std devs (brightness, not semantic)
+        //   16-23 spectral indices: 16 NDVI, 17 NDWI, 18 NDBI, 19 MNDWI, 20 BSI,
+        //         21 built-near-water, 22 cleared soil, 23 man-made contrast
+        //   32-37 spatial gradients, 37 = linear continuity (road / runway)
+        //   64-65 texture energy and high-frequency peak density
+        //   80-94 per-quadrant layout
+        // The previous 16-wide contiguous buckets did not match this layout: indices 48-63
+        // are never written by the encoder, so the "linear" score was always zero and that
+        // label was unreachable; gradients were counted as "vegetation"; and the raw band
+        // means in 0-15 have the largest magnitudes, so "structural" won almost every time.
+        // Bands 0-10 are deliberately excluded - scene brightness is not an archetype.
+        float At(int i) => i < centroid.Length ? centroid[i] : 0f;
 
-        for (int i = 0; i < 16 && i < centroid.Length; i++) structural += Math.Abs(centroid[i]);
-        for (int i = 16; i < 32 && i < centroid.Length; i++) water += Math.Abs(centroid[i]);
-        for (int i = 32; i < 48 && i < centroid.Length; i++) vegetation += Math.Abs(centroid[i]);
-        for (int i = 48; i < 64 && i < centroid.Length; i++) linear += Math.Abs(centroid[i]);
-        for (int i = 64; i < 80 && i < centroid.Length; i++) activity += Math.Abs(centroid[i]);
+        double vegetation = Math.Abs(At(16));
+        double water = Math.Abs(At(17)) + Math.Abs(At(19));
+        double structural = Math.Abs(At(18)) + Math.Abs(At(21)) + Math.Abs(At(23));
+        double clearance = Math.Abs(At(20)) + Math.Abs(At(22));
+        double linear = Math.Abs(At(37)) + Math.Abs(At(33)) + Math.Abs(At(34)) + Math.Abs(At(35)) + Math.Abs(At(36));
+        double activity = Math.Abs(At(64)) + Math.Abs(At(65));
 
-        double maxScore = Math.Max(structural, Math.Max(water, Math.Max(vegetation, Math.Max(linear, activity))));
+        var ranked = new (double Score, string Label)[]
+        {
+            (structural, $"Built-up / Compound Group ({members.Count} sites)"),
+            (linear,     $"Corridor / Linear Track Assets ({members.Count} sites)"),
+            (water,      $"Hydrological / Inundation Zone ({members.Count} sites)"),
+            (activity,   $"High-Activity / Material Staging Sites ({members.Count} sites)"),
+            (clearance,  $"Cleared Ground / Earthworks Cluster ({members.Count} sites)"),
+            (vegetation, $"Vegetation / Terrain Clearing Cluster ({members.Count} sites)")
+        };
 
-        if (maxScore == structural) return $"Built-up / Compound Group ({members.Count} sites)";
-        if (maxScore == linear) return $"Corridor / Linear Track Assets ({members.Count} sites)";
-        if (maxScore == water) return $"Hydrological / Inundation Zone ({members.Count} sites)";
-        if (maxScore == activity) return $"High-Activity / Material Staging Sites ({members.Count} sites)";
-        return $"Vegetation / Terrain Clearing Cluster ({members.Count} sites)";
+        var best = ranked[0];
+        foreach (var candidate in ranked)
+        {
+            if (candidate.Score > best.Score) best = candidate;
+        }
+        return best.Label;
     }
 }

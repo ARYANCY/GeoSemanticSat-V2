@@ -23,3 +23,18 @@ indexes/*
 .idea/
 *.log
 Thumbs.db
+
+# Personal machine setup notes (not for the repo)
+Jyotirmoy_SETUP.md
+
+.preview/
+
+# Build output. Tracked historically; ignored for new files.
+[Bb]in/
+[Oo]bj/
+
+# Local agent tooling, not part of the project
+.agents/
+.claude/
+.preview/
+skills-lock.json

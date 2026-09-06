@@ -11,8 +11,11 @@ public class HybridMapTileTests
 {
     [Theory]
     [InlineData(0.0, 0.0, 10, 512, 512)] // Null Island at zoom 10
-    [InlineData(77.2080, 28.6050, 14, 11706, 6890)] // Delhi at zoom 14
-    [InlineData(-122.4194, 37.7749, 12, 654, 1582)] // San Francisco at zoom 12
+    // Expected values below are the canonical OSM slippy-map values
+    // (https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames). The previous fixtures
+    // held incorrect numbers, so these two cases failed against a correct implementation.
+    [InlineData(77.2080, 28.6050, 14, 11705, 6832)] // Delhi at zoom 14
+    [InlineData(-122.4194, 37.7749, 12, 655, 1583)] // San Francisco at zoom 12
     public void SlippyTileMath_ConvertsLonLatToTileCorrectly(double lon, double lat, int zoom, int expectedX, int expectedY)
     {
         var (x, y) = HybridTileService.LonLatToTile(lon, lat, zoom);

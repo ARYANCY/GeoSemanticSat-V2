@@ -1,0 +1,26 @@
+# The .NET desktop app is not part of the backend image (~200MB of committed bin/obj)
+Desktop_App/
+
+# Docs, git history, local runtime state
+.git/
+.github/
+documentation/
+*.md
+!README.md
+
+# Local data/models/indexes come in via bind mounts, not the image
+data/
+models/
+indexes/
+
+# Python local env
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Secrets stay out of the image layer; compose injects them at runtime
+.env
