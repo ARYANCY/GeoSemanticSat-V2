@@ -110,13 +110,20 @@ public class GeoTiffReader
             var lines = File.ReadAllLines(sidecarTfw);
             if (lines.Length >= 6)
             {
-                double b = double.Parse(lines[0].Trim(), System.Globalization.CultureInfo.InvariantCulture);
-                double d = double.Parse(lines[1].Trim(), System.Globalization.CultureInfo.InvariantCulture);
-                double e = double.Parse(lines[2].Trim(), System.Globalization.CultureInfo.InvariantCulture);
-                double f = double.Parse(lines[3].Trim(), System.Globalization.CultureInfo.InvariantCulture);
-                double a = double.Parse(lines[4].Trim(), System.Globalization.CultureInfo.InvariantCulture);
-                double c = double.Parse(lines[5].Trim(), System.Globalization.CultureInfo.InvariantCulture);
-                transform = new AffineGeoTransform(a, b, d, c, e, f);
+                // Standard GDAL / ESRI Worldfile specification:
+                // Line 1: dx   = pixel size in X direction (B in AffineGeoTransform)
+                // Line 2: rotY = rotation term (E in AffineGeoTransform)
+                // Line 3: rotX = rotation term (C in AffineGeoTransform)
+                // Line 4: dy   = pixel size in Y direction (F in AffineGeoTransform, negative for north-up)
+                // Line 5: x0   = X coordinate of center of upper-left pixel (A in AffineGeoTransform)
+                // Line 6: y0   = Y coordinate of center of upper-left pixel (D in AffineGeoTransform)
+                double dx = double.Parse(lines[0].Trim(), System.Globalization.CultureInfo.InvariantCulture);
+                double rotY = double.Parse(lines[1].Trim(), System.Globalization.CultureInfo.InvariantCulture);
+                double rotX = double.Parse(lines[2].Trim(), System.Globalization.CultureInfo.InvariantCulture);
+                double dy = double.Parse(lines[3].Trim(), System.Globalization.CultureInfo.InvariantCulture);
+                double x0 = double.Parse(lines[4].Trim(), System.Globalization.CultureInfo.InvariantCulture);
+                double y0 = double.Parse(lines[5].Trim(), System.Globalization.CultureInfo.InvariantCulture);
+                transform = new AffineGeoTransform(x0, dx, rotX, y0, rotY, dy);
             }
             else
             {

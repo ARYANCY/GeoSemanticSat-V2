@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 3,
   "targets": {
     "net10.0": {
       "Avalonia/11.2.5": {
@@ -366,6 +366,18 @@
           }
         }
       },
+      "LucideAvalonia/1.6.2": {
+        "type": "package",
+        "dependencies": {
+          "Avalonia": "11.1.0-beta1"
+        },
+        "compile": {
+          "lib/net8.0/LucideAvalonia.dll": {}
+        },
+        "runtime": {
+          "lib/net8.0/LucideAvalonia.dll": {}
+        }
+      },
       "MicroCom.Runtime/0.11.0": {
         "type": "package",
         "compile": {
@@ -587,6 +599,20 @@
         },
         "runtime": {
           "lib/net8.0/Tmds.DBus.Protocol.dll": {}
+        }
+      },
+      "GeoSemanticSat.Cli/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "dependencies": {
+          "GeoSemanticSat.Core": "1.0.0",
+          "GeoSemanticSat.Engine": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/GeoSemanticSat.Cli.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/GeoSemanticSat.Cli.dll": {}
         }
       },
       "GeoSemanticSat.Core/1.0.0": {
@@ -1156,6 +1182,19 @@
         "runtimes/win-x86/native/libHarfBuzzSharp.dll"
       ]
     },
+    "LucideAvalonia/1.6.2": {
+      "sha512": "7SLfI8d3/4qnc1rgvLiTg0BzkgTgbzGKyp7NlVS4RF8AQMqaXWwrjll+GM3foQ5/Lk0Ch1OTv6RIEqEqoEKE2w==",
+      "type": "package",
+      "path": "lucideavalonia/1.6.2",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "icon.png",
+        "lib/net8.0/LucideAvalonia.dll",
+        "lucideavalonia.1.6.2.nupkg.sha512",
+        "lucideavalonia.nuspec"
+      ]
+    },
     "MicroCom.Runtime/0.11.0": {
       "sha512": "MEnrZ3UIiH40hjzMDsxrTyi8dtqB5ziv3iBeeU4bXsL/7NLSal9F1lZKpK+tfBRnUoDSdtcW3KufE4yhATOMCA==",
       "type": "package",
@@ -1447,6 +1486,11 @@
         "tmds.dbus.protocol.nuspec"
       ]
     },
+    "GeoSemanticSat.Cli/1.0.0": {
+      "type": "project",
+      "path": "../GeoSemanticSat.Cli/GeoSemanticSat.Cli.csproj",
+      "msbuildProject": "../GeoSemanticSat.Cli/GeoSemanticSat.Cli.csproj"
+    },
     "GeoSemanticSat.Core/1.0.0": {
       "type": "project",
       "path": "../GeoSemanticSat.Core/GeoSemanticSat.Core.csproj",
@@ -1464,41 +1508,46 @@
       "Avalonia.Desktop >= 11.2.5",
       "Avalonia.Fonts.Inter >= 11.2.5",
       "Avalonia.Themes.Fluent >= 11.2.5",
+      "GeoSemanticSat.Cli >= 1.0.0",
       "GeoSemanticSat.Core >= 1.0.0",
-      "GeoSemanticSat.Engine >= 1.0.0"
+      "GeoSemanticSat.Engine >= 1.0.0",
+      "LucideAvalonia >= 1.6.2"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\aryan\\.nuget\\packages\\": {}
+    "/home/non_qualities/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\aryan\\OneDrive\\Desktop\\UpaGraha\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.UI\\GeoSemanticSat.UI.csproj",
+      "projectUniqueName": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj",
       "projectName": "GeoSemanticSat.UI",
-      "projectPath": "C:\\Users\\aryan\\OneDrive\\Desktop\\UpaGraha\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.UI\\GeoSemanticSat.UI.csproj",
-      "packagesPath": "C:\\Users\\aryan\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\aryan\\OneDrive\\Desktop\\UpaGraha\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.UI\\obj\\",
+      "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj",
+      "packagesPath": "/home/non_qualities/.nuget/packages/",
+      "outputPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\aryan\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "/home/non_qualities/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
       ],
       "sources": {
+        "/usr/lib64/dotnet/library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net10.0": {
-          "framework": "net10.0",
           "targetAlias": "net10.0",
           "projectReferences": {
-            "C:\\Users\\aryan\\OneDrive\\Desktop\\UpaGraha\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Core\\GeoSemanticSat.Core.csproj": {
-              "projectPath": "C:\\Users\\aryan\\OneDrive\\Desktop\\UpaGraha\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Core\\GeoSemanticSat.Core.csproj"
+            "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Cli/GeoSemanticSat.Cli.csproj": {
+              "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Cli/GeoSemanticSat.Cli.csproj"
             },
-            "C:\\Users\\aryan\\OneDrive\\Desktop\\UpaGraha\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Engine\\GeoSemanticSat.Engine.csproj": {
-              "projectPath": "C:\\Users\\aryan\\OneDrive\\Desktop\\UpaGraha\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Engine\\GeoSemanticSat.Engine.csproj"
+            "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj": {
+              "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj"
+            },
+            "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj": {
+              "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj"
             }
           }
         }
@@ -1513,11 +1562,10 @@
         "auditLevel": "low",
         "auditMode": "all"
       },
-      "SdkAnalysisLevel": "10.0.400"
+      "SdkAnalysisLevel": "10.0.100"
     },
     "frameworks": {
       "net10.0": {
-        "framework": "net10.0",
         "targetAlias": "net10.0",
         "dependencies": {
           "Avalonia": {
@@ -1535,6 +1583,10 @@
           "Avalonia.Themes.Fluent": {
             "target": "Package",
             "version": "[11.2.5, )"
+          },
+          "LucideAvalonia": {
+            "target": "Package",
+            "version": "[1.6.2, )"
           }
         },
         "imports": [
@@ -1553,7 +1605,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Users\\aryan\\.dotnet\\sdk\\10.0.400/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "/usr/lib64/dotnet/sdk/10.0.111/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.CSharp": "(,4.7.32767]",
           "Microsoft.VisualBasic": "(,10.4.32767]",

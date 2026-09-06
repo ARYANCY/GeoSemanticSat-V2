@@ -12,8 +12,10 @@
           "Avalonia.Desktop": "11.2.5",
           "Avalonia.Fonts.Inter": "11.2.5",
           "Avalonia.Themes.Fluent": "11.2.5",
+          "GeoSemanticSat.Cli": "1.0.0",
           "GeoSemanticSat.Core": "1.0.0",
-          "GeoSemanticSat.Engine": "1.0.0"
+          "GeoSemanticSat.Engine": "1.0.0",
+          "LucideAvalonia": "1.6.2"
         },
         "runtime": {
           "GeoSemanticSat.UI.dll": {}
@@ -272,6 +274,17 @@
           }
         }
       },
+      "LucideAvalonia/1.6.2": {
+        "dependencies": {
+          "Avalonia": "11.2.5"
+        },
+        "runtime": {
+          "lib/net8.0/LucideAvalonia.dll": {
+            "assemblyVersion": "1.6.2.0",
+            "fileVersion": "1.6.2.0"
+          }
+        }
+      },
       "MicroCom.Runtime/0.11.0": {
         "runtime": {
           "lib/net5.0/MicroCom.Runtime.dll": {
@@ -470,6 +483,18 @@
           }
         }
       },
+      "GeoSemanticSat.Cli/1.0.0": {
+        "dependencies": {
+          "GeoSemanticSat.Core": "1.0.0",
+          "GeoSemanticSat.Engine": "1.0.0"
+        },
+        "runtime": {
+          "GeoSemanticSat.Cli.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
       "GeoSemanticSat.Core/1.0.0": {
         "runtime": {
           "GeoSemanticSat.Core.dll": {
@@ -603,6 +628,13 @@
       "path": "harfbuzzsharp.nativeassets.win32/7.3.0.3",
       "hashPath": "harfbuzzsharp.nativeassets.win32.7.3.0.3.nupkg.sha512"
     },
+    "LucideAvalonia/1.6.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-7SLfI8d3/4qnc1rgvLiTg0BzkgTgbzGKyp7NlVS4RF8AQMqaXWwrjll+GM3foQ5/Lk0Ch1OTv6RIEqEqoEKE2w==",
+      "path": "lucideavalonia/1.6.2",
+      "hashPath": "lucideavalonia.1.6.2.nupkg.sha512"
+    },
     "MicroCom.Runtime/0.11.0": {
       "type": "package",
       "serviceable": true,
@@ -658,6 +690,11 @@
       "sha512": "sha512-2gkt2kuYPhDKd8gtl34jZSJOnn4nRJfFngCDcTZT/uySbK++ua0YQx2418l9Rn1Y4dE5XNq6zG9ZsE5ltLlNNw==",
       "path": "tmds.dbus.protocol/0.20.0",
       "hashPath": "tmds.dbus.protocol.0.20.0.nupkg.sha512"
+    },
+    "GeoSemanticSat.Cli/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     },
     "GeoSemanticSat.Core/1.0.0": {
       "type": "project",

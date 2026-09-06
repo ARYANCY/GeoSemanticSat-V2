@@ -90,13 +90,28 @@ public class ChangeSearchEngine
             // 3. Temporal Window (Observation or Earliest Observation)
             if (criteria.StartDate.HasValue)
             {
-                if (record.TimestampT2 < criteria.StartDate.Value && record.EarliestObservationTimestamp < criteria.StartDate.Value)
+                var start = criteria.StartDate.Value;
+                // If an onset date is identified, check if it occurred before the StartDate
+                if (record.EarliestObservationTimestamp != default && record.EarliestObservationTimestamp < start)
+                    continue;
+                // If no onset date was identified, check if the change observation T2 is before StartDate
+                else if (record.EarliestObservationTimestamp == default && record.TimestampT2 != default && record.TimestampT2 < start)
                     continue;
             }
 
             if (criteria.EndDate.HasValue)
             {
-                if (record.TimestampT1 > criteria.EndDate.Value)
+                var end = criteria.EndDate.Value;
+                if (end.TimeOfDay == TimeSpan.Zero)
+                {
+                    end = end.Date.AddDays(1).AddTicks(-1);
+                }
+
+                // If an onset date is identified, check if it occurred after the EndDate
+                if (record.EarliestObservationTimestamp != default && record.EarliestObservationTimestamp > end)
+                    continue;
+                // If the baseline T1 itself started after EndDate
+                else if (record.TimestampT1 != default && record.TimestampT1 > end)
                     continue;
             }
 
@@ -106,10 +121,11 @@ public class ChangeSearchEngine
 
             // 5. Geographic Coordinate & Radial Proximity
             double distanceKm = 0.0;
+            double effectiveRadius = (criteria.RadiusKm.HasValue && criteria.RadiusKm.Value > 0) ? criteria.RadiusKm.Value : 15.0;
             if (criteria.Center.HasValue)
             {
                 distanceKm = record.Center.DistanceToKm(criteria.Center.Value);
-                if (criteria.RadiusKm.HasValue && distanceKm > criteria.RadiusKm.Value)
+                if (distanceKm > effectiveRadius)
                     continue;
             }
 
@@ -126,8 +142,8 @@ public class ChangeSearchEngine
 
             // Calculate overall composite relevance score
             // Prioritizes higher confidence and closer spatial proximity
-            double proximityScore = criteria.Center.HasValue && criteria.RadiusKm.HasValue && criteria.RadiusKm.Value > 0
-                ? Math.Clamp(1.0 - (distanceKm / criteria.RadiusKm.Value), 0.0, 1.0)
+            double proximityScore = criteria.Center.HasValue && effectiveRadius > 0
+                ? Math.Clamp(1.0 - (distanceKm / effectiveRadius), 0.0, 1.0)
                 : 1.0;
 
             double relevance = 0.60 * record.Confidence + 0.40 * proximityScore;

@@ -1,7 +1,7 @@
 ﻿# Reproducible Evaluation Report - Problem Statement 26227
 **Client**: Ministry of Defence (MoD) / Indian Army (DGIS)  
 **System**: GeoSemanticSat (.NET 10.0 Native Architecture)  
-**Evaluation Date**: 2026-09-04 20:04:46 UTC  
+**Evaluation Date**: 2026-09-06 08:24:34 UTC  
 **Environment**: Linux x86_64, .NET 10.0, 100% On-Premises Offline Operation  
 
 ## 1. Metric Summary
@@ -9,13 +9,13 @@
 |---|---|---|
 | **Indexed Scenes / Patches** | 128 patches (128 total) | Scale test |
 | **Initial Index Build Time** | 4 ms | < 500 ms |
-| **Incremental Ingestion Time** | 4 ms (0.06 ms/patch) | Sub-second per tile |
+| **Incremental Ingestion Time** | 3 ms (0.05 ms/patch) | Sub-second per tile |
 | **Storage Footprint** | 77.48 KB (619.9 bytes/patch) | Ultra-lightweight binary |
-| **Query Latency (P50)** | 134.0 µs (0.00134 ms) | < 10 ms |
-| **Query Latency (P95)** | 161.8 µs (0.00162 ms) | < 25 ms |
-| **Change Detection Precision** | 17.4% | Precision-first (> 85%) |
-| **Change Detection Recall** | 25.0% | High analytical discovery |
-| **Change Detection F1-Score** | 0.21 | Balanced precision-recall |
+| **Query Latency (P50)** | 33.6 µs (0.0034 ms) | < 10 ms |
+| **Query Latency (P95)** | 49.8 µs (0.0050 ms) | < 25 ms |
+| **Change Detection Precision** | 52.4% | Precision-first (> 85%) |
+| **Change Detection Recall** | 68.8% | High analytical discovery |
+| **Change Detection F1-Score** | 0.59 | Balanced precision-recall |
 | **Earliest Observation Onset** | Exact match (2024-03-20) | Accurate CUSUM detection |
 | **False-Alarm Suppression** | 100% cloud/shadow, seasonal & jitter rejection | High precision |
 

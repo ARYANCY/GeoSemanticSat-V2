@@ -190,8 +190,7 @@ public class QualityMaskEngine
         {
             for (int x = 0; x < w; x++)
             {
-                var flag = mask[y, x];
-                if ((flag & (QualityMaskFlags.Cloud | QualityMaskFlags.CloudShadow | QualityMaskFlags.Snow | QualityMaskFlags.Saturated)) == 0)
+                if (IsUsable(mask[y, x]))
                 {
                     validCount++;
                 }

@@ -55,8 +55,8 @@ public static class OnsetEstimator
             int x1 = Math.Clamp((int)Math.Max(pxMin, pxMax), 0, tile.Width - 1);
             int y1 = Math.Clamp((int)Math.Max(pyMin, pyMax), 0, tile.Height - 1);
 
-            int patchW = Math.Max(1, x1 - x0);
-            int patchH = Math.Max(1, y1 - y0);
+            int patchW = Math.Max(1, x1 - x0 + 1);
+            int patchH = Math.Max(1, y1 - y0 + 1);
 
             // Check quality mask
             var mask = QualityMaskEngine.GenerateQualityMask(tile);
@@ -75,7 +75,7 @@ public static class OnsetEstimator
             {
                 for (int x = x0; x <= x1; x++)
                 {
-                    if ((mask[y, x] & (QualityMaskFlags.Cloud | QualityMaskFlags.CloudShadow)) == 0)
+                    if (QualityMaskEngine.IsUsable(mask[y, x]))
                     {
                         validCount++;
                         metricSum += targetBand[y, x];

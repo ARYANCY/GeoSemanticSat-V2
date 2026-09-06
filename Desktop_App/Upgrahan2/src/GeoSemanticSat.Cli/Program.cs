@@ -187,10 +187,32 @@ public class Program
 
         var results = searchEngine.Search(criteria, topK: 10);
         Console.WriteLine($"\nFound {results.Count} matching change sites:");
-        int rank = 1;
-        foreach (var r in results)
+        if (results.Count == 0)
         {
-            Console.WriteLine($"  #{rank++} [{r.Record.Type}] Candidate {r.Record.Id[..8]} | Rel: {r.RelevanceScore:F3} | Conf: {(r.Record.Confidence * 100):F1}% | Dist: {r.DistanceKm:F2} km | Center: {r.Record.Center} | Date: {r.Record.TimestampT2:yyyy-MM-dd}");
+            Console.WriteLine("  [!] NO SATELLITE COVERAGE OR ZERO DETECTIONS FOR QUERIED SPATIOTEMPORAL CRITERIA.");
+            Console.WriteLine("      Active Indexed Footprint: New Delhi AOI (28.5844°N - 28.6100°N, 77.2000°E - 77.2256°E)");
+            Console.WriteLine("      Available Acquisition Epochs: 2024-01-10 to 2024-04-25");
+            if (center.HasValue)
+            {
+                double distKm = center.Value.DistanceToKm(new GeoCoordinate(28.6050, 77.2080));
+                if (distKm > (radius ?? 15.0) + 15.0)
+                {
+                    Console.WriteLine($"      Notice: Requested coordinate ({center.Value.Latitude:F4}°N, {center.Value.Longitude:F4}°E) is {distKm:F0} km away from indexed coverage.");
+                    Console.WriteLine("      To ingest GeoTIFF imagery for this region: GeoSemanticSat index <raster-directory> <index.bin>");
+                }
+            }
+            if (startDate.HasValue && startDate.Value > new DateTime(2024, 4, 25) || endDate.HasValue && endDate.Value < new DateTime(2024, 1, 10))
+            {
+                Console.WriteLine("      Notice: Requested observation dates lie completely outside the archive epoch time series.");
+            }
+        }
+        else
+        {
+            int rank = 1;
+            foreach (var r in results)
+            {
+                Console.WriteLine($"  #{rank++} [{r.Record.Type}] Candidate {r.Record.Id[..8]} | Rel: {r.RelevanceScore:F3} | Conf: {(r.Record.Confidence * 100):F1}% | Dist: {r.DistanceKm:F2} km | Center: {r.Record.Center} | Date: {r.Record.TimestampT2:yyyy-MM-dd}");
+            }
         }
     }
 

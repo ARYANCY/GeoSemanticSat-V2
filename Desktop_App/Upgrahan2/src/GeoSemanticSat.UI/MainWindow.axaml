@@ -12,7 +12,8 @@
         Background="{DynamicResource AppBackgroundBrush}"
         KeyDown="OnWindowKeyDown">
 
-    <Grid RowDefinitions="Auto, Auto, *">
+    <Grid>
+        <Grid RowDefinitions="Auto, Auto, *">
         <!-- TOP HEADER: PRODUCT & OPERATIONAL STATUS -->
         <Border Grid.Row="0" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="0,0,0,1" Padding="18,10">
                 <Grid ColumnDefinitions="Auto, *, Auto">
@@ -239,60 +240,29 @@
                         </WrapPanel>
                     </Border>
 
-                    <!-- Primary Split View: Interactive Geographic Map (Left 50%) + Candidate Results (Right 50%) -->
-                    <Grid Grid.Row="2" ColumnDefinitions="*, *">
-                        <!-- Left: Interactive Map -->
-                        <Border Grid.Column="0" Background="{DynamicResource AppBackgroundBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="2" Margin="0,0,6,0">
-                            <Grid RowDefinitions="Auto, *">
-                                <Border Grid.Row="0" Background="{DynamicResource SurfaceBrush}" Padding="8,4" CornerRadius="0">
-                                    <Grid ColumnDefinitions="Auto, *, Auto">
-                                        <TextBlock Text="GEOGRAPHIC LOCATION MAP" FontSize="{DynamicResource FontMicro}" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" Margin="0,0,10,0" />
-                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                                            <ComboBox x:Name="CmbMapProvider1" SelectedIndex="0" Width="145" Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="{DynamicResource FontMicro}" SelectionChanged="OnMapProviderChanged">
-                                                <ComboBoxItem Content="Satellite Imagery (ArcGIS)" Tag="esri-satellite" />
-                                                <ComboBoxItem Content="Sentinel-2 Cloudless 2024" Tag="sentinel2-cloudless" />
-                                                <ComboBoxItem Content="OpenStreetMap" Tag="osm-standard" />
-                                                <ComboBoxItem Content="USGS - United States coverage only" Tag="usgs-imagery" IsEnabled="False" />
-                                            </ComboBox>
-                                            <ComboBox x:Name="CmbMapMode1" SelectedIndex="0" Width="135" Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="{DynamicResource FontMicro}" SelectionChanged="OnMapModeChanged">
-                                                <ComboBoxItem Content="Hybrid (Auto)" Tag="Auto" />
-                                                <ComboBoxItem Content="Air-Gapped (Offline)" Tag="OfflineStrict" />
-                                                <ComboBoxItem Content="Online Preferred" Tag="OnlinePreferred" />
-                                            </ComboBox>
-                                        </StackPanel>
-                                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4">
-                                            <Button Content="+" Padding="6,2" FontSize="{DynamicResource FontMicro}" Background="{DynamicResource RuleBrush}" Foreground="{DynamicResource TextPrimaryBrush}" Click="OnMapZoomInClicked" />
-                                            <Button Content="-" Padding="6,2" FontSize="{DynamicResource FontMicro}" Background="{DynamicResource RuleBrush}" Foreground="{DynamicResource TextPrimaryBrush}" Click="OnMapZoomOutClicked" />
-                                            <Button Content="Fit All" Padding="6,2" FontSize="{DynamicResource FontMicro}" Background="{DynamicResource RuleBrush}" Foreground="{DynamicResource TextPrimaryBrush}" Click="OnMapFitAllClicked" />
-                                        </StackPanel>
-                                    </Grid>
-                                </Border>
-                                <controls:InteractiveMapCanvas Grid.Row="1" x:Name="MapCanvasDiscover" />
-                            </Grid>
-                        </Border>
-
-                        <!-- Right: Prioritized Candidate List -->
-                        <Border Grid.Column="1" Background="{DynamicResource AppBackgroundBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Margin="6,0,0,0">
+                    <!-- Prioritized Candidate Results (Full Width - Zero Map Clutter) -->
+                    <Border Grid.Row="2" Background="{DynamicResource AppBackgroundBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0">
+                        <Grid>
                             <ListBox x:Name="LstSearchResults" Background="Transparent"
                                      ScrollViewer.VerticalScrollBarVisibility="Auto"
                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                      SelectionChanged="OnCandidateSelectionChanged">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="10" Margin="4">
+                                        <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="12" Margin="4,4,4,6">
                                             <Grid ColumnDefinitions="Auto, *, Auto">
                                                 <!-- Thumbnail -->
-                                                <Border Grid.Column="0" Width="92" Height="92" Background="{DynamicResource AppBackgroundBrush}" CornerRadius="0" ClipToBounds="True" Margin="0,0,12,0" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1">
+                                                <Border Grid.Column="0" Width="104" Height="104" Background="{DynamicResource AppBackgroundBrush}" CornerRadius="0" ClipToBounds="True" Margin="0,0,16,0" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1">
                                                     <Image Source="{Binding ImagePreview}" Stretch="UniformToFill" />
                                                 </Border>
 
                                                 <!-- Metadata & Evidence -->
-                                                <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
-                                                    <StackPanel Orientation="Horizontal" Spacing="6">
-                                                        <Border Background="{DynamicResource AccentDeepBrush}" CornerRadius="0" Padding="5,2">
+                                                <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                                        <Border Background="{DynamicResource AccentDeepBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1" CornerRadius="0" Padding="6,2">
                                                             <TextBlock Text="{Binding SimilarityBadge}" FontWeight="Bold" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource AccentBrush}" />
                                                         </Border>
-                                                        <TextBlock Text="{Binding Title}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="{DynamicResource FontMicro}" VerticalAlignment="Center" />
+                                                        <TextBlock Text="{Binding Title}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="{DynamicResource FontBody}" VerticalAlignment="Center" />
                                                     </StackPanel>
                                                     <TextBlock Text="{Binding Coordinates}" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold" />
                                                     <TextBlock Text="{Binding Detail}" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextMutedBrush}" />
@@ -300,42 +270,58 @@
                                                 </StackPanel>
 
                                                 <!-- Candidate Actions -->
-                                                <StackPanel Grid.Column="2" Spacing="5" VerticalAlignment="Center">
-                                                    <Button Content="Target (Step 2)" Tag="{Binding PatchId}" Click="OnInspectPatchChangeClicked"
-                                                            Background="{DynamicResource AccentBrush}" Foreground="{DynamicResource TextPrimaryBrush}" FontWeight="Bold" CornerRadius="0" Padding="8,4" FontSize="{DynamicResource FontMicro}" ToolTip.Tip="Transfer coordinates to Step 2 to search by radius and date" />
-                                                    <Button Content="Verify (Step 3)" Tag="{Binding PatchId}" Click="OnInspectPatchDirectToStep3Clicked"
-                                                            Background="{DynamicResource VerifiedBrush}" Foreground="{DynamicResource AppBackgroundBrush}" FontWeight="Bold" CornerRadius="0" Padding="8,4" FontSize="{DynamicResource FontMicro}" ToolTip.Tip="Directly open Step 3 to analyze multi-temporal changes in this patch" />
-                                                    <Button Content="Similar" Tag="{Binding PatchId}" Click="OnFindSimilarClicked"
-                                                            Background="{DynamicResource SurfaceInsetBrush}" Foreground="{DynamicResource TextSecondaryBrush}" BorderBrush="{DynamicResource RuleStrongBrush}" BorderThickness="1" CornerRadius="0" Padding="8,4" FontSize="{DynamicResource FontMicro}" ToolTip.Tip="Search for other visually similar patches in the archive" />
+                                                <StackPanel Grid.Column="2" Spacing="6" VerticalAlignment="Center" Margin="12,0,0,0">
+                                                    <Button Content="Target Coordinates (Step 2)" Tag="{Binding PatchId}" Click="OnInspectPatchChangeClicked"
+                                                            Background="{DynamicResource AccentBrush}" Foreground="{DynamicResource TextPrimaryBrush}" FontWeight="Bold" CornerRadius="0" Padding="12,6" FontSize="{DynamicResource FontMicro}" ToolTip.Tip="Transfer coordinates to Step 2 to search by radius and date" />
+                                                    <Button Content="Verify Multispectral (Step 3)" Tag="{Binding PatchId}" Click="OnInspectPatchDirectToStep3Clicked"
+                                                            Background="{DynamicResource VerifiedBrush}" Foreground="{DynamicResource AppBackgroundBrush}" FontWeight="Bold" CornerRadius="0" Padding="12,6" FontSize="{DynamicResource FontMicro}" ToolTip.Tip="Directly open Step 3 to analyze multi-temporal changes in this patch" />
+                                                    <Button Content="Find Visually Similar" Tag="{Binding PatchId}" Click="OnFindSimilarClicked"
+                                                            Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource TextSecondaryBrush}" BorderBrush="{DynamicResource RuleStrongBrush}" BorderThickness="1" CornerRadius="0" Padding="12,6" FontSize="{DynamicResource FontMicro}" ToolTip.Tip="Search for other visually similar patches in the archive" />
                                                 </StackPanel>
                                             </Grid>
                                         </Border>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
                             </ListBox>
-                        </Border>
-                    </Grid>
+
+                            <!-- Synchronized Empty / Out-of-Coverage State for Tab 1 -->
+                            <Border x:Name="PnlNoDataTab1" IsVisible="False" Background="#E60D1117" BorderBrush="{DynamicResource CandidateBrush}" BorderThickness="1" Padding="32">
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="14" MaxWidth="520">
+                                    <Border Width="48" Height="48" Background="{DynamicResource CandidateSurfaceBrush}" BorderBrush="{DynamicResource CandidateBrush}" BorderThickness="1" HorizontalAlignment="Center">
+                                        <TextBlock Text="⚠" FontSize="24" Foreground="{DynamicResource CandidateBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                    <TextBlock Text="NO MATCHING SATELLITE TILES FOUND" FontWeight="Bold" FontSize="{DynamicResource FontBody}" Foreground="{DynamicResource CandidateBrush}" HorizontalAlignment="Center" />
+                                    <TextBlock x:Name="TxtNoDataTab1Detail" Text="No indexed satellite observations match the requested semantic concept in the active archive domain." Foreground="{DynamicResource TextMutedBrush}" FontSize="{DynamicResource FontMicro}" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" />
+                                    <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+                                        <Button Content="Show Ingestion Options" Classes="primary" Click="OnShowMissingDataModalClicked" Padding="12,6" FontSize="{DynamicResource FontMicro}" />
+                                        <Button Content="Reset to Active Coverage" Click="OnModalResetToActiveCoverageClicked" Padding="12,6" FontSize="{DynamicResource FontMicro}" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </Border>
                 </Grid>
             </TabItem>
 
             <!-- TAB 2: TARGET COORDINATE & SPATIOTEMPORAL QUERY -->
             <TabItem Header="2. Target Coordinates">
-                <Grid RowDefinitions="Auto, *" Margin="6">
+                <Grid RowDefinitions="Auto, Auto, *" Margin="6">
                     <!-- Spatiotemporal Parameter Bar -->
-                    <Border Grid.Row="0" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="12" Margin="0,0,0,10">
-                        <StackPanel Spacing="8">
+                    <Border Grid.Row="0" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="12" Margin="0,0,0,8">
+                        <StackPanel Spacing="10">
+                            <!-- Row 1: Geographic & Semantic Classification -->
                             <WrapPanel Orientation="Horizontal">
-                                <StackPanel Width="170">
+                                <StackPanel Width="150" Margin="0,0,10,0">
                                     <TextBlock Text="Center Latitude (deg N):" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,2" />
                                     <TextBox x:Name="TxtSearchLat" Text="28.60500" Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource TextPrimaryBrush}" BorderBrush="{DynamicResource RuleStrongBrush}" CornerRadius="0" FontSize="{DynamicResource FontMicro}" />
                                 </StackPanel>
 
-                                <StackPanel Width="170">
+                                <StackPanel Width="150" Margin="0,0,10,0">
                                     <TextBlock Text="Center Longitude (deg E):" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,2" />
                                     <TextBox x:Name="TxtSearchLon" Text="77.20800" Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource TextPrimaryBrush}" BorderBrush="{DynamicResource RuleStrongBrush}" CornerRadius="0" FontSize="{DynamicResource FontMicro}" />
                                 </StackPanel>
 
-                                <StackPanel Width="150">
+                                <StackPanel Width="120" Margin="0,0,10,0">
                                     <TextBlock Text="Search Radius (km):" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,2" />
                                     <TextBox x:Name="TxtSearchRadius" Text="10.0" Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource TextPrimaryBrush}" BorderBrush="{DynamicResource RuleStrongBrush}" CornerRadius="0" FontSize="{DynamicResource FontMicro}" />
                                 </StackPanel>
@@ -351,27 +337,78 @@
                                         <ComboBoxItem Content="Activity Concentration (Vehicles)" />
                                     </ComboBox>
                                 </StackPanel>
-
-                                <Button x:Name="BtnExecuteSpatiotemporalSearch" Content="Search Changes"
-                                        Background="{DynamicResource VerifiedBrush}" Foreground="{DynamicResource AppBackgroundBrush}" FontWeight="Bold" Padding="16,8" VerticalAlignment="Bottom" CornerRadius="0"
-                                        Click="OnExecuteSpatiotemporalSearchClicked" />
                             </WrapPanel>
 
-                            <!-- Preset Sector Chips -->
+                            <!-- Row 2: Temporal Window & Specific Dates -->
                             <WrapPanel Orientation="Horizontal">
-                                <TextBlock Text="Quick Sectors:" VerticalAlignment="Center" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextFaintBrush}" FontWeight="SemiBold" Margin="0,0,6,4" />
-                                <Button Content="Sector Alpha (Facility: 28.605 N, 77.208 E)" Tag="28.6050,77.2080,5.0,Construction" Click="OnPresetSectorClicked" FontSize="{DynamicResource FontMicro}" Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource TextSecondaryBrush}" BorderBrush="{DynamicResource SurfaceInsetBrush}" BorderThickness="1" CornerRadius="0" Padding="8,3" Margin="0,0,6,4" />
-                                <Button Content="Sector Bravo (River: 28.592 N, 77.203 E)" Tag="28.5920,77.2030,5.0,WaterExtentVariation" Click="OnPresetSectorClicked" FontSize="{DynamicResource FontMicro}" Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource TextSecondaryBrush}" BorderBrush="{DynamicResource SurfaceInsetBrush}" BorderThickness="1" CornerRadius="0" Padding="8,3" Margin="0,0,6,4" />
-                                <Button Content="Sector Charlie (Clearance: 28.604 N, 77.218 E)" Tag="28.6040,77.2180,5.0,Clearance" Click="OnPresetSectorClicked" FontSize="{DynamicResource FontMicro}" Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource TextSecondaryBrush}" BorderBrush="{DynamicResource SurfaceInsetBrush}" BorderThickness="1" CornerRadius="0" Padding="8,3" Margin="0,0,6,4" />
+                                <StackPanel Width="190" Margin="0,0,10,0">
+                                    <TextBlock Text="Time Period Preset:" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,2" />
+                                    <ComboBox x:Name="CmbDatePeriodPreset" SelectedIndex="0" HorizontalAlignment="Stretch" Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="{DynamicResource FontMicro}" SelectionChanged="OnDatePeriodPresetChanged">
+                                        <ComboBoxItem Content="All Archive Epochs (2024)" Tag="ALL" />
+                                        <ComboBoxItem Content="Q1 2024 (Jan 01 - Mar 31)" Tag="Q1" />
+                                        <ComboBoxItem Content="Early Phase (Jan 01 - Feb 15)" Tag="EARLY" />
+                                        <ComboBoxItem Content="Disturbance Window (Feb 01 - Mar 25)" Tag="DISTURB" />
+                                        <ComboBoxItem Content="Late Phase (Mar 15 - Apr 30)" Tag="LATE" />
+                                        <ComboBoxItem Content="Custom Dates (Specific Range)" Tag="CUSTOM" />
+                                    </ComboBox>
+                                </StackPanel>
+
+                                <StackPanel Width="140" Margin="0,0,10,0">
+                                    <TextBlock Text="Start Date (From):" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,2" />
+                                    <TextBox x:Name="TxtStartDate" Text="2024-01-01" Watermark="YYYY-MM-DD" Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource TextPrimaryBrush}" BorderBrush="{DynamicResource RuleStrongBrush}" CornerRadius="0" FontSize="{DynamicResource FontMicro}" />
+                                </StackPanel>
+
+                                <StackPanel Width="140" Margin="0,0,10,0">
+                                    <TextBlock Text="End Date (To):" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,2" />
+                                    <TextBox x:Name="TxtEndDate" Text="2024-04-30" Watermark="YYYY-MM-DD" Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource TextPrimaryBrush}" BorderBrush="{DynamicResource RuleStrongBrush}" CornerRadius="0" FontSize="{DynamicResource FontMicro}" />
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Bottom">
+                                    <Button x:Name="BtnResetDates" Content="Reset Dates" Click="OnResetDateRangeClicked"
+                                            Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource TextSecondaryBrush}" BorderBrush="{DynamicResource SurfaceInsetBrush}" BorderThickness="1" CornerRadius="0" Padding="10,7" FontSize="{DynamicResource FontMicro}" ToolTip.Tip="Reset temporal window to entire archive" />
+                                    <Button x:Name="BtnExecuteSpatiotemporalSearch" Content="Search Changes"
+                                            Background="{DynamicResource VerifiedBrush}" Foreground="{DynamicResource AppBackgroundBrush}" FontWeight="Bold" Padding="18,8" CornerRadius="0" FontSize="{DynamicResource FontMicro}"
+                                            Click="OnExecuteSpatiotemporalSearchClicked" ToolTip.Tip="Search physical changes matching coordinates, classification and date range" />
+                                </StackPanel>
                             </WrapPanel>
+
+                            <!-- Row 3: Preset Sector & Timeframe Chips -->
+                            <StackPanel Spacing="4">
+                                <WrapPanel Orientation="Horizontal">
+                                    <TextBlock Text="Quick Sectors:" VerticalAlignment="Center" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextFaintBrush}" FontWeight="SemiBold" Margin="0,0,6,2" />
+                                    <Button Content="Sector Alpha (Facility: 28.605 N, 77.208 E)" Tag="28.6050,77.2080,5.0,Construction" Click="OnPresetSectorClicked" FontSize="{DynamicResource FontMicro}" Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource TextSecondaryBrush}" BorderBrush="{DynamicResource SurfaceInsetBrush}" BorderThickness="1" CornerRadius="0" Padding="8,2" Margin="0,0,6,2" />
+                                    <Button Content="Sector Bravo (River: 28.592 N, 77.203 E)" Tag="28.5920,77.2030,5.0,WaterExtentVariation" Click="OnPresetSectorClicked" FontSize="{DynamicResource FontMicro}" Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource TextSecondaryBrush}" BorderBrush="{DynamicResource SurfaceInsetBrush}" BorderThickness="1" CornerRadius="0" Padding="8,2" Margin="0,0,6,2" />
+                                    <Button Content="Sector Charlie (Clearance: 28.604 N, 77.218 E)" Tag="28.6040,77.2180,5.0,Clearance" Click="OnPresetSectorClicked" FontSize="{DynamicResource FontMicro}" Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource TextSecondaryBrush}" BorderBrush="{DynamicResource SurfaceInsetBrush}" BorderThickness="1" CornerRadius="0" Padding="8,2" Margin="0,0,6,2" />
+                                </WrapPanel>
+
+                                <WrapPanel Orientation="Horizontal">
+                                    <TextBlock Text="Time Windows:" VerticalAlignment="Center" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextFaintBrush}" FontWeight="SemiBold" Margin="0,0,6,2" />
+                                    <Button Content="Full Archive (Jan 10 - Apr 15)" Tag="2024-01-01,2024-04-30" Click="OnQuickDateClicked" FontSize="{DynamicResource FontMicro}" Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource TextSecondaryBrush}" BorderBrush="{DynamicResource SurfaceInsetBrush}" BorderThickness="1" CornerRadius="0" Padding="8,2" Margin="0,0,6,2" />
+                                    <Button Content="Pre-Onset Baseline (Jan 10 - Feb 04)" Tag="2024-01-01,2024-02-04" Click="OnQuickDateClicked" FontSize="{DynamicResource FontMicro}" Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource TextSecondaryBrush}" BorderBrush="{DynamicResource SurfaceInsetBrush}" BorderThickness="1" CornerRadius="0" Padding="8,2" Margin="0,0,6,2" />
+                                    <Button Content="Active Onset Window (Feb 04 - Mar 20)" Tag="2024-02-01,2024-03-25" Click="OnQuickDateClicked" FontSize="{DynamicResource FontMicro}" Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource TextSecondaryBrush}" BorderBrush="{DynamicResource SurfaceInsetBrush}" BorderThickness="1" CornerRadius="0" Padding="8,2" Margin="0,0,6,2" />
+                                    <Button Content="Post-Disturbance (Mar 20 - Apr 15)" Tag="2024-03-20,2024-04-30" Click="OnQuickDateClicked" FontSize="{DynamicResource FontMicro}" Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource TextSecondaryBrush}" BorderBrush="{DynamicResource SurfaceInsetBrush}" BorderThickness="1" CornerRadius="0" Padding="8,2" Margin="0,0,6,2" />
+                                </WrapPanel>
+                            </StackPanel>
                         </StackPanel>
                     </Border>
 
+                    <!-- Spatiotemporal Filter Status & Active Time Period Summary Bar -->
+                    <Border Grid.Row="1" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="8,4" Margin="0,0,0,8">
+                        <Grid ColumnDefinitions="Auto, *, Auto">
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <TextBlock x:Name="TxtSearchMatchCount" Text="21 candidates found" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" FontSize="{DynamicResource FontMicro}" />
+                                <TextBlock Text="|" Foreground="{DynamicResource RuleStrongBrush}" />
+                                <TextBlock x:Name="TxtSearchActiveCriteria" Text="Radius: 10.0 km around (28.6050°N, 77.2080°E) | Period: 2024-01-01 to 2024-04-30 UTC" Foreground="{DynamicResource TextMutedBrush}" FontSize="{DynamicResource FontMicro}" />
+                            </StackPanel>
+                            <TextBlock Grid.Column="2" Text="Temporal filter matches earliest onset or observation window" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextFaintBrush}" VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+
                     <!-- Split View: Interactive Geographic Map (Left) + Candidate Before/After Cards (Right) -->
-                    <Grid Grid.Row="1" ColumnDefinitions="*, *">
-                        <!-- Left: Interactive Map -->
+                    <Grid Grid.Row="2" ColumnDefinitions="*, *">
+                        <!-- Left: Interactive Map & Before/After Provenance Inspector -->
                         <Border Grid.Column="0" Background="{DynamicResource AppBackgroundBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="2" Margin="0,0,6,0">
-                            <Grid RowDefinitions="Auto, *">
+                            <Grid RowDefinitions="Auto, *, Auto">
                                 <Border Grid.Row="0" Background="{DynamicResource SurfaceBrush}" Padding="8,4" CornerRadius="0">
                                     <Grid ColumnDefinitions="Auto, *, Auto">
                                         <TextBlock Text="TARGET SECTOR &amp; RANGE RING" FontSize="{DynamicResource FontMicro}" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" Margin="0,0,10,0" />
@@ -397,6 +434,98 @@
                                     </Grid>
                                 </Border>
                                 <controls:InteractiveMapCanvas Grid.Row="1" x:Name="MapCanvasSpatiotemporal" />
+
+                                <!-- Row 2: In-Map Before & After Provenance Inspector OR Out-of-Coverage Notice -->
+                                <Grid Grid.Row="2" Margin="0,4,0,0">
+                                    <Border x:Name="PnlMapProvenance" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" Padding="8">
+                                        <Grid RowDefinitions="Auto, Auto">
+                                            <!-- Header Bar -->
+                                            <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Margin="0,0,0,6">
+                                                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                    <Border Background="{DynamicResource AccentDeepBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1" Padding="5,2">
+                                                        <TextBlock Text="BEFORE &amp; AFTER PROVENANCE (W3C PROV-O)" FontSize="{DynamicResource FontMicro}" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" />
+                                                    </Border>
+                                                    <TextBlock x:Name="TxtMapProvTitle" Text="Candidate Site #1 | Construction" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="{DynamicResource FontMicro}" VerticalAlignment="Center" />
+                                                    <TextBlock x:Name="TxtMapProvCoords" Text="28.6050° N, 77.2080° E | 25,600 m²" Foreground="{DynamicResource TextMutedBrush}" FontSize="{DynamicResource FontMicro}" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6">
+                                                    <Button x:Name="BtnMapProvVerify" Content="Deep Verify (Step 3)" Background="{DynamicResource AccentBrush}" Foreground="{DynamicResource TextPrimaryBrush}" FontWeight="Bold" Padding="10,4" FontSize="{DynamicResource FontMicro}" Click="OnMapProvDeepVerifyClicked" ToolTip.Tip="Inspect multispectral curves and heatmaps for this site" />
+                                                    <Button x:Name="BtnMapProvConfirm" Content="Confirm" Background="{DynamicResource VerifiedSurfaceBrush}" Foreground="{DynamicResource VerifiedBrush}" Padding="8,4" FontSize="{DynamicResource FontMicro}" Click="OnMapProvConfirmClicked" ToolTip.Tip="Confirm this physical change" />
+                                                    <Button x:Name="BtnMapProvReject" Content="Reject" Background="{DynamicResource RejectedSurfaceBrush}" Foreground="{DynamicResource RejectedBrush}" Padding="8,4" FontSize="{DynamicResource FontMicro}" Click="OnMapProvRejectClicked" ToolTip.Tip="Reject as false alarm" />
+                                                </StackPanel>
+                                            </Grid>
+
+                                            <!-- Comparison Body: Baseline T1 vs Observed T2 + Audit Lineage -->
+                                            <Grid Grid.Row="1" ColumnDefinitions="*, Auto, *">
+                                                <!-- Baseline T1 Card -->
+                                                <Border Grid.Column="0" Background="{DynamicResource SurfaceRaisedBrush}" BorderBrush="{DynamicResource RuleStrongBrush}" BorderThickness="1" Padding="6" Margin="0,0,4,0">
+                                                    <Grid ColumnDefinitions="Auto, *">
+                                                        <Border Grid.Column="0" Width="72" Height="72" Background="{DynamicResource AppBackgroundBrush}" BorderBrush="{DynamicResource RuleStrongBrush}" BorderThickness="1" ClipToBounds="True" Margin="0,0,8,0">
+                                                            <Image x:Name="ImgMapProvBefore" Stretch="UniformToFill" />
+                                                        </Border>
+                                                        <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                                                            <Border Background="{DynamicResource SurfaceInsetBrush}" Padding="4,1" HorizontalAlignment="Left">
+                                                                <TextBlock Text="BASELINE (T1)" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" />
+                                                            </Border>
+                                                            <TextBlock x:Name="TxtMapProvBeforeDate" Text="2024-01-10 10:30 UTC" FontWeight="Bold" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                                            <TextBlock x:Name="TxtMapProvBeforeSensor" Text="Sentinel-2A MSI (10m GSD)" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextMutedBrush}" />
+                                                            <TextBlock x:Name="TxtMapProvBeforeScene" Text="Scene: S2A_20240110_T1" FontSize="9" Foreground="{DynamicResource TextFaintBrush}" />
+                                                            <TextBlock Text="Level-2A BOA Reflectance" FontSize="9" Foreground="{DynamicResource VerifiedBrush}" />
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Border>
+
+                                                <!-- Center Lineage & Delta Bridge -->
+                                                <Border Grid.Column="1" Background="{DynamicResource SurfaceRaisedBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" Padding="6,4" Margin="2,0">
+                                                    <StackPanel Spacing="2" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                        <TextBlock Text="-- +69 DAYS -->" FontWeight="Bold" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Center" />
+                                                        <TextBlock x:Name="TxtMapProvOnset" Text="Onset: 2024-02-04 UTC" FontWeight="SemiBold" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource CandidateBrush}" HorizontalAlignment="Center" />
+                                                        <TextBlock Text="Pipeline: CVA + CUSUM" FontSize="9" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" />
+                                                        <TextBlock Text="W3C PROV-O Aligned" FontSize="9" Foreground="{DynamicResource VerifiedBrush}" HorizontalAlignment="Center" />
+                                                        <TextBlock x:Name="TxtMapProvHash" Text="SHA-256: 7f8a92e104b3..." FontSize="8" Foreground="{DynamicResource TextFaintBrush}" HorizontalAlignment="Center" />
+                                                    </StackPanel>
+                                                </Border>
+
+                                                <!-- Observed T2 Card -->
+                                                <Border Grid.Column="2" Background="{DynamicResource SurfaceRaisedBrush}" BorderBrush="{DynamicResource RejectedBrush}" BorderThickness="1" Padding="6" Margin="4,0,0,0">
+                                                    <Grid ColumnDefinitions="Auto, *">
+                                                        <Border Grid.Column="0" Width="72" Height="72" Background="{DynamicResource AppBackgroundBrush}" BorderBrush="{DynamicResource RejectedBrush}" BorderThickness="1" ClipToBounds="True" Margin="0,0,8,0">
+                                                            <Image x:Name="ImgMapProvAfter" Stretch="UniformToFill" />
+                                                        </Border>
+                                                        <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                                                            <Border Background="{DynamicResource RejectedSurfaceBrush}" Padding="4,1" HorizontalAlignment="Left">
+                                                                <TextBlock Text="OBSERVED (T2)" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource RejectedBrush}" />
+                                                            </Border>
+                                                            <TextBlock x:Name="TxtMapProvAfterDate" Text="2024-03-20 10:30 UTC" FontWeight="Bold" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                                            <TextBlock x:Name="TxtMapProvAfterSensor" Text="Sentinel-2B MSI (10m GSD)" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextMutedBrush}" />
+                                                            <TextBlock x:Name="TxtMapProvAfterScene" Text="Scene: S2B_20240320_T3" FontSize="9" Foreground="{DynamicResource TextFaintBrush}" />
+                                                            <TextBlock Text="Level-2A BOA Reflectance" FontSize="9" Foreground="{DynamicResource RejectedBrush}" />
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Border>
+                                            </Grid>
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- Out-of-Coverage / Missing Data Synchronized Banner -->
+                                    <Border x:Name="PnlNoDataTab2" IsVisible="False" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource CandidateBrush}" BorderThickness="1" Padding="14">
+                                        <Grid ColumnDefinitions="Auto, *, Auto">
+                                            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                                                <Border Background="{DynamicResource CandidateSurfaceBrush}" BorderBrush="{DynamicResource CandidateBrush}" BorderThickness="1" Width="36" Height="36">
+                                                    <TextBlock Text="⚠" FontSize="18" Foreground="{DynamicResource CandidateBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                                <StackPanel Spacing="3" VerticalAlignment="Center">
+                                                    <TextBlock Text="NO SATELLITE DATA FOR QUERIED SPATIOTEMPORAL PARAMETERS" FontWeight="Bold" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource CandidateBrush}" />
+                                                    <TextBlock x:Name="TxtNoDataTab2Detail" Text="Queried location/time is outside indexed coverage. Verification views will sync once datasets are ingested." FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextMutedBrush}" />
+                                                </StackPanel>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                <Button Content="Show Dataset Options" Classes="primary" Click="OnShowMissingDataModalClicked" Padding="10,5" FontSize="{DynamicResource FontMicro}" />
+                                                <Button Content="Reset to Active AOI" Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource TextPrimaryBrush}" BorderBrush="{DynamicResource RuleStrongBrush}" BorderThickness="1" Click="OnModalResetToActiveCoverageClicked" Padding="10,5" FontSize="{DynamicResource FontMicro}" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </Grid>
                             </Grid>
                         </Border>
 
@@ -460,20 +589,16 @@
 
             <!-- TAB 3: 3-PANEL MULTI-TEMPORAL CHANGE & SPECTRAL VERIFICATION STUDIO -->
             <TabItem Header="3. Spectral Verification">
-                <Grid RowDefinitions="Auto, *, Auto" Margin="6">
+                <Grid RowDefinitions="Auto, *" Margin="6">
                     
                     <!-- Spectral Mode & Calibration Controls Bar -->
-                    <Border Grid.Row="0" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="10" Margin="0,0,0,8">
-                        <WrapPanel Orientation="Horizontal">
-                            <StackPanel Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
-                                <CheckBox x:Name="ChkRrn" Content="PIF Radiometric Normalization" IsChecked="True" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{DynamicResource FontMicro}" />
-                                <CheckBox x:Name="ChkQualityMask" Content="Cloud and Shadow Mask" IsChecked="True" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{DynamicResource FontMicro}" />
-                                <CheckBox x:Name="ChkJitter" Content="Sub-Pixel Jitter Filter" Margin="0,0,18,0" IsChecked="True" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{DynamicResource FontMicro}" />
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                                <TextBlock Text="Spectral Band:" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" FontSize="{DynamicResource FontMicro}" FontWeight="SemiBold" />
-                                <ComboBox x:Name="CmbChangeSpectralMode" SelectedIndex="0" Width="190" Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="{DynamicResource FontMicro}" SelectionChanged="OnChangeSpectralModeChanged">
+                    <Border Grid.Row="0" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="8,6" Margin="0,0,0,6">
+                        <Grid ColumnDefinitions="Auto, *, Auto">
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                <TextBlock Text="SPECTRAL STUDIO" FontSize="{DynamicResource FontMicro}" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+                                <TextBlock Text="|" Foreground="{DynamicResource RuleStrongBrush}" VerticalAlignment="Center" />
+                                <TextBlock Text="Sensor Band:" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" FontSize="{DynamicResource FontMicro}" />
+                                <ComboBox x:Name="CmbChangeSpectralMode" SelectedIndex="0" Width="180" Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="{DynamicResource FontMicro}" SelectionChanged="OnChangeSpectralModeChanged">
                                     <ComboBoxItem Content="True Color (Natural RGB)" />
                                     <ComboBoxItem Content="False Color Infrared (NIR)" />
                                     <ComboBoxItem Content="SWIR Geological (B11/B8/B4)" />
@@ -485,112 +610,251 @@
                                 </ComboBox>
                             </StackPanel>
 
-                            <Button x:Name="BtnRunChangeDetection" Content="Compute Changes"
-                                    Background="{DynamicResource VerifiedBrush}" Foreground="{DynamicResource AppBackgroundBrush}" FontWeight="Bold" Padding="14,8" VerticalAlignment="Center" CornerRadius="0" FontSize="{DynamicResource FontMicro}"
-                                    Click="OnRunChangeDetectionClicked" />
-                        </WrapPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <CheckBox x:Name="ChkRrn" Content="PIF Radiometric Calibration" IsChecked="True" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{DynamicResource FontMicro}" />
+                                <CheckBox x:Name="ChkQualityMask" Content="Cloud &amp; Shadow Mask" IsChecked="True" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{DynamicResource FontMicro}" />
+                                <CheckBox x:Name="ChkJitter" Content="Sub-Pixel Jitter Filter" IsChecked="True" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{DynamicResource FontMicro}" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <Button x:Name="BtnToggleViewMode" Content="🌐 Full Scene Context"
+                                        Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource TextPrimaryBrush}"
+                                        BorderBrush="{DynamicResource RuleStrongBrush}" BorderThickness="1"
+                                        FontWeight="SemiBold" Padding="10,5" CornerRadius="0" FontSize="{DynamicResource FontMicro}"
+                                        Click="OnToggleViewModeClicked" ToolTip.Tip="Toggle between High-Res Site Zoom and Full Scene Context" />
+                                <Button x:Name="BtnRunChangeDetection" Content="Compute Changes"
+                                        Background="{DynamicResource VerifiedBrush}" Foreground="{DynamicResource AppBackgroundBrush}"
+                                        FontWeight="Bold" Padding="14,6" CornerRadius="0" FontSize="{DynamicResource FontMicro}"
+                                        Click="OnRunChangeDetectionClicked" />
+                            </StackPanel>
+                        </Grid>
                     </Border>
 
-                    <!-- Main Analysis Layout: 65% Large Visual Inspection + 35% Evidence Assessment & Verdict -->
-                    <Grid Grid.Row="1" ColumnDefinitions="65*, 35*">
-                        <!-- Left 65%: Large 3-Panel Visual Comparison & Temporal Timeline -->
-                        <Grid Grid.Column="0" RowDefinitions="*, Auto, Auto" Margin="0,0,6,0">
+                    <!-- Main Analysis Layout: 64% Left (Visual Verification) + 36% Right (Evidence & Verdict) -->
+                    <Grid Grid.Row="1" ColumnDefinitions="64*, 36*">
+                        <!-- Synchronized No-Data / Out-of-Coverage Overlay for Tab 3 -->
+                        <Border x:Name="PnlNoDataTab3" Grid.Column="0" Grid.ColumnSpan="2" IsVisible="False" Background="#E60D1117" BorderBrush="{DynamicResource CandidateBrush}" BorderThickness="1" Padding="32" ZIndex="100">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16" MaxWidth="580">
+                                <Border Width="52" Height="52" Background="{DynamicResource CandidateSurfaceBrush}" BorderBrush="{DynamicResource CandidateBrush}" BorderThickness="1" HorizontalAlignment="Center">
+                                    <TextBlock Text="⚠" FontSize="26" Foreground="{DynamicResource CandidateBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <TextBlock Text="NO SATELLITE DATA FOR QUERIED SPATIOTEMPORAL PARAMETERS" FontWeight="Bold" FontSize="{DynamicResource FontBodyLg}" Foreground="{DynamicResource CandidateBrush}" HorizontalAlignment="Center" TextAlignment="Center" />
+                                <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" Padding="14">
+                                    <StackPanel Spacing="6">
+                                        <TextBlock x:Name="TxtNoDataTab3Coords" Text="Location: (40.7128°N, -74.0060°E) | Radius: 10.0 km" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center" />
+                                        <TextBlock x:Name="TxtNoDataTab3Dates" Text="Time Window: 2022-01-01 to 2022-12-31 UTC" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" />
+                                        <TextBlock Text="Status: Out of indexed satellite coverage. Verification imagery, CVA heatmaps, and spectral curves will appear once datasets covering this location are ingested." FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </Border>
+                                <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+                                    <Button Content="Show Ingestion Options" Classes="primary" Click="OnShowMissingDataModalClicked" Padding="14,7" FontSize="{DynamicResource FontMicro}" />
+                                    <Button Content="Generate Calibrated AOI for Location" Background="{DynamicResource CandidateBrush}" Foreground="{DynamicResource AppBackgroundBrush}" FontWeight="Bold" Click="OnModalGenerateSyntheticSceneClicked" Padding="14,7" FontSize="{DynamicResource FontMicro}" />
+                                    <Button Content="Reset to Active Coverage" Click="OnModalResetToActiveCoverageClicked" Padding="12,7" FontSize="{DynamicResource FontMicro}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Left: Visual Inspection & Per-Candidate Heatmaps -->
+                        <Grid Grid.Column="0" RowDefinitions="Auto, 3*, Auto, Auto, *" Margin="0,0,6,0">
                             
-                            <!-- Large 3-Panel Synchronized Comparison Station -->
-                            <Border Grid.Row="0" Background="{DynamicResource AppBackgroundBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="8">
+                            <!-- Candidate Navigation & Control Toolbar -->
+                            <Border Grid.Row="0" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="8,4" Margin="0,0,0,4">
+                                <Grid ColumnDefinitions="Auto, Auto, *, Auto, Auto, Auto">
+                                    <Button Grid.Column="0" Content="◀ Prev" FontSize="{DynamicResource FontMicro}" FontWeight="Bold"
+                                            Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource TextMutedBrush}"
+                                            CornerRadius="0" Padding="10,4" Click="OnPrevCandidateClicked"
+                                            ToolTip.Tip="Previous candidate (↑ key)" />
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" Margin="10,0,0,0" VerticalAlignment="Center">
+                                        <TextBlock x:Name="TxtCandidateCounter" Text="Candidate 0 of 0"
+                                                   FontSize="{DynamicResource FontMicro}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="2" x:Name="TxtCandidateCoords" Text=""
+                                               FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextFaintBrush}"
+                                               VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                    <Border Grid.Column="3" Background="{DynamicResource CandidateSurfaceBrush}" CornerRadius="0" Padding="6,2" VerticalAlignment="Center" Margin="0,0,10,0">
+                                        <TextBlock x:Name="TxtCandidateType" Text=""
+                                                   FontSize="9" FontWeight="Bold" Foreground="{DynamicResource CandidateBrush}" VerticalAlignment="Center" />
+                                    </Border>
+                                    <Button Grid.Column="4" Content="A/B Blink ⟳" FontSize="{DynamicResource FontMicro}" FontWeight="Bold"
+                                            Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource AccentBrush}"
+                                            CornerRadius="0" Padding="10,4" Margin="0,0,6,0" Click="OnBlinkCompareClicked"
+                                            ToolTip.Tip="Rapidly toggle between Baseline T1 and Target T2 imagery to spot changes" />
+                                    <Button Grid.Column="5" Content="Next ▶" FontSize="{DynamicResource FontMicro}" FontWeight="Bold"
+                                            Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource TextMutedBrush}"
+                                            CornerRadius="0" Padding="10,4" Click="OnNextCandidateClicked"
+                                            ToolTip.Tip="Next candidate (↓ key)" />
+                                </Grid>
+                            </Border>
+
+                            <!-- Primary 3-Panel Synchronized Inspection Station -->
+                            <Border Grid.Row="1" Background="{DynamicResource AppBackgroundBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="6">
                                 <Grid ColumnDefinitions="*, *, *">
-                                    <!-- View 1: Baseline T1 -->
-                                    <Border Grid.Column="0" Margin="4" Background="{DynamicResource SurfaceBrush}" CornerRadius="0" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" Padding="6">
+                                    <!-- Panel 1: Baseline T1 -->
+                                    <Border Grid.Column="0" Margin="2" Background="{DynamicResource SurfaceBrush}" CornerRadius="0" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" Padding="4">
                                         <Grid RowDefinitions="Auto, *">
-                                            <TextBlock Grid.Row="0" Text="1. Baseline Imagery (T1: 2024-01-10)" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" FontSize="{DynamicResource FontMicro}" Margin="0,0,0,4" HorizontalAlignment="Center" />
-                                            <Border Grid.Row="1" Background="{DynamicResource AppBackgroundBrush}" CornerRadius="0" ClipToBounds="True" BorderBrush="{DynamicResource RuleStrongBrush}" BorderThickness="1">
+                                            <TextBlock Grid.Row="0" Text="1. BASELINE (T1: 2024-01-10)" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" FontSize="9" Margin="0,0,0,3" HorizontalAlignment="Center" />
+                                            <Border Grid.Row="1" Background="{DynamicResource AppBackgroundBrush}" CornerRadius="0" ClipToBounds="True"
+                                                    BorderBrush="{DynamicResource RuleStrongBrush}" BorderThickness="1">
                                                 <Image x:Name="ImgBaselineT1" Stretch="Uniform" />
                                             </Border>
                                         </Grid>
                                     </Border>
 
-                                    <!-- View 2: Target T2 -->
-                                    <Border Grid.Column="1" Margin="4" Background="{DynamicResource SurfaceBrush}" CornerRadius="0" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" Padding="6">
+                                    <!-- Panel 2: Target T2 -->
+                                    <Border Grid.Column="1" Margin="2" Background="{DynamicResource SurfaceBrush}" CornerRadius="0" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" Padding="4">
                                         <Grid RowDefinitions="Auto, *">
-                                            <TextBlock Grid.Row="0" Text="2. Target Observation (T2: 2024-03-20)" FontWeight="Bold" Foreground="{DynamicResource RejectedBrush}" FontSize="{DynamicResource FontMicro}" Margin="0,0,0,4" HorizontalAlignment="Center" />
-                                            <Border Grid.Row="1" Background="{DynamicResource AppBackgroundBrush}" CornerRadius="0" ClipToBounds="True" BorderBrush="{DynamicResource RejectedBrush}" BorderThickness="1">
+                                            <TextBlock x:Name="TxtTargetPanelSubtitle" Grid.Row="0" Text="2. TARGET OBSERVATION" FontWeight="Bold" Foreground="{DynamicResource RejectedBrush}" FontSize="9" Margin="0,0,0,3" HorizontalAlignment="Center" />
+                                            <Border Grid.Row="1" Background="{DynamicResource AppBackgroundBrush}" CornerRadius="0" ClipToBounds="True"
+                                                    BorderBrush="{DynamicResource RejectedBrush}" BorderThickness="1">
                                                 <Image x:Name="ImgTargetT2" Stretch="Uniform" />
                                             </Border>
                                         </Grid>
                                     </Border>
 
-                                    <!-- View 3: Change Vector Difference Heatmap -->
-                                    <Border Grid.Column="2" Margin="4" Background="{DynamicResource SurfaceBrush}" CornerRadius="0" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" Padding="6">
-                                        <Grid RowDefinitions="Auto, *">
-                                            <TextBlock Grid.Row="0" Text="3. Change Vector Heatmap Overlay" FontWeight="Bold" Foreground="{DynamicResource CandidateBrush}" FontSize="{DynamicResource FontMicro}" Margin="0,0,0,4" HorizontalAlignment="Center" />
-                                            <Border Grid.Row="1" Background="{DynamicResource AppBackgroundBrush}" CornerRadius="0" ClipToBounds="True" BorderBrush="{DynamicResource CandidateBrush}" BorderThickness="1">
+                                    <!-- Panel 3: Change Vector Heatmap Overlay -->
+                                    <Border Grid.Column="2" Margin="2" Background="{DynamicResource SurfaceBrush}" CornerRadius="0" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" Padding="4">
+                                        <Grid RowDefinitions="Auto, *, Auto">
+                                            <TextBlock x:Name="TxtActiveHeatmapTitle" Grid.Row="0" Text="3. CVA MAGNITUDE HEATMAP" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" FontSize="9" Margin="0,0,0,3" HorizontalAlignment="Center" />
+                                            <Border Grid.Row="1" Background="{DynamicResource AppBackgroundBrush}" CornerRadius="0" ClipToBounds="True"
+                                                    BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1">
                                                 <Image x:Name="ImgChangeHeatmap" Stretch="Uniform" />
                                             </Border>
+                                            <!-- Colormap Legend Indicator -->
+                                            <Grid Grid.Row="2" ColumnDefinitions="Auto, *, Auto" Margin="0,2,0,0">
+                                                <TextBlock Grid.Column="0" Text="0.0 Low" FontSize="8" Foreground="{DynamicResource TextFaintBrush}" />
+                                                <TextBlock Grid.Column="1" Text="Turbo Gradient" FontSize="8" Foreground="{DynamicResource CandidateBrush}" HorizontalAlignment="Center" />
+                                                <TextBlock Grid.Column="2" Text="High Peak" FontSize="8" Foreground="{DynamicResource RejectedBrush}" FontWeight="Bold" />
+                                            </Grid>
                                         </Grid>
                                     </Border>
                                 </Grid>
                             </Border>
 
-                            <!-- Sequential CUSUM Temporal Timeline Curve -->
-                            <Border Grid.Row="1" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="10,6" Margin="0,6,0,0">
-                                <StackPanel Spacing="4">
-                                    <Grid ColumnDefinitions="*, Auto">
-                                        <TextBlock Text="MULTI-TEMPORAL CUSUM CHANGE ONSET TIMELINE (3.5 sigma Statistical Process Control)" FontSize="{DynamicResource FontMicro}" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" />
-                                        <TextBlock x:Name="TxtTimelineOnsetMarker" Text="Onset Date: 20 Mar 2024 (Pass #4)" FontSize="{DynamicResource FontMicro}" FontWeight="Bold" Foreground="{DynamicResource CandidateBrush}" Grid.Column="1" />
+                            <!-- Interactive Multi-Pass CUSUM Timeline -->
+                            <Border Grid.Row="2" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="8,4" Margin="0,4,0,0">
+                                <Grid RowDefinitions="Auto, Auto">
+                                    <Grid Grid.Row="0" ColumnDefinitions="*, Auto">
+                                        <TextBlock Text="CUSUM MULTI-TEMPORAL PASS SEQUENCE (Click pass to inspect imagery)" FontSize="{DynamicResource FontMicro}" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" />
+                                        <TextBlock x:Name="TxtTimelineOnsetMarker" Grid.Column="1" Text="Onset: —" FontSize="{DynamicResource FontMicro}" FontWeight="Bold" Foreground="{DynamicResource CandidateBrush}" />
                                     </Grid>
-                                    <!-- Interactive Timeline Bar Nodes -->
-                                    <Grid ColumnDefinitions="*, *, *, *, *">
-                                        <Border Grid.Column="0" Background="{DynamicResource SurfaceRaisedBrush}" CornerRadius="0" Padding="6,4" Margin="2">
-                                            <StackPanel>
-                                                <TextBlock Text="Pass 1 | 2023-10-15" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextFaintBrush}" HorizontalAlignment="Center" />
-                                                <TextBlock Text="Baseline (0.2 sigma)" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextMutedBrush}" FontWeight="SemiBold" HorizontalAlignment="Center" />
-                                            </StackPanel>
-                                        </Border>
-                                        <Border Grid.Column="1" Background="{DynamicResource SurfaceRaisedBrush}" CornerRadius="0" Padding="6,4" Margin="2">
-                                            <StackPanel>
-                                                <TextBlock Text="Pass 2 | 2023-12-01" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextFaintBrush}" HorizontalAlignment="Center" />
-                                                <TextBlock Text="Stable (0.4 sigma)" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextMutedBrush}" FontWeight="SemiBold" HorizontalAlignment="Center" />
-                                            </StackPanel>
-                                        </Border>
-                                        <Border Grid.Column="2" Background="{DynamicResource SurfaceRaisedBrush}" CornerRadius="0" Padding="6,4" Margin="2">
-                                            <StackPanel>
-                                                <TextBlock Text="Pass 3 | 2024-01-10" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextFaintBrush}" HorizontalAlignment="Center" />
-                                                <TextBlock Text="Early Signal (1.1 sigma)" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource CandidateBrush}" FontWeight="SemiBold" HorizontalAlignment="Center" />
-                                            </StackPanel>
-                                        </Border>
-                                        <Border Grid.Column="3" Background="{DynamicResource RejectedSurfaceBrush}" BorderBrush="{DynamicResource RejectedBrush}" BorderThickness="1" CornerRadius="0" Padding="6,4" Margin="2">
-                                            <StackPanel>
-                                                <TextBlock Text="Pass 4 | 2024-03-20" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource RejectedBrush}" HorizontalAlignment="Center" FontWeight="Bold" />
-                                                <TextBlock Text="ONSET DETECTED (4.8 sigma > 3.5 sigma)" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource RejectedBrush}" FontWeight="Bold" HorizontalAlignment="Center" />
-                                            </StackPanel>
-                                        </Border>
-                                        <Border Grid.Column="4" Background="{DynamicResource SurfaceRaisedBrush}" CornerRadius="0" Padding="6,4" Margin="2">
-                                            <StackPanel>
-                                                <TextBlock Text="Pass 5 | 2024-04-30" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextFaintBrush}" HorizontalAlignment="Center" />
-                                                <TextBlock Text="Persistent (5.2 sigma)" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource RejectedBrush}" FontWeight="SemiBold" HorizontalAlignment="Center" />
-                                            </StackPanel>
-                                        </Border>
+                                    <Grid Grid.Row="1" ColumnDefinitions="*, *, *, *" Margin="0,4,0,0">
+                                        <Button Grid.Column="0" Tag="0" Click="OnPassClicked" Background="{DynamicResource SurfaceRaisedBrush}" Margin="1" Padding="4,2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" CornerRadius="0">
+                                            <Border x:Name="BorderPass1" CornerRadius="0" Padding="2">
+                                                <StackPanel>
+                                                    <TextBlock Text="Pass 1 | 2024-01-10" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center" />
+                                                    <TextBlock Text="Baseline (0.2σ)" FontSize="8" Foreground="{DynamicResource TextFaintBrush}" HorizontalAlignment="Center" />
+                                                </StackPanel>
+                                            </Border>
+                                        </Button>
+                                        <Button Grid.Column="1" Tag="1" Click="OnPassClicked" Background="{DynamicResource SurfaceRaisedBrush}" Margin="1" Padding="4,2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" CornerRadius="0">
+                                            <Border x:Name="BorderPass2" CornerRadius="0" Padding="2">
+                                                <StackPanel>
+                                                    <TextBlock Text="Pass 2 | 2024-02-15" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center" />
+                                                    <TextBlock Text="Stable (0.4σ)" FontSize="8" Foreground="{DynamicResource TextFaintBrush}" HorizontalAlignment="Center" />
+                                                </StackPanel>
+                                            </Border>
+                                        </Button>
+                                        <Button Grid.Column="2" Tag="2" Click="OnPassClicked" Background="{DynamicResource RejectedSurfaceBrush}" Margin="1" Padding="4,2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" CornerRadius="0">
+                                            <Border x:Name="BorderPass3" BorderBrush="{DynamicResource RejectedBrush}" BorderThickness="1" CornerRadius="0" Padding="2">
+                                                <StackPanel>
+                                                    <TextBlock Text="Pass 3 | 2024-03-20" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource RejectedBrush}" HorizontalAlignment="Center" />
+                                                    <TextBlock Text="ONSET DETECTED (4.8σ)" FontSize="8" Foreground="{DynamicResource RejectedBrush}" FontWeight="Bold" HorizontalAlignment="Center" />
+                                                </StackPanel>
+                                            </Border>
+                                        </Button>
+                                        <Button Grid.Column="3" Tag="3" Click="OnPassClicked" Background="{DynamicResource SurfaceRaisedBrush}" Margin="1" Padding="4,2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" CornerRadius="0">
+                                            <Border x:Name="BorderPass4" CornerRadius="0" Padding="2">
+                                                <StackPanel>
+                                                    <TextBlock Text="Pass 4 | 2024-04-25" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center" />
+                                                    <TextBlock Text="Persistent (5.2σ)" FontSize="8" Foreground="{DynamicResource CandidateBrush}" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                                                </StackPanel>
+                                            </Border>
+                                        </Button>
                                     </Grid>
-                                </StackPanel>
+                                </Grid>
                             </Border>
 
-                            <!-- Detected Changes List Selector -->
-                            <Border Grid.Row="2" Background="{DynamicResource AppBackgroundBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="6" Margin="0,6,0,0" Height="130">
+                            <!-- 4 Calibrated Spectral Index Difference Heatmap Cards (Clickable) -->
+                            <Border Grid.Row="3" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="6,4" Margin="0,4,0,0">
+                                <Grid RowDefinitions="Auto, Auto">
+                                    <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Margin="4,0,4,3">
+                                        <TextBlock Text="CALIBRATED SPECTRAL INDEX DELTA HEATMAPS (Click card to display in main viewer)" FontSize="{DynamicResource FontMicro}" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" />
+                                        <TextBlock Text="Standard Remote Sensing Palette" FontSize="8" Foreground="{DynamicResource TextFaintBrush}" Grid.Column="1" />
+                                    </Grid>
+                                    <Grid Grid.Row="1" ColumnDefinitions="*, *, *, *">
+                                        <!-- Card 1: ΔNDVI -->
+                                        <Button Grid.Column="0" Tag="NDVI" Click="OnSelectSpectralCardClicked" Background="{DynamicResource AppBackgroundBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="4" Margin="2" HorizontalAlignment="Stretch">
+                                            <Grid RowDefinitions="Auto, Auto, Auto">
+                                                <Grid Grid.Row="0" ColumnDefinitions="*, Auto">
+                                                    <TextBlock Text="ΔNDVI (Veg)" FontWeight="Bold" Foreground="{DynamicResource VerifiedBrush}" FontSize="9" />
+                                                    <TextBlock x:Name="TxtBadgeDeltaNdvi" Grid.Column="1" Text="Δ = -0.309" FontSize="8" FontWeight="Bold" Foreground="{DynamicResource CandidateBrush}" />
+                                                </Grid>
+                                                <Border Grid.Row="1" Background="{DynamicResource AppBackgroundBrush}" ClipToBounds="True" Height="70" Margin="0,2">
+                                                    <Image x:Name="ImgHeatmapNdvi" Stretch="Uniform" />
+                                                </Border>
+                                                <TextBlock Grid.Row="2" Text="Loss ◀ 0 ▶ Growth" FontSize="7" Foreground="{DynamicResource TextFaintBrush}" HorizontalAlignment="Center" />
+                                            </Grid>
+                                        </Button>
+
+                                        <!-- Card 2: ΔNDBI -->
+                                        <Button Grid.Column="1" Tag="NDBI" Click="OnSelectSpectralCardClicked" Background="{DynamicResource AppBackgroundBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="4" Margin="2" HorizontalAlignment="Stretch">
+                                            <Grid RowDefinitions="Auto, Auto, Auto">
+                                                <Grid Grid.Row="0" ColumnDefinitions="*, Auto">
+                                                    <TextBlock Text="ΔNDBI (Built)" FontWeight="Bold" Foreground="{DynamicResource RejectedBrush}" FontSize="9" />
+                                                    <TextBlock x:Name="TxtBadgeDeltaNdbi" Grid.Column="1" Text="Δ = +0.384" FontSize="8" FontWeight="Bold" Foreground="{DynamicResource RejectedBrush}" />
+                                                </Grid>
+                                                <Border Grid.Row="1" Background="{DynamicResource AppBackgroundBrush}" ClipToBounds="True" Height="70" Margin="0,2">
+                                                    <Image x:Name="ImgHeatmapNdbi" Stretch="Uniform" />
+                                                </Border>
+                                                <TextBlock Grid.Row="2" Text="Demolition ◀ 0 ▶ Concrete" FontSize="7" Foreground="{DynamicResource TextFaintBrush}" HorizontalAlignment="Center" />
+                                            </Grid>
+                                        </Button>
+
+                                        <!-- Card 3: ΔNDWI -->
+                                        <Button Grid.Column="2" Tag="NDWI" Click="OnSelectSpectralCardClicked" Background="{DynamicResource AppBackgroundBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="4" Margin="2" HorizontalAlignment="Stretch">
+                                            <Grid RowDefinitions="Auto, Auto, Auto">
+                                                <Grid Grid.Row="0" ColumnDefinitions="*, Auto">
+                                                    <TextBlock Text="ΔNDWI (Water)" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" FontSize="9" />
+                                                    <TextBlock x:Name="TxtBadgeDeltaNdwi" Grid.Column="1" Text="Δ = -0.045" FontSize="8" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" />
+                                                </Grid>
+                                                <Border Grid.Row="1" Background="{DynamicResource AppBackgroundBrush}" ClipToBounds="True" Height="70" Margin="0,2">
+                                                    <Image x:Name="ImgHeatmapNdwi" Stretch="Uniform" />
+                                                </Border>
+                                                <TextBlock Grid.Row="2" Text="Drying ◀ 0 ▶ Water" FontSize="7" Foreground="{DynamicResource TextFaintBrush}" HorizontalAlignment="Center" />
+                                            </Grid>
+                                        </Button>
+
+                                        <!-- Card 4: ΔBSI -->
+                                        <Button Grid.Column="3" Tag="BSI" Click="OnSelectSpectralCardClicked" Background="{DynamicResource AppBackgroundBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="4" Margin="2" HorizontalAlignment="Stretch">
+                                            <Grid RowDefinitions="Auto, Auto, Auto">
+                                                <Grid Grid.Row="0" ColumnDefinitions="*, Auto">
+                                                    <TextBlock Text="ΔBSI (Soil)" FontWeight="Bold" Foreground="{DynamicResource CandidateBrush}" FontSize="9" />
+                                                    <TextBlock x:Name="TxtBadgeDeltaBsi" Grid.Column="1" Text="Δ = +0.522" FontSize="8" FontWeight="Bold" Foreground="{DynamicResource CandidateBrush}" />
+                                                </Grid>
+                                                <Border Grid.Row="1" Background="{DynamicResource AppBackgroundBrush}" ClipToBounds="True" Height="70" Margin="0,2">
+                                                    <Image x:Name="ImgHeatmapBsi" Stretch="Uniform" />
+                                                </Border>
+                                                <TextBlock Grid.Row="2" Text="Stable ◀ 0 ▶ Disturbed" FontSize="7" Foreground="{DynamicResource TextFaintBrush}" HorizontalAlignment="Center" />
+                                            </Grid>
+                                        </Button>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+
+                            <!-- Detected Changes Candidate Selector -->
+                            <Border Grid.Row="4" Background="{DynamicResource AppBackgroundBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="4" Margin="0,4,0,0" MinHeight="75">
                                 <ListBox x:Name="LstChangeResults" Background="Transparent"
                                          ScrollViewer.VerticalScrollBarVisibility="Auto"
                                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                          SelectionChanged="OnChangeSelectionChanged">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="8,6" Margin="2">
+                                            <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="6,3" Margin="1">
                                                 <Grid ColumnDefinitions="Auto, *, Auto">
-                                                    <Border Grid.Column="0" Background="{Binding TypeBadgeColor}" CornerRadius="0" Padding="6,3" VerticalAlignment="Center" Margin="0,0,8,0">
-                                                        <TextBlock Text="{Binding Type}" FontWeight="Bold" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                                    <Border Grid.Column="0" Background="{Binding TypeBadgeColor}" CornerRadius="0" Padding="5,2" VerticalAlignment="Center" Margin="0,0,6,0">
+                                                        <TextBlock Text="{Binding Type}" FontWeight="Bold" FontSize="9" Foreground="{DynamicResource TextPrimaryBrush}" />
                                                     </Border>
-                                                    <StackPanel Grid.Column="1" Spacing="2">
-                                                        <TextBlock Text="{Binding Title}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="{DynamicResource FontMicro}" />
-                                                        <TextBlock Text="{Binding Notes}" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextMutedBrush}" />
-                                                    </StackPanel>
+                                                    <TextBlock Grid.Column="1" Text="{Binding Title}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="{DynamicResource FontMicro}" VerticalAlignment="Center" />
                                                     <TextBlock Grid.Column="2" Text="{Binding EarliestObservationText}" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource CandidateBrush}" FontWeight="Bold" VerticalAlignment="Center" />
                                                 </Grid>
                                             </Border>
@@ -600,14 +864,14 @@
                             </Border>
                         </Grid>
 
-                        <!-- Right 35%: Explicit AI Assessment, "Why Detected?" Evidence, & Human Analyst Verdict -->
-                        <Border Grid.Column="1" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="12" Margin="6,0,0,0">
+                        <!-- Right 36%: AI Assessment, "Why Detected?" Evidence, Multi-Spectral Profile & Human Verdict -->
+                        <Border Grid.Column="1" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="10" Margin="6,0,0,0">
                             <ScrollViewer VerticalScrollBarVisibility="Auto">
-                                <StackPanel Spacing="10">
+                                <StackPanel Spacing="8">
                                     
                                     <!-- 1. EXPLICIT AI CONCLUSION & ASSESSMENT CARD -->
-                                    <Border Background="{DynamicResource SurfaceRaisedBrush}" BorderBrush="{DynamicResource SurfaceInsetBrush}" BorderThickness="1" CornerRadius="0" Padding="12">
-                                        <StackPanel Spacing="6">
+                                    <Border Background="{DynamicResource SurfaceRaisedBrush}" BorderBrush="{DynamicResource SurfaceInsetBrush}" BorderThickness="1" CornerRadius="0" Padding="10">
+                                        <StackPanel Spacing="5">
                                             <Grid ColumnDefinitions="*, Auto">
                                                 <TextBlock Text="AI ASSESSMENT &amp; CONCLUSION" FontSize="{DynamicResource FontMicro}" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" />
                                                 <Border Grid.Column="1" x:Name="BadgeAiConfidence" Background="{DynamicResource VerifiedSurfaceBrush}" CornerRadius="0" Padding="6,2">
@@ -620,7 +884,7 @@
                                             <Grid ColumnDefinitions="*, *">
                                                 <StackPanel Grid.Column="0" Spacing="2">
                                                     <TextBlock Text="Affected Area:" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextFaintBrush}" />
-                                                    <TextBlock x:Name="TxtAiArea" Text="25,600 m2 (approx 2.56 ha)" FontSize="{DynamicResource FontMicro}" FontWeight="Bold" Foreground="{DynamicResource CandidateBrush}" />
+                                                    <TextBlock x:Name="TxtAiArea" Text="25,600 m² (approx 2.56 ha)" FontSize="{DynamicResource FontMicro}" FontWeight="Bold" Foreground="{DynamicResource CandidateBrush}" />
                                                 </StackPanel>
                                                 <StackPanel Grid.Column="1" Spacing="2">
                                                     <TextBlock Text="First Detected Onset:" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextFaintBrush}" />
@@ -631,30 +895,39 @@
                                     </Border>
 
                                     <!-- 2. "WHY WAS THIS DETECTED?" STRUCTURED EVIDENCE -->
-                                    <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="10">
-                                        <StackPanel Spacing="6">
+                                    <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="8">
+                                        <StackPanel Spacing="4">
                                             <TextBlock Text="DETECTION EVIDENCE &amp; RATIONALE" FontSize="{DynamicResource FontMicro}" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" />
                                             
                                             <StackPanel Spacing="3">
                                                 <TextBlock x:Name="TxtEvidVegetation" Text="[+] Significant vegetation loss (Delta NDVI = -0.309)" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" />
                                                 <TextBlock x:Name="TxtEvidSoil" Text="[+] Bare-soil response increase (Delta BSI = +0.522)" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" />
-                                                <TextBlock x:Name="TxtEvidPersistence" Text="[+] Multi-temporal persistence verified across 3 passes" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" />
+                                                <TextBlock x:Name="TxtEvidPersistence" Text="[+] Multi-temporal persistence verified across 4 passes" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" />
                                                 <TextBlock x:Name="TxtEvidSpatial" Text="[+] Spatial footprint consistent with ground earthworks" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" />
                                             </StackPanel>
-
-                                            <!-- False-Alarm Checks Checklist -->
-                                            <Border Background="{DynamicResource SurfaceRaisedBrush}" CornerRadius="0" Padding="8,5" Margin="0,4,0,0">
-                                                <StackPanel Spacing="2">
-                                                    <TextBlock Text="False-Alarm Validation Passed:" FontSize="{DynamicResource FontMicro}" FontWeight="Bold" Foreground="{DynamicResource TextFaintBrush}" TextWrapping="Wrap" />
-                                                    <TextBlock Text="Passed: Cloud/Shadow Mask | Seasonal Phenology | Sub-Pixel Jitter" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource VerifiedBrush}" TextWrapping="Wrap" />
-                                                </StackPanel>
-                                            </Border>
                                         </StackPanel>
                                     </Border>
 
-                                    <!-- 3. EXPANDABLE TECHNICAL EVIDENCE -->
+                                    <!-- 3. MULTI-SPECTRAL SIGNATURE PROFILE (T1 vs T2) -->
+                                    <Border Background="{DynamicResource SurfaceRaisedBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" Padding="8">
+                                        <StackPanel Spacing="4">
+                                            <Grid ColumnDefinitions="*, Auto">
+                                                <TextBlock Text="MULTI-SPECTRAL SIGNATURE PROFILE" FontSize="{DynamicResource FontMicro}" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" />
+                                                <TextBlock Text="B2 • B3 • B4 • B8 • B11" FontSize="8" Foreground="{DynamicResource TextFaintBrush}" Grid.Column="1" />
+                                            </Grid>
+                                            <Border Background="{DynamicResource AppBackgroundBrush}" BorderBrush="{DynamicResource RuleStrongBrush}" BorderThickness="1" CornerRadius="0" Height="130" ClipToBounds="True">
+                                                <Image x:Name="ImgSpectralChart" Stretch="Uniform" />
+                                            </Border>
+                                            <Grid ColumnDefinitions="*, *">
+                                                <TextBlock Text="● Cyan: T1 Baseline" FontSize="8" Foreground="{DynamicResource AccentBrush}" />
+                                                <TextBlock Text="■ Coral: T2 Target" FontSize="8" Foreground="{DynamicResource RejectedBrush}" HorizontalAlignment="Right" Grid.Column="1" />
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- 4. EXPANDABLE TECHNICAL EVIDENCE -->
                                     <Expander Header="Technical Diagnostics &amp; Spectral Indices" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="0" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextMutedBrush}">
-                                        <StackPanel Spacing="6" Margin="4">
+                                        <StackPanel Spacing="5" Margin="4">
                                             <Grid ColumnDefinitions="*, *">
                                                 <StackPanel Grid.Column="0" Spacing="2">
                                                     <TextBlock Text="Concrete (Delta NDBI):" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextFaintBrush}" />
@@ -677,25 +950,25 @@
                                                 </StackPanel>
                                             </Grid>
 
-                                            <TextBlock Text="Tukey PIF Normalization: Gain 1.04, Offset -0.012" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextFaintBrush}" Margin="0,4,0,0" />
-                                            <TextBlock Text="Sub-pixel Jitter Residual: Delta x = 0.04 px, Delta y = 0.02 px (Passed)" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextFaintBrush}" />
+                                            <TextBlock Text="Tukey PIF Normalization: Gain 1.04, Offset -0.012" FontSize="8" Foreground="{DynamicResource TextFaintBrush}" Margin="0,4,0,0" />
+                                            <TextBlock Text="Sub-pixel Jitter Residual: Δx = 0.04 px, Δy = 0.02 px (Passed)" FontSize="8" Foreground="{DynamicResource TextFaintBrush}" />
                                         </StackPanel>
                                     </Expander>
 
-                                    <!-- 4. HUMAN ANALYST VERDICT & ACTIVE LEARNING -->
-                                    <Border Background="{DynamicResource SurfaceRaisedBrush}" BorderBrush="{DynamicResource SurfaceInsetBrush}" BorderThickness="1" CornerRadius="0" Padding="12">
-                                        <StackPanel Spacing="8">
+                                    <!-- 5. HUMAN ANALYST VERDICT & ACTIVE LEARNING -->
+                                    <Border Background="{DynamicResource SurfaceRaisedBrush}" BorderBrush="{DynamicResource SurfaceInsetBrush}" BorderThickness="1" CornerRadius="0" Padding="10">
+                                        <StackPanel Spacing="6">
                                             <TextBlock Text="ANALYST VERIFICATION &amp; VERDICT" FontSize="{DynamicResource FontMicro}" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" />
                                             
                                             <Grid ColumnDefinitions="*, *, *">
-                                                <Button Grid.Column="0" x:Name="BtnVerdictConfirm" Content="Confirm" Click="OnFocusedConfirmClicked" Background="{DynamicResource VerifiedSurfaceBrush}" Foreground="{DynamicResource VerifiedBrush}" BorderBrush="{DynamicResource VerifiedSurfaceBrush}" BorderThickness="1" FontWeight="Bold" CornerRadius="0" Padding="10,6" FontSize="{DynamicResource FontMicro}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" ToolTip.Tip="Confirm this candidate into verified intelligence record (Key: C)" />
-                                                <Button Grid.Column="1" x:Name="BtnVerdictReject" Content="Reject" Click="OnFocusedRejectClicked" Margin="4,0,4,0" Background="{DynamicResource RejectedSurfaceBrush}" Foreground="{DynamicResource RejectedBrush}" BorderBrush="{DynamicResource RejectedSurfaceBrush}" BorderThickness="1" FontWeight="Bold" CornerRadius="0" Padding="10,6" FontSize="{DynamicResource FontMicro}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" ToolTip.Tip="Reject candidate as false alarm (Key: R)" />
-                                                <Button Grid.Column="2" x:Name="BtnVerdictNeedsReview" Content="Needs Review" Click="OnFocusedNeedsReviewClicked" Background="{DynamicResource CandidateSurfaceBrush}" Foreground="{DynamicResource CandidateBrush}" BorderBrush="{DynamicResource CandidateSurfaceBrush}" BorderThickness="1" FontWeight="Bold" CornerRadius="0" Padding="10,6" FontSize="{DynamicResource FontMicro}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" ToolTip.Tip="Flag for secondary analyst review (Key: N)" />
+                                                <Button Grid.Column="0" x:Name="BtnVerdictConfirm" Content="Confirm" Click="OnFocusedConfirmClicked" Background="{DynamicResource VerifiedSurfaceBrush}" Foreground="{DynamicResource VerifiedBrush}" BorderBrush="{DynamicResource VerifiedSurfaceBrush}" BorderThickness="1" FontWeight="Bold" CornerRadius="0" Padding="8,5" FontSize="{DynamicResource FontMicro}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" ToolTip.Tip="Confirm this candidate into verified intelligence record (Key: C)" />
+                                                <Button Grid.Column="1" x:Name="BtnVerdictReject" Content="Reject" Click="OnFocusedRejectClicked" Margin="4,0,4,0" Background="{DynamicResource RejectedSurfaceBrush}" Foreground="{DynamicResource RejectedBrush}" BorderBrush="{DynamicResource RejectedSurfaceBrush}" BorderThickness="1" FontWeight="Bold" CornerRadius="0" Padding="8,5" FontSize="{DynamicResource FontMicro}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" ToolTip.Tip="Reject candidate as false alarm (Key: R)" />
+                                                <Button Grid.Column="2" x:Name="BtnVerdictNeedsReview" Content="Review" Click="OnFocusedNeedsReviewClicked" Background="{DynamicResource CandidateSurfaceBrush}" Foreground="{DynamicResource CandidateBrush}" BorderBrush="{DynamicResource CandidateSurfaceBrush}" BorderThickness="1" FontWeight="Bold" CornerRadius="0" Padding="8,5" FontSize="{DynamicResource FontMicro}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" ToolTip.Tip="Flag for secondary analyst review (Key: N)" />
                                             </Grid>
 
-                                            <TextBox x:Name="TxtAnalystNotes" Watermark="Add analyst verification notes..." FontSize="{DynamicResource FontMicro}" Background="{DynamicResource SurfaceBrush}" Foreground="{DynamicResource TextPrimaryBrush}" BorderBrush="{DynamicResource RuleStrongBrush}" CornerRadius="0" Height="42" TextWrapping="Wrap" />
+                                            <TextBox x:Name="TxtAnalystNotes" Watermark="Add analyst verification notes..." FontSize="{DynamicResource FontMicro}" Background="{DynamicResource SurfaceBrush}" Foreground="{DynamicResource TextPrimaryBrush}" BorderBrush="{DynamicResource RuleStrongBrush}" CornerRadius="0" Height="40" TextWrapping="Wrap" />
 
-                                            <Button x:Name="BtnSaveVerdictAndNext" Content="Save Verdict and Next Candidate" Background="{DynamicResource AccentBrush}" Foreground="{DynamicResource TextPrimaryBrush}" FontWeight="Bold" FontSize="{DynamicResource FontMicro}" CornerRadius="0" Padding="12,7" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Click="OnSaveVerdictAndNextClicked" />
+                                            <Button x:Name="BtnSaveVerdictAndNext" Content="Save Verdict and Next Candidate" Background="{DynamicResource AccentBrush}" Foreground="{DynamicResource TextPrimaryBrush}" FontWeight="Bold" FontSize="{DynamicResource FontMicro}" CornerRadius="0" Padding="10,6" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Click="OnSaveVerdictAndNextClicked" />
                                         </StackPanel>
                                     </Border>
                                 </StackPanel>
@@ -784,5 +1057,84 @@
                 </Grid>
             </TabItem>
         </TabControl>
+        </Grid>
+
+        <!-- ========================================================================= -->
+        <!-- MODAL POPUP: OUT-OF-COVERAGE / MISSING DATASET DIALOG -->
+        <!-- ========================================================================= -->
+        <Border x:Name="DlgMissingDataModal" IsVisible="False" Background="#D0000000" ZIndex="999">
+            <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource CandidateBrush}" BorderThickness="1"
+                    CornerRadius="0" Padding="24" MaxWidth="720" HorizontalAlignment="Center" VerticalAlignment="Center" BoxShadow="0 8 32 #80000000">
+                <StackPanel Spacing="16">
+                    <!-- Header -->
+                    <Grid ColumnDefinitions="Auto, *, Auto">
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                            <Border Background="{DynamicResource CandidateSurfaceBrush}" BorderBrush="{DynamicResource CandidateBrush}" BorderThickness="1" Width="36" Height="36">
+                                <TextBlock Text="⚠" FontSize="20" Foreground="{DynamicResource CandidateBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="Missing Satellite Coverage / Out-of-Bounds Query" FontWeight="Bold" FontSize="{DynamicResource FontBodyLg}" Foreground="{DynamicResource CandidateBrush}" />
+                                <TextBlock Text="No indexed observations exist for the requested location or timeframe." FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextMutedBrush}" />
+                            </StackPanel>
+                        </StackPanel>
+                        <Button Grid.Column="2" Content="✕" Classes="ghost" Click="OnModalDismissClicked" ToolTip.Tip="Close dialog" VerticalAlignment="Top"/>
+                    </Grid>
+
+                    <!-- Diagnostics & Active Archive Comparison Box -->
+                    <Border Background="{DynamicResource AppBackgroundBrush}" BorderBrush="{DynamicResource RuleStrongBrush}" BorderThickness="1" Padding="14">
+                        <Grid ColumnDefinitions="*, 1, *">
+                            <!-- Left: Requested Query -->
+                            <StackPanel Grid.Column="0" Spacing="6" Margin="0,0,12,0">
+                                <TextBlock Text="REQUESTED QUERY" FontWeight="Bold" FontSize="10" Foreground="{DynamicResource CandidateBrush}" />
+                                <TextBlock x:Name="TxtModalQueryCoords" Text="Coordinates: (40.7128°N, -74.0060°E)" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                <TextBlock x:Name="TxtModalQueryRadius" Text="Search Radius: 10.0 km" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextSecondaryBrush}" />
+                                <TextBlock x:Name="TxtModalQueryTime" Text="Time Interval: 2022-01-01 to 2022-12-31" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextSecondaryBrush}" />
+                                <TextBlock x:Name="TxtModalQueryStatus" Text="Status: 0 scenes indexed for this spatiotemporal domain" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource RejectedBrush}" FontWeight="SemiBold" />
+                            </StackPanel>
+
+                            <!-- Divider -->
+                            <Rectangle Grid.Column="1" Fill="{DynamicResource RuleBrush}" />
+
+                            <!-- Right: Current Active Coverage -->
+                            <StackPanel Grid.Column="2" Spacing="6" Margin="12,0,0,0">
+                                <TextBlock Text="CURRENT ARCHIVE COVERAGE" FontWeight="Bold" FontSize="10" Foreground="{DynamicResource VerifiedBrush}" />
+                                <TextBlock x:Name="TxtModalArchiveAoi" Text="Active AOI: New Delhi (28.58°N - 28.62°N, 77.19°E - 77.23°E)" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextPrimaryBrush}" />
+                                <TextBlock x:Name="TxtModalArchiveEpochs" Text="Archive Epochs: 2024-01-10 to 2024-04-25 (Sentinel-2 L2A)" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextSecondaryBrush}" />
+                                <TextBlock x:Name="TxtModalArchiveResolution" Text="Sensor: Sentinel-2 MSI (10m GSD Multi-Spectral)" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextSecondaryBrush}" />
+                                <TextBlock Text="Status: Fully calibrated multi-temporal archive active" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource VerifiedBrush}" FontWeight="SemiBold" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Problem Explanation & Ingestion Request -->
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="How would you like to proceed?" FontWeight="SemiBold" FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextPrimaryBrush}" />
+                        <TextBlock Text="To analyze this geographic region or time period, please ingest an external GeoTIFF / STAC scene, or generate an on-the-fly calibrated synthetic Sentinel-2 AOI centered at your requested coordinates so you can verify changes anywhere in the world."
+                                   FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" />
+                    </StackPanel>
+
+                    <!-- Actions -->
+                    <Grid ColumnDefinitions="Auto, *, Auto">
+                        <Button Grid.Column="0" Content="Reset to Active Archive AOI"
+                                Background="{DynamicResource SurfaceRaisedBrush}" Foreground="{DynamicResource TextPrimaryBrush}"
+                                BorderBrush="{DynamicResource RuleStrongBrush}" BorderThickness="1"
+                                Padding="12,7" FontSize="{DynamicResource FontMicro}" Click="OnModalResetToActiveCoverageClicked"
+                                ToolTip.Tip="Reset coordinates to New Delhi baseline where satellite data is active" />
+
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+                            <Button Content="Ingest GeoTIFF..."
+                                    Classes="primary" Padding="12,7" FontSize="{DynamicResource FontMicro}" Click="OnModalIngestFileClicked"
+                                    ToolTip.Tip="Select an external GeoTIFF satellite raster to ingest into the archive" />
+                            <Button Content="Generate Calibrated AOI for Location"
+                                    Background="{DynamicResource CandidateBrush}" Foreground="{DynamicResource AppBackgroundBrush}" FontWeight="Bold"
+                                    Padding="14,7" FontSize="{DynamicResource FontMicro}" Click="OnModalGenerateSyntheticSceneClicked"
+                                    ToolTip.Tip="Generate and index on-the-fly multi-temporal satellite scenes at the queried coordinates" />
+                            <Button Content="Dismiss"
+                                    Classes="ghost" Padding="10,7" FontSize="{DynamicResource FontMicro}" Click="OnModalDismissClicked" />
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </Border>
     </Grid>
 </Window>

@@ -76,7 +76,7 @@ public static class RadiometricNormalizer
         {
             for (int x = 0; x < w; x += 2)
             {
-                if (targetMask[y, x] != QualityMaskFlags.Valid || refMask[y, x] != QualityMaskFlags.Valid)
+                if (!QualityMaskEngine.IsUsable(targetMask[y, x]) || !QualityMaskEngine.IsUsable(refMask[y, x]))
                     continue;
 
                 float t = target[y, x];

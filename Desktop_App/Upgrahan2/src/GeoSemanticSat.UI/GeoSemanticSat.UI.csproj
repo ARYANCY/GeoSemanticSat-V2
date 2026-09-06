@@ -1,8 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <ProjectReference Include="..\GeoSemanticSat.Core\GeoSemanticSat.Core.csproj" />
     <ProjectReference Include="..\GeoSemanticSat.Engine\GeoSemanticSat.Engine.csproj" />
+    <ProjectReference Include="..\GeoSemanticSat.Cli\GeoSemanticSat.Cli.csproj" />
   </ItemGroup>
 
   <ItemGroup>

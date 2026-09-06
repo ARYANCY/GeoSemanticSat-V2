@@ -139,18 +139,29 @@ public class VectorIndex
                     if (filter.BoundingBox.HasValue && !filter.BoundingBox.Value.Intersects(patch.Bounds))
                         continue;
 
-                    if (filter.CenterCoordinate.HasValue && filter.RadiusKm.HasValue)
+                    if (filter.CenterCoordinate.HasValue)
                     {
+                        double effectiveRadius = (filter.RadiusKm.HasValue && filter.RadiusKm.Value > 0)
+                            ? filter.RadiusKm.Value
+                            : 15.0;
                         double distKm = patch.Bounds.Center.DistanceToKm(filter.CenterCoordinate.Value);
-                        if (distKm > filter.RadiusKm.Value)
+                        if (distKm > effectiveRadius)
                             continue;
                     }
 
                     if (filter.StartDate.HasValue && patch.Timestamp < filter.StartDate.Value)
                         continue;
 
-                    if (filter.EndDate.HasValue && patch.Timestamp > filter.EndDate.Value)
-                        continue;
+                    if (filter.EndDate.HasValue)
+                    {
+                        var end = filter.EndDate.Value;
+                        if (end.TimeOfDay == TimeSpan.Zero)
+                        {
+                            end = end.Date.AddDays(1).AddTicks(-1);
+                        }
+                        if (patch.Timestamp > end)
+                            continue;
+                    }
 
                     if (filter.Platform.HasValue && patch.Platform != filter.Platform.Value)
                         continue;

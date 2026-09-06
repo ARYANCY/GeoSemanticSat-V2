@@ -9,3 +9,15 @@
 /home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/obj/Debug/net10.0/refint/GeoSemanticSat.Core.dll
 /home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/obj/Debug/net10.0/GeoSemanticSat.Core.pdb
 /home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/obj/Debug/net10.0/ref/GeoSemanticSat.Core.dll
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/bin/Debug/net10.0/GeoSemanticSat.Core.deps.json
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/bin/Debug/net10.0/GeoSemanticSat.Core.dll
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/bin/Debug/net10.0/GeoSemanticSat.Core.pdb
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/obj/Debug/net10.0/GeoSemanticSat.Core.GeneratedMSBuildEditorConfig.editorconfig
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/obj/Debug/net10.0/GeoSemanticSat.Core.AssemblyInfoInputs.cache
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/obj/Debug/net10.0/GeoSemanticSat.Core.AssemblyInfo.cs
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/obj/Debug/net10.0/GeoSemanticSat.Core.csproj.CoreCompileInputs.cache
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/obj/Debug/net10.0/GeoSemanticSat.Core.sourcelink.json
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/obj/Debug/net10.0/GeoSemanticSat.Core.dll
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/obj/Debug/net10.0/refint/GeoSemanticSat.Core.dll
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/obj/Debug/net10.0/GeoSemanticSat.Core.pdb
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/obj/Debug/net10.0/ref/GeoSemanticSat.Core.dll

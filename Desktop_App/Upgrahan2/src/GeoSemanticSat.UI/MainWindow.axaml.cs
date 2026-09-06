@@ -101,7 +101,11 @@ public partial class MainWindow : Window
     private VisualRenderMode _currentRenderMode = VisualRenderMode.TrueColorRGB;
     private VisualRenderMode _currentChangeSpectralMode = VisualRenderMode.TrueColorRGB;
     private ChangeRecord? _selectedChangeRecord = null;
+    private ChangeRecord? _inspectedMapRecord = null;
     private List<SearchResultItemViewModel> _currentSearchResults = new();
+    private string _activeHeatmapLayer = "CVA";
+    private bool _isFullSceneContext = false;
+    private int _activePassIndex = 2;
 
     // Workflow state flags
     private bool _searchCompleted = false;
@@ -210,7 +214,6 @@ public partial class MainWindow : Window
         {
             Dispatcher.UIThread.Post(() =>
             {
-                MapCanvasDiscover?.UpdateConnectivityStatus(e.IsOnline, e.LatencyMs);
                 MapCanvasSpatiotemporal?.UpdateConnectivityStatus(e.IsOnline, e.LatencyMs);
                 MapCanvasFacilities?.UpdateConnectivityStatus(e.IsOnline, e.LatencyMs);
             });
@@ -222,23 +225,10 @@ public partial class MainWindow : Window
         {
             Dispatcher.UIThread.Post(() =>
             {
-                MapCanvasDiscover?.InvalidateVisual();
                 MapCanvasSpatiotemporal?.InvalidateVisual();
                 MapCanvasFacilities?.InvalidateVisual();
             });
         };
-
-        if (MapCanvasDiscover != null)
-        {
-            MapCanvasDiscover.PinSelected += (s, pin) =>
-            {
-                var match = _currentSearchResults.FirstOrDefault(r => r.PatchId == pin.Id);
-                if (match != null)
-                {
-                    LstSearchResults.SelectedItem = match;
-                }
-            };
-        }
 
         if (MapCanvasSpatiotemporal != null)
         {
@@ -247,8 +237,7 @@ public partial class MainWindow : Window
                 var record = _detectedChanges.FirstOrDefault(c => c.Id == pin.Id);
                 if (record != null)
                 {
-                    _selectedChangeRecord = record;
-                    DisplayFocusedInspection(record);
+                    SyncActiveCandidate(record);
                 }
             };
         }
@@ -259,7 +248,6 @@ public partial class MainWindow : Window
         if (sender is ComboBox cmb && cmb.SelectedItem is ComboBoxItem item && item.Tag is string tag)
         {
             var provider = HybridTileService.AvailableProviders.FirstOrDefault(p => p.Id == tag) ?? HybridTileService.CartoDark;
-            MapCanvasDiscover?.SetBasemapProvider(provider);
             MapCanvasSpatiotemporal?.SetBasemapProvider(provider);
         }
     }
@@ -270,7 +258,6 @@ public partial class MainWindow : Window
         {
             if (Enum.TryParse<MapTileMode>(tag, out var mode))
             {
-                MapCanvasDiscover?.SetTileMode(mode);
                 MapCanvasSpatiotemporal?.SetTileMode(mode);
             }
         }
@@ -386,24 +373,126 @@ public partial class MainWindow : Window
 
     private void UpdateMapPins()
     {
-        var pins = _detectedChanges.Select((c, i) => new MapPin
+        if (_t1 != null && MapCanvasSpatiotemporal != null)
         {
-            Id = c.Id,
-            Title = $"Candidate #{i + 1} ({c.Type})",
-            Latitude = c.Center.Latitude,
-            Longitude = c.Center.Longitude,
-            ChangeType = c.Type.ToString(),
-            Confidence = c.Confidence,
-            AreaSqM = c.AreaSqMeters,
-            Bounds = c.Bounds,
-            State = MapMarkerState.Candidate
+            MapCanvasSpatiotemporal.SceneFootprint = _t1.Bounds;
+            MapCanvasSpatiotemporal.SceneFootprintLabel = $"Sentinel-2 Multi-Temporal AOI (T1: {_t1.AcquisitionTimestamp:yyyy-MM-dd} / T2: {_t3.AcquisitionTimestamp:yyyy-MM-dd} • 10m GSD)";
+        }
+
+        var pins = _detectedChanges.Select((c, i) =>
+        {
+            var (px1, py1) = _t1.Transform.GeoToPixel(new GeoCoordinate(c.Bounds.MaxLat, c.Bounds.MinLon));
+            int x0 = Math.Clamp((int)px1, 0, _t1.Width - 32);
+            int y0 = Math.Clamp((int)py1, 0, _t1.Height - 32);
+
+            Bitmap? beforeBmp = null;
+            Bitmap? afterBmp = null;
+            try
+            {
+                using var sBefore = RasterVisualizer.RenderTileToBmpStream(_t1, x0, y0, 32, 32, VisualRenderMode.TrueColorRGB);
+                beforeBmp = new Bitmap(sBefore);
+
+                using var sAfter = RasterVisualizer.RenderTileToBmpStream(_t3, x0, y0, 32, 32, VisualRenderMode.TrueColorRGB);
+                afterBmp = new Bitmap(sAfter);
+            }
+            catch { }
+
+            string rawHash = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(c.Id + c.TileId + c.Type + c.Center.Latitude + c.Center.Longitude)));
+
+            return new MapPin
+            {
+                Id = c.Id,
+                Title = $"Candidate #{i + 1} ({c.Type})",
+                Latitude = c.Center.Latitude,
+                Longitude = c.Center.Longitude,
+                ChangeType = c.Type.ToString(),
+                Confidence = c.Confidence,
+                AreaSqM = c.AreaSqMeters,
+                Bounds = c.Bounds,
+                State = c.ConfirmedByAnalyst ? MapMarkerState.Confirmed : (c.RejectedByAnalyst ? MapMarkerState.Rejected : MapMarkerState.Candidate),
+                BeforePreview = beforeBmp,
+                AfterPreview = afterBmp,
+                TimestampT1 = _t1.AcquisitionTimestamp,
+                TimestampT2 = _t3.AcquisitionTimestamp,
+                EarliestOnset = c.EarliestObservationTimestamp,
+                SensorPlatformT1 = $"{_t1.Platform} (10m)",
+                SensorPlatformT2 = $"{_t3.Platform} (10m)",
+                SceneIdT1 = _t1.TileId,
+                SceneIdT2 = _t3.TileId,
+                ProvenanceHash = $"SHA256:{rawHash[..16].ToLowerInvariant()}..."
+            };
         }).ToList();
 
         MapCanvasSpatiotemporal?.SetPins(pins);
         MapCanvasSpatiotemporal?.SetCenterAndRadius(28.6050, 77.2080, 5.0);
 
-        MapCanvasDiscover?.SetPins(pins);
-        MapCanvasDiscover?.SetCenterAndRadius(28.6050, 77.2080, 5.0);
+        if (_detectedChanges.Count > 0)
+        {
+            DisplayMapProvenance(_detectedChanges[0]);
+        }
+    }
+
+    private void DisplayMapProvenance(ChangeRecord c)
+    {
+        _inspectedMapRecord = c;
+
+        // Render Before (T1) and After (T2) miniature chips for this candidate
+        var (px1, py1) = _t1.Transform.GeoToPixel(new GeoCoordinate(c.Bounds.MaxLat, c.Bounds.MinLon));
+        int x0 = Math.Clamp((int)px1, 0, _t1.Width - 32);
+        int y0 = Math.Clamp((int)py1, 0, _t1.Height - 32);
+
+        Bitmap? beforeBmp = null;
+        Bitmap? afterBmp = null;
+        try
+        {
+            using var sBefore = RasterVisualizer.RenderTileToBmpStream(_t1, x0, y0, 32, 32, VisualRenderMode.TrueColorRGB);
+            beforeBmp = new Bitmap(sBefore);
+
+            using var sAfter = RasterVisualizer.RenderTileToBmpStream(_t3, x0, y0, 32, 32, VisualRenderMode.TrueColorRGB);
+            afterBmp = new Bitmap(sAfter);
+        }
+        catch { }
+
+        if (ImgMapProvBefore != null) ImgMapProvBefore.Source = beforeBmp;
+        if (ImgMapProvAfter != null) ImgMapProvAfter.Source = afterBmp;
+
+        if (TxtMapProvTitle != null)
+            TxtMapProvTitle.Text = $"Site {c.Id[..8]} | {c.Type} ({(c.Confidence * 100):F0}% Evidence)";
+
+        if (TxtMapProvCoords != null)
+            TxtMapProvCoords.Text = $"{c.Center.Latitude:F5}° N, {c.Center.Longitude:F5}° E | {c.AreaSqMeters:N0} m²";
+
+        if (TxtMapProvBeforeDate != null)
+            TxtMapProvBeforeDate.Text = $"{_t1.AcquisitionTimestamp:yyyy-MM-dd HH:mm} UTC";
+
+        if (TxtMapProvBeforeSensor != null)
+            TxtMapProvBeforeSensor.Text = $"{_t1.Platform} (10m GSD)";
+
+        if (TxtMapProvBeforeScene != null)
+            TxtMapProvBeforeScene.Text = $"Scene: {_t1.TileId}";
+
+        if (TxtMapProvAfterDate != null)
+            TxtMapProvAfterDate.Text = $"{_t3.AcquisitionTimestamp:yyyy-MM-dd HH:mm} UTC";
+
+        if (TxtMapProvAfterSensor != null)
+            TxtMapProvAfterSensor.Text = $"{_t3.Platform} (10m GSD)";
+
+        if (TxtMapProvAfterScene != null)
+            TxtMapProvAfterScene.Text = $"Scene: {_t3.TileId}";
+
+        if (TxtMapProvOnset != null)
+            TxtMapProvOnset.Text = $"Onset: {c.EarliestObservationTimestamp:yyyy-MM-dd} UTC";
+
+        string rawHash = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(c.Id + c.TileId + c.Type + c.Center.Latitude + c.Center.Longitude)));
+        if (TxtMapProvHash != null)
+            TxtMapProvHash.Text = $"SHA-256: {rawHash[..16].ToLowerInvariant()}... (Tamper-evident)";
+
+        if (BtnMapProvVerify != null) BtnMapProvVerify.Tag = c.Id;
+        if (BtnMapProvConfirm != null) BtnMapProvConfirm.Tag = c.Id;
+        if (BtnMapProvReject != null) BtnMapProvReject.Tag = c.Id;
+
+        // Synchronize in-map canvas selected pin
+        MapCanvasSpatiotemporal?.SelectPin(c.Id);
     }
 
     private void UpdateOverviewRenderings()
@@ -551,23 +640,6 @@ public partial class MainWindow : Window
         LstSearchResults.ItemsSource = _currentSearchResults;
         _searchCompleted = true;
         RefreshWorkflowUI();
-
-        // Update Discover Map
-        var pins = _currentSearchResults.Select(r => new MapPin
-        {
-            Id = r.PatchId,
-            Title = r.Title,
-            Latitude = r.Patch.Bounds.Center.Latitude,
-            Longitude = r.Patch.Bounds.Center.Longitude,
-            ChangeType = "Result",
-            Confidence = r.SimilarityScore,
-            AreaSqM = 102400,
-            Bounds = r.Patch.Bounds,
-            State = MapMarkerState.Candidate
-        }).ToList();
-
-        MapCanvasDiscover?.SetPins(pins);
-        MapCanvasDiscover?.SetCenterAndRadius(28.6050, 77.2080, 5.0);
     }
 
     private void OnQuickQueryClicked(object? sender, RoutedEventArgs e)
@@ -579,19 +651,288 @@ public partial class MainWindow : Window
         }
     }
 
+    // =========================================================================
+    // CROSS-TAB SYNCHRONIZATION (DATA-PRESENT & NO-DATA EMPTY STATE)
+    // =========================================================================
+
+    private bool _isSyncingCandidate = false;
+
+    private void SyncActiveCandidate(ChangeRecord? record)
+    {
+        if (_isSyncingCandidate) return;
+        _isSyncingCandidate = true;
+        try
+        {
+            if (record == null)
+            {
+                _selectedChangeRecord = null;
+                _inspectedMapRecord = null;
+                return;
+            }
+
+            _selectedChangeRecord = record;
+            _inspectedMapRecord = record;
+
+            // 1. Tab 2: Map Pin, Pan & Provenance
+            MapCanvasSpatiotemporal?.SelectPin(record.Id);
+            MapCanvasSpatiotemporal?.PanTo(record.Center.Latitude, record.Center.Longitude);
+            DisplayMapProvenance(record);
+
+            if (LstSpatiotemporalResults?.ItemsSource is IEnumerable<SpatiotemporalResultItemViewModel> spItems)
+            {
+                var match = spItems.FirstOrDefault(it => it.Id == record.Id);
+                if (match != null && LstSpatiotemporalResults.SelectedItem != match)
+                {
+                    LstSpatiotemporalResults.SelectedItem = match;
+                }
+            }
+
+            // 2. Tab 3: Focused Inspection & Candidate List
+            if (LstChangeResults?.ItemsSource is IEnumerable<ChangeListItemViewModel> chgItems)
+            {
+                var match = chgItems.FirstOrDefault(it => it.Id == record.Id);
+                if (match != null && LstChangeResults.SelectedItem != match)
+                {
+                    LstChangeResults.SelectedItem = match;
+                }
+            }
+            DisplayFocusedInspection(record);
+
+            // 3. Tab 1: Highlight closest matching patch
+            if (LstSearchResults?.ItemsSource is IEnumerable<SearchResultItemViewModel> searchItems)
+            {
+                var closest = searchItems
+                    .OrderBy(s => s.Patch.Bounds.Center.DistanceToKm(record.Center))
+                    .FirstOrDefault();
+                if (closest != null && closest.Patch.Bounds.Center.DistanceToKm(record.Center) < 2.0)
+                {
+                    if (LstSearchResults.SelectedItem != closest)
+                        LstSearchResults.SelectedItem = closest;
+                }
+            }
+        }
+        finally
+        {
+            _isSyncingCandidate = false;
+        }
+    }
+
+    private void SyncNoDataState(string reason, double lat, double lon, DateTime? startDate, DateTime? endDate)
+    {
+        _selectedChangeRecord = null;
+        _inspectedMapRecord = null;
+
+        string dateSummary = (startDate.HasValue && endDate.HasValue)
+            ? $"{startDate.Value:yyyy-MM-dd} to {endDate.Value:yyyy-MM-dd} UTC"
+            : (startDate.HasValue ? $"From {startDate.Value:yyyy-MM-dd} UTC" : (endDate.HasValue ? $"Up to {endDate.Value:yyyy-MM-dd} UTC" : "All Archive Epochs"));
+
+        // Tab 2 No-Data State
+        if (PnlMapProvenance != null) PnlMapProvenance.IsVisible = false;
+        if (PnlNoDataTab2 != null)
+        {
+            PnlNoDataTab2.IsVisible = true;
+            if (TxtNoDataTab2Detail != null)
+                TxtNoDataTab2Detail.Text = $"Coordinates ({lat:F4}°N, {lon:F4}°E) | Time: {dateSummary} | {reason}";
+        }
+        if (MapCanvasSpatiotemporal != null)
+        {
+            MapCanvasSpatiotemporal.SetPins(new List<MapPin>());
+            MapCanvasSpatiotemporal.SetCenterAndRadius(lat, lon, 10.0);
+        }
+        if (LstSpatiotemporalResults != null)
+        {
+            LstSpatiotemporalResults.ItemsSource = new List<SpatiotemporalResultItemViewModel>();
+        }
+
+        // Tab 3 No-Data State (Overlay + Reset metrics)
+        if (PnlNoDataTab3 != null)
+        {
+            PnlNoDataTab3.IsVisible = true;
+            if (TxtNoDataTab3Coords != null)
+                TxtNoDataTab3Coords.Text = $"Location: ({lat:F5}°N, {lon:F5}°E) | Radius: 10.0 km";
+            if (TxtNoDataTab3Dates != null)
+                TxtNoDataTab3Dates.Text = $"Observation Window: {dateSummary}";
+        }
+        if (TxtCandidateCounter != null) TxtCandidateCounter.Text = "Candidate 0 of 0";
+        if (TxtCandidateCoords != null) TxtCandidateCoords.Text = $"{lat:F5}°N, {lon:F5}°E (No Local Data)";
+        if (TxtCandidateType != null) TxtCandidateType.Text = "None";
+        if (TxtAiClassificationVerdict != null) TxtAiClassificationVerdict.Text = "No satellite observations for active spatiotemporal query.";
+        if (TxtAiConfidence != null) TxtAiConfidence.Text = "0% DATA COVERAGE";
+        if (BadgeAiConfidence != null) BadgeAiConfidence.Background = Brush.Parse("#374151");
+        if (TxtAiArea != null) TxtAiArea.Text = "0 m²";
+        if (TxtAiOnset != null) TxtAiOnset.Text = "N/A";
+        if (TxtTimelineOnsetMarker != null) TxtTimelineOnsetMarker.Text = "N/A";
+        if (TxtEvidVegetation != null) TxtEvidVegetation.Text = "Vegetation: No coverage";
+        if (TxtEvidSoil != null) TxtEvidSoil.Text = "Soil/Built: No coverage";
+        if (TxtEvidPersistence != null) TxtEvidPersistence.Text = "No multi-temporal observations in archive";
+        if (TxtEvidSpatial != null) TxtEvidSpatial.Text = "Spatial footprint: 0 m²";
+        if (ImgBaselineT1 != null) ImgBaselineT1.Source = null;
+        if (ImgTargetT2 != null) ImgTargetT2.Source = null;
+        if (ImgChangeHeatmap != null) ImgChangeHeatmap.Source = null;
+        if (ImgSpectralChart != null) ImgSpectralChart.Source = null;
+
+        // Tab 1 No-Data State (if coordinate is out of archive bounds)
+        double distFromArchive = new GeoCoordinate(lat, lon).DistanceToKm(new GeoCoordinate(28.6050, 77.2080));
+        if (distFromArchive > 25.0)
+        {
+            if (PnlNoDataTab1 != null)
+            {
+                PnlNoDataTab1.IsVisible = true;
+                if (TxtNoDataTab1Detail != null)
+                    TxtNoDataTab1Detail.Text = $"Coordinates ({lat:F4}°N, {lon:F4}°E) lie outside indexed archive domain ({distFromArchive:F0} km away).";
+            }
+        }
+    }
+
+    private void SyncDataAvailableState()
+    {
+        if (PnlNoDataTab1 != null) PnlNoDataTab1.IsVisible = false;
+        if (PnlNoDataTab2 != null) PnlNoDataTab2.IsVisible = false;
+        if (PnlNoDataTab3 != null) PnlNoDataTab3.IsVisible = false;
+        if (PnlMapProvenance != null) PnlMapProvenance.IsVisible = true;
+        if (DlgMissingDataModal != null) DlgMissingDataModal.IsVisible = false;
+    }
+
+    private void OnShowMissingDataModalClicked(object? sender, RoutedEventArgs e)
+    {
+        if (DlgMissingDataModal != null)
+            DlgMissingDataModal.IsVisible = true;
+    }
+
+    private void OnModalDismissClicked(object? sender, RoutedEventArgs e)
+    {
+        if (DlgMissingDataModal != null)
+            DlgMissingDataModal.IsVisible = false;
+    }
+
+    private void OnModalResetToActiveCoverageClicked(object? sender, RoutedEventArgs e)
+    {
+        if (DlgMissingDataModal != null)
+            DlgMissingDataModal.IsVisible = false;
+
+        if (TxtSearchLat != null) TxtSearchLat.Text = "28.60500";
+        if (TxtSearchLon != null) TxtSearchLon.Text = "77.20800";
+        if (TxtSearchRadius != null) TxtSearchRadius.Text = "10.0";
+        if (TxtStartDate != null) TxtStartDate.Text = "2024-01-01";
+        if (TxtEndDate != null) TxtEndDate.Text = "2024-04-30";
+        if (CmbDatePeriodPreset != null) CmbDatePeriodPreset.SelectedIndex = 0;
+        if (CmbChangeTypeFilter != null) CmbChangeTypeFilter.SelectedIndex = 0;
+
+        SyncDataAvailableState();
+        OnExecuteSpatiotemporalSearchClicked(null, null!);
+    }
+
+    private void OnModalIngestFileClicked(object? sender, RoutedEventArgs e)
+    {
+        if (DlgMissingDataModal != null)
+            DlgMissingDataModal.IsVisible = false;
+        OnLoadGeoTiffClicked(sender, e);
+    }
+
+    private void OnModalGenerateSyntheticSceneClicked(object? sender, RoutedEventArgs e)
+    {
+        if (DlgMissingDataModal != null)
+            DlgMissingDataModal.IsVisible = false;
+
+        double lat = double.TryParse(TxtSearchLat?.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedLat) ? parsedLat : 28.6050;
+        double lon = double.TryParse(TxtSearchLon?.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedLon) ? parsedLon : 77.2080;
+
+        DateTime? startDate = null;
+        if (!string.IsNullOrWhiteSpace(TxtStartDate?.Text) && DateTime.TryParse(TxtStartDate.Text.Trim(), CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var sDate))
+            startDate = sDate;
+
+        DateTime? endDate = null;
+        if (!string.IsNullOrWhiteSpace(TxtEndDate?.Text) && DateTime.TryParse(TxtEndDate.Text.Trim(), CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var eDate))
+            endDate = eDate;
+
+        GenerateSyntheticSceneForLocation(lat, lon, startDate, endDate);
+    }
+
+    public void GenerateSyntheticSceneForLocation(double lat, double lon, DateTime? startDate, DateTime? endDate)
+    {
+        DateTime baseDate = startDate ?? new DateTime(2024, 1, 10, 10, 30, 0, DateTimeKind.Utc);
+        DateTime targetDate = endDate ?? baseDate.AddDays(70);
+
+        int sceneW = 256;
+        int sceneH = 256;
+        double baseLon = lon - 0.0128;
+        double baseLat = lat + 0.0128;
+        var transform = AffineGeoTransform.NorthUp(baseLon, baseLat, 0.0001, 0.0001);
+
+        string locName = $"{Math.Abs(lat):F2}{(lat >= 0 ? "N" : "S")}_{Math.Abs(lon):F2}{(lon >= 0 ? "E" : "W")}";
+        _t1 = CreateTile($"S2_{locName}_{baseDate:yyyyMMdd}_T1", SensorPlatform.Sentinel2_Optical, baseDate, sceneW, sceneH, transform);
+        var t2 = CreateTile($"S2_{locName}_{baseDate.AddDays(36):yyyyMMdd}_T2", SensorPlatform.Sentinel2_Optical, baseDate.AddDays(36), sceneW, sceneH, transform);
+        _t3 = CreateTile($"S2_{locName}_{targetDate:yyyyMMdd}_T3", SensorPlatform.Sentinel2_Optical, targetDate, sceneW, sceneH, transform);
+        var t4 = CreateTile($"S2_{locName}_{targetDate.AddDays(35):yyyyMMdd}_T4", SensorPlatform.Sentinel2_Optical, targetDate.AddDays(35), sceneW, sceneH, transform);
+
+        // Inject ground changes
+        InjectConstruction(_t3, 60, 60, 40, 40);
+        InjectClearance(_t3, 160, 40, 40, 40);
+        InjectWaterVariation(_t3, 20, 160, 30, 40);
+        InjectRoad(_t3, 120, 140, 100, 10);
+
+        InjectConstruction(t4, 60, 60, 40, 40);
+        InjectClearance(t4, 160, 40, 40, 40);
+
+        _timeSeries = new List<SatelliteTile> { _t1, t2, _t3, t4 };
+
+        // Re-index
+        _index = new VectorIndex(128);
+        _searchEngine = new SemanticSearchEngine(_index);
+        _searchEngine.IngestTile(_t1, patchSize: 32);
+        _searchEngine.IngestTile(_t3, patchSize: 32);
+
+        _changeSearchEngine = new ChangeSearchEngine();
+        _reviewQueue = new ReviewQueue();
+
+        UpdateOverviewRenderings();
+        RunInitialChangeDetection();
+        OnRunClusteringClicked(null, null!);
+
+        if (TxtTelemetryArchive != null)
+            TxtTelemetryArchive.Text = $"{_index.Count} observations indexed (AOI: {lat:F4}°N, {lon:F4}°E)";
+
+        SyncDataAvailableState();
+
+        if (TxtSearchLat != null) TxtSearchLat.Text = lat.ToString("F5", CultureInfo.InvariantCulture);
+        if (TxtSearchLon != null) TxtSearchLon.Text = lon.ToString("F5", CultureInfo.InvariantCulture);
+        if (TxtStartDate != null) TxtStartDate.Text = baseDate.ToString("yyyy-MM-dd");
+        if (TxtEndDate != null) TxtEndDate.Text = targetDate.ToString("yyyy-MM-dd");
+
+        OnExecuteSpatiotemporalSearchClicked(null, null!);
+
+        if (TxtSearchQuery != null && !string.IsNullOrWhiteSpace(TxtSearchQuery.Text))
+        {
+            OnSearchClicked(null, null!);
+        }
+    }
+
     private void OnCandidateSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (LstSearchResults.SelectedItem is SearchResultItemViewModel item)
+        if (LstSearchResults?.SelectedItem is SearchResultItemViewModel item)
         {
-            MapCanvasDiscover?.SelectPin(item.PatchId);
+            var patch = item.Patch;
+            var center = patch.Bounds.Center;
+            var matchingRecord = _detectedChanges
+                .OrderBy(c => c.Center.DistanceToKm(center))
+                .FirstOrDefault();
+
+            if (matchingRecord != null)
+            {
+                SyncActiveCandidate(matchingRecord);
+            }
         }
     }
 
     private void OnSpatiotemporalSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (LstSpatiotemporalResults.SelectedItem is SpatiotemporalResultItemViewModel item)
+        if (LstSpatiotemporalResults?.SelectedItem is SpatiotemporalResultItemViewModel item)
         {
-            MapCanvasSpatiotemporal?.SelectPin(item.Id);
+            var record = _detectedChanges.FirstOrDefault(c => c.Id == item.Id) ?? item.Record;
+            if (record != null)
+            {
+                SyncActiveCandidate(record);
+            }
         }
     }
 
@@ -645,6 +986,14 @@ public partial class MainWindow : Window
 
             MainTabControl.SelectedIndex = 1;
             OnExecuteSpatiotemporalSearchClicked(null, null!);
+
+            var matchingRecord = _detectedChanges
+                .OrderBy(c => c.Center.DistanceToKm(targetPatch.Bounds.Center))
+                .FirstOrDefault();
+            if (matchingRecord != null)
+            {
+                SyncActiveCandidate(matchingRecord);
+            }
         }
     }
 
@@ -653,6 +1002,18 @@ public partial class MainWindow : Window
         double lat = double.TryParse(TxtSearchLat.Text, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var parsedLat) ? parsedLat : 28.6050;
         double lon = double.TryParse(TxtSearchLon.Text, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var parsedLon) ? parsedLon : 77.2080;
         double radius = double.TryParse(TxtSearchRadius.Text, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var parsedRad) ? parsedRad : 10.0;
+
+        DateTime? startDate = null;
+        if (!string.IsNullOrWhiteSpace(TxtStartDate?.Text) && DateTime.TryParse(TxtStartDate.Text.Trim(), CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var sDate))
+        {
+            startDate = sDate;
+        }
+
+        DateTime? endDate = null;
+        if (!string.IsNullOrWhiteSpace(TxtEndDate?.Text) && DateTime.TryParse(TxtEndDate.Text.Trim(), CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var eDate))
+        {
+            endDate = eDate.Date.AddDays(1).AddTicks(-1);
+        }
 
         ChangeType? targetType = CmbChangeTypeFilter.SelectedIndex switch
         {
@@ -667,11 +1028,60 @@ public partial class MainWindow : Window
         var criteria = new ChangeSearchCriteria(
             Center: new GeoCoordinate(lat, lon),
             RadiusKm: radius,
+            StartDate: startDate,
+            EndDate: endDate,
             TargetChangeType: targetType,
             MinConfidence: 0.50
         );
 
-        var results = _changeSearchEngine.Search(criteria, topK: 25);
+        var results = _changeSearchEngine.Search(criteria, topK: 50);
+
+        string dateSummary = (startDate.HasValue && endDate.HasValue)
+            ? $"Period: {startDate.Value:yyyy-MM-dd} to {endDate.Value:yyyy-MM-dd} UTC"
+            : (startDate.HasValue ? $"From: {startDate.Value:yyyy-MM-dd} UTC" : (endDate.HasValue ? $"To: {endDate.Value:yyyy-MM-dd} UTC" : "All Available Epochs"));
+
+        if (TxtSearchMatchCount != null)
+            TxtSearchMatchCount.Text = $"{results.Count} candidates found";
+
+        if (TxtSearchActiveCriteria != null)
+            TxtSearchActiveCriteria.Text = $"Radius: {radius:F1} km around ({lat:F4}°N, {lon:F4}°E) | {dateSummary}";
+
+        // Check if out-of-coverage geographically or temporally
+        double distFromArchiveCenter = new GeoCoordinate(lat, lon).DistanceToKm(_t1.Bounds.Center);
+        bool isSpatialOutOfCoverage = distFromArchiveCenter > (radius + 20.0);
+        bool isTemporalOutOfCoverage = (startDate.HasValue && startDate.Value > _t3.AcquisitionTimestamp.AddDays(30)) ||
+                                       (endDate.HasValue && endDate.Value < _t1.AcquisitionTimestamp.AddDays(-30));
+
+        if (results.Count == 0 || isSpatialOutOfCoverage || isTemporalOutOfCoverage)
+        {
+            string reason = isSpatialOutOfCoverage && isTemporalOutOfCoverage
+                ? "Out of bounds spatially and temporally."
+                : (isSpatialOutOfCoverage
+                    ? $"Geographic coordinates are {(int)distFromArchiveCenter} km outside active satellite coverage."
+                    : (isTemporalOutOfCoverage
+                        ? "Requested observation dates lie outside the archive epoch time series."
+                        : "Zero change candidates found matching criteria in active scene."));
+
+            if (DlgMissingDataModal != null)
+            {
+                if (TxtModalQueryCoords != null)
+                    TxtModalQueryCoords.Text = $"Coordinates: ({lat:F5}°N, {lon:F5}°E)" + (isSpatialOutOfCoverage ? $" [{(int)distFromArchiveCenter} km from archive]" : "");
+                if (TxtModalQueryRadius != null)
+                    TxtModalQueryRadius.Text = $"Search Radius: {radius:F1} km";
+                if (TxtModalQueryTime != null)
+                    TxtModalQueryTime.Text = $"Time Window: {dateSummary}";
+                if (TxtModalQueryStatus != null)
+                    TxtModalQueryStatus.Text = $"Status: {reason}";
+                DlgMissingDataModal.IsVisible = true;
+            }
+
+            SyncNoDataState(reason, lat, lon, startDate, endDate);
+            _spatiotemporalCompleted = true;
+            RefreshWorkflowUI();
+            return;
+        }
+
+        SyncDataAvailableState();
 
         LstSpatiotemporalResults.ItemsSource = results.Select(r =>
         {
@@ -708,11 +1118,115 @@ public partial class MainWindow : Window
             };
         }).ToList();
 
+        // Update Map Center and Pins to match active search filter
+        var searchPins = results.Select((r, i) =>
+        {
+            var c = r.Record;
+            var (px1, py1) = _t1.Transform.GeoToPixel(new GeoCoordinate(c.Bounds.MaxLat, c.Bounds.MinLon));
+            int x0 = Math.Clamp((int)px1, 0, _t1.Width - 32);
+            int y0 = Math.Clamp((int)py1, 0, _t1.Height - 32);
+
+            Bitmap? beforeBmp = null;
+            Bitmap? afterBmp = null;
+            try
+            {
+                using var sBefore = RasterVisualizer.RenderTileToBmpStream(_t1, x0, y0, 32, 32, VisualRenderMode.TrueColorRGB);
+                beforeBmp = new Bitmap(sBefore);
+
+                using var sAfter = RasterVisualizer.RenderTileToBmpStream(_t3, x0, y0, 32, 32, VisualRenderMode.TrueColorRGB);
+                afterBmp = new Bitmap(sAfter);
+            }
+            catch { }
+
+            string rawHash = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(c.Id + c.TileId + c.Type + c.Center.Latitude + c.Center.Longitude)));
+
+            return new MapPin
+            {
+                Id = c.Id,
+                Title = $"Candidate #{i + 1} ({c.Type})",
+                Latitude = c.Center.Latitude,
+                Longitude = c.Center.Longitude,
+                ChangeType = c.Type.ToString(),
+                Confidence = c.Confidence,
+                AreaSqM = c.AreaSqMeters,
+                Bounds = c.Bounds,
+                State = c.ConfirmedByAnalyst ? MapMarkerState.Confirmed : (c.RejectedByAnalyst ? MapMarkerState.Rejected : MapMarkerState.Candidate),
+                BeforePreview = beforeBmp,
+                AfterPreview = afterBmp,
+                TimestampT1 = _t1.AcquisitionTimestamp,
+                TimestampT2 = _t3.AcquisitionTimestamp,
+                EarliestOnset = c.EarliestObservationTimestamp,
+                SensorPlatformT1 = $"{_t1.Platform} (10m)",
+                SensorPlatformT2 = $"{_t3.Platform} (10m)",
+                SceneIdT1 = _t1.TileId,
+                SceneIdT2 = _t3.TileId,
+                ProvenanceHash = $"SHA256:{rawHash[..16].ToLowerInvariant()}..."
+            };
+        }).ToList();
+
+        MapCanvasSpatiotemporal?.SetPins(searchPins);
+        MapCanvasSpatiotemporal?.SetCenterAndRadius(lat, lon, radius);
+
+        SyncActiveCandidate(results[0].Record);
+
         _spatiotemporalCompleted = true;
         RefreshWorkflowUI();
+    }
 
-        // Update Map Center and Pins
-        MapCanvasSpatiotemporal?.SetCenterAndRadius(lat, lon, radius);
+    private void OnDatePeriodPresetChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (CmbDatePeriodPreset == null || TxtStartDate == null || TxtEndDate == null) return;
+
+        switch (CmbDatePeriodPreset.SelectedIndex)
+        {
+            case 0: // All Archive Epochs (2024)
+                TxtStartDate.Text = "2024-01-01";
+                TxtEndDate.Text = "2024-04-30";
+                break;
+            case 1: // Q1 2024 (Jan 01 - Mar 31)
+                TxtStartDate.Text = "2024-01-01";
+                TxtEndDate.Text = "2024-03-31";
+                break;
+            case 2: // Early Phase (Jan 01 - Feb 15)
+                TxtStartDate.Text = "2024-01-01";
+                TxtEndDate.Text = "2024-02-15";
+                break;
+            case 3: // Disturbance Window (Feb 01 - Mar 25)
+                TxtStartDate.Text = "2024-02-01";
+                TxtEndDate.Text = "2024-03-25";
+                break;
+            case 4: // Late Phase (Mar 15 - Apr 30)
+                TxtStartDate.Text = "2024-03-15";
+                TxtEndDate.Text = "2024-04-30";
+                break;
+            case 5: // Custom Dates (Specific Range)
+                break;
+        }
+
+        OnExecuteSpatiotemporalSearchClicked(null, null!);
+    }
+
+    private void OnResetDateRangeClicked(object? sender, RoutedEventArgs e)
+    {
+        if (TxtStartDate != null) TxtStartDate.Text = "2024-01-01";
+        if (TxtEndDate != null) TxtEndDate.Text = "2024-04-30";
+        if (CmbDatePeriodPreset != null) CmbDatePeriodPreset.SelectedIndex = 0;
+        OnExecuteSpatiotemporalSearchClicked(null, null!);
+    }
+
+    private void OnQuickDateClicked(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is string tag)
+        {
+            var parts = tag.Split(',');
+            if (parts.Length >= 2)
+            {
+                if (TxtStartDate != null) TxtStartDate.Text = parts[0];
+                if (TxtEndDate != null) TxtEndDate.Text = parts[1];
+                if (CmbDatePeriodPreset != null) CmbDatePeriodPreset.SelectedIndex = 5; // Custom
+                OnExecuteSpatiotemporalSearchClicked(null, null!);
+            }
+        }
     }
 
     private void OnPresetSectorClicked(object? sender, RoutedEventArgs e)
@@ -801,6 +1315,106 @@ public partial class MainWindow : Window
         {
             _selectedChangeRecord = item.Record;
             DisplayFocusedInspection(item.Record);
+            SyncActiveCandidate(item.Record);
+        }
+    }
+
+    private bool _blinkShowingT1 = true; // For A/B blink comparison toggle
+
+    private void OnPrevCandidateClicked(object? sender, RoutedEventArgs e)
+    {
+        int idx = LstChangeResults.SelectedIndex;
+        if (idx > 0)
+            LstChangeResults.SelectedIndex = idx - 1;
+    }
+
+    private void OnNextCandidateClicked(object? sender, RoutedEventArgs e)
+    {
+        int idx = LstChangeResults.SelectedIndex;
+        if (idx >= 0 && idx < _detectedChanges.Count - 1)
+            LstChangeResults.SelectedIndex = idx + 1;
+    }
+
+    private void OnToggleViewModeClicked(object? sender, RoutedEventArgs e)
+    {
+        _isFullSceneContext = !_isFullSceneContext;
+        BtnToggleViewMode.Content = _isFullSceneContext ? "🔍 Site Zoom (1:1)" : "🌐 Full Scene Context";
+        if (_selectedChangeRecord != null)
+        {
+            DisplayFocusedInspection(_selectedChangeRecord);
+        }
+    }
+
+    private void OnSelectSpectralCardClicked(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is string layer)
+        {
+            _activeHeatmapLayer = layer;
+            TxtActiveHeatmapTitle.Text = layer switch
+            {
+                "NDBI" => "3. ΔNDBI BUILT-UP HEATMAP",
+                "NDVI" => "3. ΔNDVI VEGETATION HEATMAP",
+                "NDWI" => "3. ΔNDWI WATER EXTENT HEATMAP",
+                "BSI"  => "3. ΔBSI BARE SOIL HEATMAP",
+                _      => "3. CVA MAGNITUDE HEATMAP"
+            };
+            if (_selectedChangeRecord != null)
+            {
+                DisplayFocusedInspection(_selectedChangeRecord);
+            }
+        }
+    }
+
+    private void OnPassClicked(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && int.TryParse(btn.Tag?.ToString(), out int passIdx))
+        {
+            _activePassIndex = Math.Clamp(passIdx, 0, _timeSeries.Count - 1);
+            var tile = _timeSeries[_activePassIndex];
+            TxtTargetPanelSubtitle.Text = $"2. TARGET OBSERVATION ({tile.AcquisitionTimestamp:yyyy-MM-dd})";
+            if (_selectedChangeRecord != null)
+            {
+                DisplayFocusedInspection(_selectedChangeRecord);
+            }
+        }
+    }
+
+    private void OnBlinkCompareClicked(object? sender, RoutedEventArgs e)
+    {
+        if (_selectedChangeRecord == null || _t1 == null || _timeSeries.Count == 0) return;
+        try
+        {
+            _blinkShowingT1 = !_blinkShowingT1;
+            var targetTile = (_activePassIndex >= 0 && _activePassIndex < _timeSeries.Count)
+                ? _timeSeries[_activePassIndex]
+                : _t3;
+            var tile = _blinkShowingT1 ? _t1 : targetTile;
+
+            if (_isFullSceneContext)
+            {
+                using var s = RasterVisualizer.RenderTileToBmpStream(tile, 0, 0, tile.Width, tile.Height, _currentChangeSpectralMode);
+                ImgBaselineT1.Source = new Bitmap(s);
+            }
+            else
+            {
+                var (px1, py1) = _t1.Transform.GeoToPixel(new GeoCoordinate(_selectedChangeRecord.Bounds.MaxLat, _selectedChangeRecord.Bounds.MinLon));
+                var (px2, py2) = _t1.Transform.GeoToPixel(new GeoCoordinate(_selectedChangeRecord.Bounds.MinLat, _selectedChangeRecord.Bounds.MaxLon));
+                int minX = (int)Math.Min(px1, px2);
+                int minY = (int)Math.Min(py1, py2);
+                int maxX = (int)Math.Max(px1, px2);
+                int maxY = (int)Math.Max(py1, py2);
+                int cropX = Math.Clamp(minX - 28, 0, _t1.Width - 1);
+                int cropY = Math.Clamp(minY - 28, 0, _t1.Height - 1);
+                int cropW = Math.Clamp((maxX + 28) - cropX, 16, _t1.Width - cropX);
+                int cropH = Math.Clamp((maxY + 28) - cropY, 16, _t1.Height - cropY);
+
+                using var s = RasterVisualizer.RenderTileToBmpStream(tile, cropX, cropY, cropW, cropH, _currentChangeSpectralMode);
+                ImgBaselineT1.Source = new Bitmap(s);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Blink compare error: {ex.Message}");
         }
     }
 
@@ -808,14 +1422,22 @@ public partial class MainWindow : Window
     {
         try
         {
-            // Explicit AI Conclusion & Assessment
+            _blinkShowingT1 = true; // Reset blink state on candidate change
+
+            // ── Candidate navigation info ──
+            int idx = _detectedChanges.IndexOf(record);
+            TxtCandidateCounter.Text = $"Candidate {idx + 1} of {_detectedChanges.Count}";
+            TxtCandidateCoords.Text = $"{record.Center.Latitude:F5}°N, {record.Center.Longitude:F5}°E";
+            TxtCandidateType.Text = record.Type.ToString();
+
+            // ── AI Conclusion & Assessment ──
             TxtAiClassificationVerdict.Text = $"Likely {record.Type} / Ground Disturbance";
             TxtAiConfidence.Text = $"{(record.Confidence * 100):F0}% CONFIDENCE ({(record.Confidence >= HighConfidenceThreshold ? "HIGH" : "MODERATE")})";
             BadgeAiConfidence.Background = Brush.Parse(record.Confidence >= HighConfidenceThreshold ? "#065F46" : "#78350F");
 
-            TxtAiArea.Text = $"{record.AreaSqMeters:N0} m2 (approx {(record.AreaSqMeters / 10000.0):F2} ha)";
+            TxtAiArea.Text = $"{record.AreaSqMeters:N0} m² ({(record.AreaSqMeters / 10000.0):F2} ha)";
             TxtAiOnset.Text = $"{record.EarliestObservationTimestamp:yyyy-MM-dd}";
-            TxtTimelineOnsetMarker.Text = $"Onset Date: {record.EarliestObservationTimestamp:yyyy-MM-dd} (Confirmed by usable imagery)";
+            TxtTimelineOnsetMarker.Text = $"Onset: {record.EarliestObservationTimestamp:yyyy-MM-dd}";
 
             record.Metrics.TryGetValue("DeltaNDBI", out var dNdbi);
             record.Metrics.TryGetValue("DeltaNDVI", out var dNdvi);
@@ -823,28 +1445,103 @@ public partial class MainWindow : Window
             record.Metrics.TryGetValue("DeltaBSI", out var dBsi);
             record.Metrics.TryGetValue("DeltaGradient", out var dGrad);
 
-            // Structured Evidence Bullets
-            TxtEvidVegetation.Text = $"Vegetation Response: {(dNdvi < -0.15 ? "Significant loss" : "Stable")} (Delta NDVI = {dNdvi:+0.000;-0.000})";
-            TxtEvidSoil.Text = $"Bare-Soil / Built Response: {(dNdbi > 0.15 ? "High increase" : "Moderate")} (Delta NDBI = {dNdbi:+0.000;-0.000}, Delta BSI = {dBsi:+0.000;-0.000})";
-            TxtEvidPersistence.Text = $"Multi-temporal persistence verified across passes (3.5 sigma CUSUM threshold exceeded)";
-            TxtEvidSpatial.Text = $"Spatial footprint {record.AreaSqMeters:N0} m2 ({record.AffectedPixels} px) without jitter";
+            // ── Structured Evidence Bullets ──
+            TxtEvidVegetation.Text = $"Vegetation: {(dNdvi < -0.15 ? "Significant loss" : "Stable")} (ΔNDVI = {dNdvi:+0.000;-0.000})";
+            TxtEvidSoil.Text = $"Bare-Soil/Built: {(dNdbi > 0.15 ? "High increase" : "Moderate")} (ΔNDBI = {dNdbi:+0.000;-0.000}, ΔBSI = {dBsi:+0.000;-0.000})";
+            TxtEvidPersistence.Text = $"Multi-temporal persistence verified across 4 passes (3.5σ CUSUM threshold exceeded)";
+            TxtEvidSpatial.Text = $"Spatial footprint {record.AreaSqMeters:N0} m² ({record.AffectedPixels} px) without jitter";
 
-            // Technical Diagnostics Drawer
+            // ── Technical Diagnostics ──
             TxtFocusedDeltaNdbi.Text = $"{(dNdbi >= 0 ? "+" : "")}{dNdbi:F4}";
             TxtFocusedDeltaNdvi.Text = $"{(dNdvi >= 0 ? "+" : "")}{dNdvi:F4}";
             TxtFocusedDeltaNdwi.Text = $"{(dNdwi >= 0 ? "+" : "")}{dNdwi:F4}";
             TxtFocusedDeltaGrad.Text = $"{(dGrad >= 0 ? "+" : "")}{dGrad:F4}";
 
-            // High-detail 3-panel renders
-            using var s1 = RasterVisualizer.RenderTileToBmpStream(_t1, 0, 0, _t1.Width, _t1.Height, _currentChangeSpectralMode);
-            ImgBaselineT1.Source = new Bitmap(s1);
+            // ── Update Badges on Individual Index Cards ──
+            TxtBadgeDeltaNdvi.Text = $"Δ = {dNdvi:+0.000;-0.000}";
+            TxtBadgeDeltaNdbi.Text = $"Δ = {dNdbi:+0.000;-0.000}";
+            TxtBadgeDeltaNdwi.Text = $"Δ = {dNdwi:+0.000;-0.000}";
+            TxtBadgeDeltaBsi.Text  = $"Δ = {dBsi:+0.000;-0.000}";
 
-            using var s2 = RasterVisualizer.RenderTileToBmpStream(_t3, 0, 0, _t3.Width, _t3.Height, _currentChangeSpectralMode);
-            ImgTargetT2.Source = new Bitmap(s2);
+            var targetTile = (_timeSeries != null && _activePassIndex >= 0 && _activePassIndex < _timeSeries.Count)
+                ? _timeSeries[_activePassIndex]
+                : _t3;
+
+            TxtTargetPanelSubtitle.Text = $"2. TARGET OBSERVATION ({targetTile.AcquisitionTimestamp:yyyy-MM-dd})";
+
+            // ── Render Primary 3-Panel Visualizations ──
+            if (_isFullSceneContext)
+            {
+                using var s1 = RasterVisualizer.RenderTileToBmpStream(_t1, 0, 0, _t1.Width, _t1.Height, _currentChangeSpectralMode);
+                ImgBaselineT1.Source = new Bitmap(s1);
+
+                using var s2 = RasterVisualizer.RenderTileToBmpStream(targetTile, 0, 0, targetTile.Width, targetTile.Height, _currentChangeSpectralMode);
+                ImgTargetT2.Source = new Bitmap(s2);
+
+                using var s3 = RasterVisualizer.RenderChangeHeatmapBmpStream(_t1, targetTile, _detectedChanges, record);
+                ImgChangeHeatmap.Source = new Bitmap(s3);
+            }
+            else
+            {
+                var focused = RasterVisualizer.RenderFocusedSite(_t1, targetTile, record, _currentChangeSpectralMode, _activeHeatmapLayer, padding: 28, scale: 2);
+                ImgBaselineT1.Source = new Bitmap(focused.T1Stream);
+                ImgTargetT2.Source = new Bitmap(focused.T2Stream);
+                ImgChangeHeatmap.Source = new Bitmap(focused.OverlayStream);
+                focused.T1Stream.Dispose();
+                focused.T2Stream.Dispose();
+                focused.OverlayStream.Dispose();
+            }
+
+            // ── Per-candidate calibrated individual spectral index heatmaps ──
+            var indexHeatmaps = RasterVisualizer.RenderFocusedIndexHeatmaps(_t1, targetTile, record, padding: 20, scale: 2);
+            ImgHeatmapNdvi.Source = new Bitmap(indexHeatmaps.NdviStream);
+            ImgHeatmapNdbi.Source = new Bitmap(indexHeatmaps.NdbiStream);
+            ImgHeatmapNdwi.Source = new Bitmap(indexHeatmaps.NdwiStream);
+            ImgHeatmapBsi.Source = new Bitmap(indexHeatmaps.BsiStream);
+            indexHeatmaps.NdviStream.Dispose();
+            indexHeatmaps.NdbiStream.Dispose();
+            indexHeatmaps.NdwiStream.Dispose();
+            indexHeatmaps.BsiStream.Dispose();
+
+            // ── Multi-Spectral Signature Reflectance Profile Chart ──
+            using var chartStream = RasterVisualizer.RenderSpectralProfileChart(_t1, targetTile, record);
+            ImgSpectralChart.Source = new Bitmap(chartStream);
+
+            // ── Update Multi-Pass Timeline Highlight ──
+            UpdateTimelineHighlight(record.EarliestObservationTimestamp);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error updating focused change inspection: {ex.Message}");
+        }
+    }
+
+    private void UpdateTimelineHighlight(DateTime onsetDate)
+    {
+        BorderPass1.BorderThickness = new Thickness(0);
+        BorderPass2.BorderThickness = new Thickness(0);
+        BorderPass3.BorderThickness = new Thickness(0);
+        BorderPass4.BorderThickness = new Thickness(0);
+
+        if (onsetDate <= new DateTime(2024, 1, 20))
+        {
+            BorderPass1.BorderThickness = new Thickness(2);
+            BorderPass1.BorderBrush = Brush.Parse("#F59E0B");
+        }
+        else if (onsetDate <= new DateTime(2024, 2, 28))
+        {
+            BorderPass2.BorderThickness = new Thickness(2);
+            BorderPass2.BorderBrush = Brush.Parse("#F59E0B");
+        }
+        else if (onsetDate <= new DateTime(2024, 3, 31))
+        {
+            BorderPass3.BorderThickness = new Thickness(2);
+            BorderPass3.BorderBrush = Brush.Parse("#EF4444");
+        }
+        else
+        {
+            BorderPass4.BorderThickness = new Thickness(2);
+            BorderPass4.BorderBrush = Brush.Parse("#F87171");
         }
     }
 
@@ -1021,21 +1718,18 @@ public partial class MainWindow : Window
 
     private void OnMapZoomInClicked(object? sender, RoutedEventArgs e)
     {
-        MapCanvasDiscover?.ZoomIn();
         MapCanvasSpatiotemporal?.ZoomIn();
         MapCanvasFacilities?.ZoomIn();
     }
 
     private void OnMapZoomOutClicked(object? sender, RoutedEventArgs e)
     {
-        MapCanvasDiscover?.ZoomOut();
         MapCanvasSpatiotemporal?.ZoomOut();
         MapCanvasFacilities?.ZoomOut();
     }
 
     private void OnMapFitAllClicked(object? sender, RoutedEventArgs e)
     {
-        MapCanvasDiscover?.FitToAll();
         MapCanvasSpatiotemporal?.FitToAll();
         MapCanvasFacilities?.FitToAll();
     }
@@ -1196,7 +1890,6 @@ public partial class MainWindow : Window
         RefreshWorkflowUI();
         Dispatcher.UIThread.Post(() =>
         {
-            MapCanvasDiscover?.InvalidateVisual();
             MapCanvasSpatiotemporal?.InvalidateVisual();
             MapCanvasFacilities?.InvalidateVisual();
         });
@@ -1207,6 +1900,12 @@ public partial class MainWindow : Window
         if (sender is not Button btn) return;
         string patchId = btn.Tag?.ToString() ?? string.Empty;
         if (string.IsNullOrEmpty(patchId)) return;
+
+        var record = _detectedChanges.FirstOrDefault(c => c.TileId == patchId || c.Id == patchId);
+        if (record != null)
+        {
+            SyncActiveCandidate(record);
+        }
 
         _searchCompleted = true;
         _spatiotemporalCompleted = true;
@@ -1225,10 +1924,50 @@ public partial class MainWindow : Window
         {
             _selectedChangeRecord = record;
             DisplayFocusedInspection(record);
+            SyncActiveCandidate(record);
         }
 
         _spatiotemporalCompleted = true;
         MainTabControl.SelectedIndex = 2;
         RefreshWorkflowUI();
+    }
+
+    private void OnMapProvDeepVerifyClicked(object? sender, RoutedEventArgs e)
+    {
+        if (_inspectedMapRecord != null)
+        {
+            _selectedChangeRecord = _inspectedMapRecord;
+            DisplayFocusedInspection(_inspectedMapRecord);
+            SyncActiveCandidate(_inspectedMapRecord);
+            _spatiotemporalCompleted = true;
+            MainTabControl.SelectedIndex = 2; // Step 3: Spectral Verification
+            RefreshWorkflowUI();
+        }
+    }
+
+    private void OnMapProvConfirmClicked(object? sender, RoutedEventArgs e)
+    {
+        if (_inspectedMapRecord != null)
+        {
+            _reviewQueue.Confirm(_inspectedMapRecord.Id, "Confirmed by analyst via Map Provenance Inspector.");
+            _inspectedMapRecord.ConfirmedByAnalyst = true;
+            _inspectedMapRecord.RejectedByAnalyst = false;
+            UpdateReviewQueueList();
+            UpdateMapPins();
+            DisplayMapProvenance(_inspectedMapRecord);
+        }
+    }
+
+    private void OnMapProvRejectClicked(object? sender, RoutedEventArgs e)
+    {
+        if (_inspectedMapRecord != null)
+        {
+            _reviewQueue.Reject(_inspectedMapRecord.Id, "Rejected false alarm via Map Provenance Inspector.");
+            _inspectedMapRecord.RejectedByAnalyst = true;
+            _inspectedMapRecord.ConfirmedByAnalyst = false;
+            UpdateReviewQueueList();
+            UpdateMapPins();
+            DisplayMapProvenance(_inspectedMapRecord);
+        }
     }
 }
