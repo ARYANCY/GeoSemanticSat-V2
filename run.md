@@ -1,26 +1,37 @@
 # UpaGraha / GeoSemanticSat — Operational Setup & Run Guide
 
-Comprehensive guide to set up, configure, test, and run the **UpaGraha / GeoSemanticSat** air-gapped satellite analytics platform, covering the **FastAPI Analytics Backend**, **Pretrained Geospatial Foundation Models**, and the **Avalonia Desktop Intelligence Studio**.
+Comprehensive guide to set up, configure, test, and run the **UpaGraha / GeoSemanticSat** air-gapped satellite analytics platform, covering the **FastAPI Analytics Backend**, **Pretrained Geospatial Foundation Models**, and the **Avalonia Desktop Intelligence Studio**..
 
 ---
 
 ## Table of Contents
-1. [Prerequisites & System Requirements](#1-prerequisites--system-requirements)
-2. [Quickstart (3 Steps)](#2-quickstart-3-steps)
-3. [Python Analytics Backend Setup](#3-python-analytics-backend-setup)
-   - [Option A: Conda Environment (Recommended)](#option-a-conda-environment-recommended)
-   - [Option B: Virtual Environment (`venv`)](#option-b-virtual-environment-venv)
-   - [Option C: Docker Container Deployment](#option-c-docker-container-deployment)
-4. [Pretrained Geospatial Foundation Models Setup](#4-pretrained-geospatial-foundation-models-setup)
-5. [Database Initialization & Synthetic Data Generation](#5-database-initialization--synthetic-data-generation)
-6. [Running the Backend Service](#6-running-the-backend-service)
-7. [API Verification & Interactive Documentation](#7-api-verification--interactive-documentation)
-8. [Desktop Application Setup & Execution](#8-desktop-application-setup--execution)
-   - [Option A: Running Pre-Compiled Standalone Release (No SDK Required)](#option-a-running-pre-compiled-standalone-release-no-sdk-required)
-   - [Option B: Running from Source (.NET 10 SDK)](#option-b-running-from-source-net-10-sdk)
-9. [Running Test Suites](#9-running-test-suites)
-10. [Offline Map Basemap & Tile Caching](#10-offline-map-basemap--tile-caching)
-11. [Troubleshooting & FAQ](#11-troubleshooting--faq)
+
+- [UpaGraha / GeoSemanticSat — Operational Setup \& Run Guide](#upagraha--geosemanticsat--operational-setup--run-guide)
+  - [Table of Contents](#table-of-contents)
+  - [1. Prerequisites \& System Requirements](#1-prerequisites--system-requirements)
+  - [2. Quickstart (3 Steps)](#2-quickstart-3-steps)
+  - [3. Python Analytics Backend Setup](#3-python-analytics-backend-setup)
+    - [Option A: Conda Environment (Recommended)](#option-a-conda-environment-recommended)
+    - [Option B: Virtual Environment (`venv`)](#option-b-virtual-environment-venv)
+    - [Option C: Docker Container Deployment](#option-c-docker-container-deployment)
+  - [4. Pretrained Geospatial Foundation Models Setup](#4-pretrained-geospatial-foundation-models-setup)
+    - [Stage and Export Models](#stage-and-export-models)
+    - [Switching Active Foundation Model](#switching-active-foundation-model)
+  - [5. Database Initialization \& Synthetic Data Generation](#5-database-initialization--synthetic-data-generation)
+  - [6. Running the Backend Service](#6-running-the-backend-service)
+  - [7. API Verification \& Interactive Documentation](#7-api-verification--interactive-documentation)
+    - [Quick Smoke Test (PowerShell)](#quick-smoke-test-powershell)
+  - [8. Desktop Application Setup \& Execution](#8-desktop-application-setup--execution)
+    - [Option A: Running Pre-Compiled Standalone Release (No SDK Required)](#option-a-running-pre-compiled-standalone-release-no-sdk-required)
+    - [Option B: Running from Source (.NET 10 SDK)](#option-b-running-from-source-net-10-sdk)
+  - [9. Running Test Suites](#9-running-test-suites)
+    - [Backend Python \& Foundation Model Test Suite](#backend-python--foundation-model-test-suite)
+    - [Desktop C# Engine Test Suite](#desktop-c-engine-test-suite)
+  - [10. Offline Map Basemap \& Tile Caching](#10-offline-map-basemap--tile-caching)
+  - [11. Troubleshooting \& FAQ](#11-troubleshooting--faq)
+    - [Q: How do I verify offline mode is active?](#q-how-do-i-verify-offline-mode-is-active)
+    - [Q: What if `torch` or `onnx` is not installed?](#q-what-if-torch-or-onnx-is-not-installed)
+    - [Q: Why do we never commit `bin/` or `obj/`?](#q-why-do-we-never-commit-bin-or-obj)
 
 ---
 
@@ -53,6 +64,7 @@ python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
 Then launch the Desktop Studio:
+
 ```powershell
 dotnet run --project "Desktop_App\Upgrahan2\src\GeoSemanticSat.UI\GeoSemanticSat.UI.csproj"
 ```
@@ -134,6 +146,7 @@ python scripts/stage_foundation_models.py
 ### Switching Active Foundation Model
 
 In your `.env` file or environment variables:
+
 ```env
 # Available: terramind | satmae_pp | gfm_composition | prithvi | baseline
 EO_MODEL_NAME=terramind
@@ -172,16 +185,16 @@ python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 
 Once running, verify service availability at:
 
-| Endpoint | Method | URL | Description |
-| :--- | :---: | :--- | :--- |
-| **Root Navigation** | `GET` | [http://127.0.0.1:8000/](http://127.0.0.1:8000/) | Service metadata and navigation |
-| **Interactive Docs (Swagger)** | `GET` | [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) | Interactive API exploration and test execution |
-| **ReDoc Specification** | `GET` | [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc) | Clean API specification |
-| **Health Check** | `GET` | [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health) | System health & offline mode verification |
-| **System Status** | `GET` | [http://127.0.0.1:8000/system/status](http://127.0.0.1:8000/system/status) | DB state, observation count, and active foundation models |
-| **Semantic Text Search** | `POST` | `http://127.0.0.1:8000/api/v1/search/text` | Natural language text-to-satellite query (TerraMind) |
-| **Visual Search** | `POST` | `http://127.0.0.1:8000/api/v1/search/image` | Search visually similar satellite observations |
-| **Change Analysis** | `POST` | `http://127.0.0.1:8000/api/v1/change/analyze` | Bi-temporal change analysis + Prithvi temporal sequence |
+| Endpoint                       | Method | URL                                                                        | Description                                               |
+| :----------------------------- | :----: | :------------------------------------------------------------------------- | :-------------------------------------------------------- |
+| **Root Navigation**            | `GET`  | [http://127.0.0.1:8000/](http://127.0.0.1:8000/)                           | Service metadata and navigation                           |
+| **Interactive Docs (Swagger)** | `GET`  | [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)                   | Interactive API exploration and test execution            |
+| **ReDoc Specification**        | `GET`  | [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)                 | Clean API specification                                   |
+| **Health Check**               | `GET`  | [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health)               | System health & offline mode verification                 |
+| **System Status**              | `GET`  | [http://127.0.0.1:8000/system/status](http://127.0.0.1:8000/system/status) | DB state, observation count, and active foundation models |
+| **Semantic Text Search**       | `POST` | `http://127.0.0.1:8000/api/v1/search/text`                                 | Natural language text-to-satellite query (TerraMind)      |
+| **Visual Search**              | `POST` | `http://127.0.0.1:8000/api/v1/search/image`                                | Search visually similar satellite observations            |
+| **Change Analysis**            | `POST` | `http://127.0.0.1:8000/api/v1/change/analyze`                              | Bi-temporal change analysis + Prithvi temporal sequence   |
 
 ### Quick Smoke Test (PowerShell)
 
@@ -235,7 +248,7 @@ dotnet publish "Desktop_App\Upgrahan2\src\GeoSemanticSat.UI\GeoSemanticSat.UI.cs
 conda run -n ps227_sih2026 pytest -v
 ```
 
-*Expected output: `13 passed, 2 warnings`*
+_Expected output: `13 passed, 2 warnings`_
 
 ### Desktop C# Engine Test Suite
 
@@ -262,10 +275,13 @@ The Desktop Map Engine uses a four-tier hybrid tile caching architecture (`L1 Me
 ## 11. Troubleshooting & FAQ
 
 ### Q: How do I verify offline mode is active?
+
 **A:** Query `GET /health`. The response `{"status":"ok","offline_mode":true}` confirms 100% sovereign air-gapped readiness.
 
 ### Q: What if `torch` or `onnx` is not installed?
+
 **A:** All foundation model adapters (`TerraMindEmbedder`, `SatMaePPEmbedder`, `GFMCompositionEmbedder`, `PrithviTemporalEmbedder`) include automatic offline fallback to deterministic multi-spectral semantic projection engines with zero crash risk.
 
 ### Q: Why do we never commit `bin/` or `obj/`?
+
 **A:** `bin/` and `obj/` directories are local build outputs. Always check `git status` before committing to keep the repository clean.
