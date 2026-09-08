@@ -1,24 +1,26 @@
-# GeoSemanticSat — Comprehensive Operational Run & Setup Guide
+# UpaGraha / GeoSemanticSat — Operational Setup & Run Guide
 
-This guide provides end-to-end instructions to set up, configure, test, and run the **GeoSemanticSat** satellite intelligence platform, including the **FastAPI Offline Analytics Backend** and the **Desktop Analyst Workflow Studio**.
+Comprehensive guide to set up, configure, test, and run the **UpaGraha / GeoSemanticSat** air-gapped satellite analytics platform, covering the **FastAPI Analytics Backend**, **Pretrained Geospatial Foundation Models**, and the **Avalonia Desktop Intelligence Studio**.
 
 ---
 
 ## Table of Contents
 1. [Prerequisites & System Requirements](#1-prerequisites--system-requirements)
-2. [Python Analytics Backend Setup](#2-python-analytics-backend-setup)
+2. [Quickstart (3 Steps)](#2-quickstart-3-steps)
+3. [Python Analytics Backend Setup](#3-python-analytics-backend-setup)
    - [Option A: Conda Environment (Recommended)](#option-a-conda-environment-recommended)
-   - [Option B: Python Virtual Environment (`venv`)](#option-b-python-virtual-environment-venv)
+   - [Option B: Virtual Environment (`venv`)](#option-b-virtual-environment-venv)
    - [Option C: Docker Container Deployment](#option-c-docker-container-deployment)
-3. [Sample Data Generation & Database Initialization](#3-sample-data-generation--database-initialization)
-4. [Running the Backend Service](#4-running-the-backend-service)
-5. [API Endpoints & Verification](#5-api-endpoints--verification)
-6. [Desktop Application Setup & Execution](#6-desktop-application-setup--execution)
+4. [Pretrained Geospatial Foundation Models Setup](#4-pretrained-geospatial-foundation-models-setup)
+5. [Database Initialization & Synthetic Data Generation](#5-database-initialization--synthetic-data-generation)
+6. [Running the Backend Service](#6-running-the-backend-service)
+7. [API Verification & Interactive Documentation](#7-api-verification--interactive-documentation)
+8. [Desktop Application Setup & Execution](#8-desktop-application-setup--execution)
    - [Option A: Running Pre-Compiled Standalone Release (No SDK Required)](#option-a-running-pre-compiled-standalone-release-no-sdk-required)
-   - [Option B: Building and Running from Source (.NET 10 SDK)](#option-b-building-and-running-from-source-net-10-sdk)
-7. [Running Test Suites](#7-running-test-suites)
-8. [Offline Map Basemap & Tile Caching](#8-offline-map-basemap--tile-caching)
-9. [Troubleshooting & Common Questions](#9-troubleshooting--common-questions)
+   - [Option B: Running from Source (.NET 10 SDK)](#option-b-running-from-source-net-10-sdk)
+9. [Running Test Suites](#9-running-test-suites)
+10. [Offline Map Basemap & Tile Caching](#10-offline-map-basemap--tile-caching)
+11. [Troubleshooting & FAQ](#11-troubleshooting--faq)
 
 ---
 
@@ -26,43 +28,67 @@ This guide provides end-to-end instructions to set up, configure, test, and run 
 
 - **Operating System:** Windows 10/11 x64, Linux (Ubuntu 22.04+), or macOS
 - **Python:** Python 3.11.x (recommended) or 3.12.x
-- **Desktop UI Runtime:** Windows 10/11 x64 (DirectX/Avalonia GPU acceleration supported)
-- **C++ Build Tools / GDAL & PROJ:** Pre-bundled via standard wheels (`rasterio`, `shapely`)
+- **.NET SDK:** .NET 10 SDK (for building the desktop app from source) or Windows x64 runtime (for standalone binary)
+- **Docker Desktop (Optional):** Required only if running backend in containerized mode
 
 ---
 
-## 2. Python Analytics Backend Setup
+## 2. Quickstart (3 Steps)
+
+From the project root:
+
+```powershell
+# 1. Activate your Conda / Python environment
+conda activate ps227_sih2026
+
+# 2. Initialize database and stage foundation models
+python scripts/init_db.py
+python scripts/create_sample_data.py
+python scripts/stage_foundation_models.py
+python scripts/export_models_to_onnx.py
+python scripts/build_index.py
+
+# 3. Start the FastAPI analytics backend
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+```
+
+Then launch the Desktop Studio:
+```powershell
+dotnet run --project "Desktop_App\Upgrahan2\src\GeoSemanticSat.UI\GeoSemanticSat.UI.csproj"
+```
+
+---
+
+## 3. Python Analytics Backend Setup
 
 ### Option A: Conda Environment (Recommended)
 
-From the project root directory:
-
 ```powershell
-# 1. Create dedicated Conda environment with Python 3.11
-conda create -n geosemanticsat python=3.11 -y
+# 1. Create a dedicated Conda environment with Python 3.11
+conda create -n ps227_sih2026 python=3.11 -y
 
 # 2. Activate the environment
-conda activate geosemanticsat
+conda activate ps227_sih2026
 
-# 3. Install all locked dependencies
+# 3. Install dependencies
 pip install -r requirements.txt
 ```
 
 ---
 
-### Option B: Python Virtual Environment (`venv`)
+### Option B: Virtual Environment (`venv`)
 
 ```powershell
 # 1. Create a virtual environment
 python -m venv .venv
 
 # 2. Activate the virtual environment
-# On Windows PowerShell:
+# Windows PowerShell:
 .\.venv\Scripts\Activate.ps1
-# On Linux/macOS:
+# Linux / macOS:
 # source .venv/bin/activate
 
-# 3. Upgrade pip and install dependencies
+# 3. Install dependencies
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
@@ -72,59 +98,92 @@ pip install -r requirements.txt
 ### Option C: Docker Container Deployment
 
 ```powershell
-# Build and launch all backend services in detached mode
+# 1. Build and start services in detached mode
 docker compose up -d --build
 
-# View container logs
+# 2. Initialize database and sample rasters inside container
+docker compose exec api python scripts/init_db.py
+docker compose exec api python scripts/create_sample_data.py
+docker compose exec api python scripts/stage_foundation_models.py
+
+# 3. View container logs
 docker compose logs -f
 ```
 
 ---
 
-## 3. Sample Data Generation & Database Initialization
+## 4. Pretrained Geospatial Foundation Models Setup
 
-Initialize the SQLite database schema and generate local test GeoTIFF rasters (3-band RGB and 1-band SAR/NDVI):
+The platform supports 4 state-of-the-art Earth Observation foundation models:
+
+1. **[TerraMind-1.0-base](https://huggingface.co/ibm-esa-geospatial/TerraMind-1.0-base)** (IBM / ESA Any-to-Any Multimodal foundation model)
+2. **[SatMAE++ Transformers](https://huggingface.co/BiliSakura/SATMAE-PP-transformers)** (Grouped multi-spectral Vision Transformer Masked Autoencoder)
+3. **[GFM Composition Pretraining](https://github.com/05kashyap/GFM_Composition_Pretraining)** (Multi-sensor Sentinel-1 SAR + Sentinel-2 Optical composition)
+4. **[Prithvi-EO-2.0-600M-TL](https://huggingface.co/ibm-nasa-geospatial/Prithvi-EO-2.0-600M-TL)** (IBM / NASA Geospatial 600M parameter spatio-temporal sequence model)
+
+### Stage and Export Models
 
 ```powershell
-# Initialize database tables
-python scripts/init_db.py
+# 1. Generate local TorchScript / ONNX weights for offline execution
+python scripts/export_models_to_onnx.py
 
-# Generate sample synthetic satellite rasters under data/
-python scripts/create_sample_data.py
+# 2. Verify model staging and inspect manifest
+python scripts/stage_foundation_models.py
+```
+
+### Switching Active Foundation Model
+
+In your `.env` file or environment variables:
+```env
+# Available: terramind | satmae_pp | gfm_composition | prithvi | baseline
+EO_MODEL_NAME=terramind
 ```
 
 ---
 
-## 4. Running the Backend Service
+## 5. Database Initialization & Synthetic Data Generation
 
-Execute the FastAPI uvicorn application:
+Initialize the SQLite database schema and generate local test GeoTIFF rasters (Sentinel-2 multi-band and Sentinel-1 SAR):
 
 ```powershell
-# Windows PowerShell (with Rasterio PROJ/GDAL bindings configured)
-$env:PROJ_DATA = "$PWD\.venv\Lib\site-packages\rasterio\proj_data"
-$env:GDAL_DATA = "$PWD\.venv\Lib\site-packages\rasterio\gdal_data"
+# Initialize SQLite database schema
+python scripts/init_db.py
 
+# Generate sample synthetic satellite rasters under data/
+python scripts/create_sample_data.py
+
+# Build local FAISS cosine similarity index from stored embeddings
+python scripts/build_index.py
+```
+
+---
+
+## 6. Running the Backend Service
+
+Start the FastAPI application with auto-reload:
+
+```powershell
 python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
 ---
 
-## 5. API Endpoints & Verification
+## 7. API Verification & Interactive Documentation
 
-Once the backend is running, verify service availability:
+Once running, verify service availability at:
 
 | Endpoint | Method | URL | Description |
 | :--- | :---: | :--- | :--- |
-| **API Root** | `GET` | [http://127.0.0.1:8000/](http://127.0.0.1:8000/) | Service metadata and navigation overview |
-| **Swagger UI** | `GET` | [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) | Interactive API documentation & test runner |
-| **ReDoc UI** | `GET` | [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc) | Clean API reference specification |
-| **Health Check** | `GET` | [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health) | System health and offline status flag |
-| **System Status**| `GET` | [http://127.0.0.1:8000/system/status](http://127.0.0.1:8000/system/status) | DB connection state, observation and vector counts |
-| **Ingest GeoTIFF**| `POST` | `http://127.0.0.1:8000/api/v1/ingest` | Ingest new multi-band raster and index embeddings |
-| **Search Vectors**| `POST` | `http://127.0.0.1:8000/api/v1/search` | Execute cosine similarity search across vectors |
-| **Change Analysis**| `POST` | `http://127.0.0.1:8000/api/v1/change` | Compute bi-temporal change detection & spectral physics |
+| **Root Navigation** | `GET` | [http://127.0.0.1:8000/](http://127.0.0.1:8000/) | Service metadata and navigation |
+| **Interactive Docs (Swagger)** | `GET` | [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) | Interactive API exploration and test execution |
+| **ReDoc Specification** | `GET` | [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc) | Clean API specification |
+| **Health Check** | `GET` | [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health) | System health & offline mode verification |
+| **System Status** | `GET` | [http://127.0.0.1:8000/system/status](http://127.0.0.1:8000/system/status) | DB state, observation count, and active foundation models |
+| **Semantic Text Search** | `POST` | `http://127.0.0.1:8000/api/v1/search/text` | Natural language text-to-satellite query (TerraMind) |
+| **Visual Search** | `POST` | `http://127.0.0.1:8000/api/v1/search/image` | Search visually similar satellite observations |
+| **Change Analysis** | `POST` | `http://127.0.0.1:8000/api/v1/change/analyze` | Bi-temporal change analysis + Prithvi temporal sequence |
 
-### Quick Smoke Test via PowerShell
+### Quick Smoke Test (PowerShell)
 
 ```powershell
 # Health check test
@@ -136,11 +195,13 @@ Invoke-RestMethod -Uri "http://127.0.0.1:8000/system/status" -Method Get
 
 ---
 
-## 6. Desktop Application Setup & Execution
+## 8. Desktop Application Setup & Execution
+
+> **Note on Architecture:** The desktop UI performs change detection, CUSUM onset, and SIMD vector search **in-process** via `GeoSemanticSat.Core` and does not require the FastAPI backend to be running.
 
 ### Option A: Running Pre-Compiled Standalone Release (No SDK Required)
 
-The repository includes a pre-compiled, self-contained Windows x64 binary. Launch it directly in your active desktop session:
+Launch the pre-compiled binary:
 
 ```powershell
 Start-Process `
@@ -150,9 +211,7 @@ Start-Process `
 
 ---
 
-### Option B: Building and Running from Source (.NET 10 SDK)
-
-When the [.NET 10 SDK](https://dotnet.microsoft.com/download) is installed:
+### Option B: Running from Source (.NET 10 SDK)
 
 ```powershell
 # Run the Desktop Application directly
@@ -167,51 +226,46 @@ dotnet publish "Desktop_App\Upgrahan2\src\GeoSemanticSat.UI\GeoSemanticSat.UI.cs
 
 ---
 
-## 7. Running Test Suites
+## 9. Running Test Suites
 
-### Backend Python Test Suite
+### Backend Python & Foundation Model Test Suite
 
 ```powershell
-# Run all automated API and raster processing unit tests
-pytest -v
+# Run all automated tests (API integration, raster math, and 4 foundation models)
+conda run -n ps227_sih2026 pytest -v
 ```
 
-*Expected output: `7 passed, 2 warnings`*
+*Expected output: `13 passed, 2 warnings`*
 
-### Desktop C# / .NET Test Suite
+### Desktop C# Engine Test Suite
 
 ```powershell
-# Run hybrid tile math, caching, and slippy map projection tests
+# Run change detection, vector indexing, and algorithm correctness tests
 dotnet test "Desktop_App\Upgrahan2\src\GeoSemanticSat.Tests\GeoSemanticSat.Tests.csproj"
 ```
 
 ---
 
-## 8. Offline Map Basemap & Tile Caching
+## 10. Offline Map Basemap & Tile Caching
 
-The Desktop Map Engine uses a multi-tier caching architecture (`L1 Memory` -> `L2 Disk` -> `L3 Online Fetch` -> `L4 Procedural Graticule`):
+The Desktop Map Engine uses a four-tier hybrid tile caching architecture (`L1 Memory` -> `L2 Disk` -> `L3 Online Fetch` -> `L4 Procedural Graticule`):
 
 - **Default Cache Directory:** `%LocalAppData%\GeoSemanticSat\MapTileCache\`
 - **Operational Modes:**
   - `Auto`: Checks local disk cache first; fetches missing tiles from open-source basemaps if online and caches them locally.
-  - `OfflineStrict`: 100% Air-Gapped mode. Never attempts network connections; strictly renders from disk or tactical fallback grid.
+  - `OfflineStrict`: 100% Air-Gapped mode. Never attempts network connections; renders strictly from disk or tactical procedural grid.
   - `OnlinePreferred`: Checks for updated basemap tiles before falling back to disk cache.
-- **Supported Basemaps:**
-  - CartoDB Dark Matter (Tactical)
-  - OpenStreetMap Standard
-  - ESRI World Imagery (Satellite)
-  - Sentinel-2 Cloudless (EOX 10m)
-  - USGS The National Map
+- **Supported Basemaps:** CartoDB Dark Matter, OpenStreetMap, ESRI Satellite, Sentinel-2 Cloudless (EOX 10m), USGS National Map.
 
 ---
 
-## 9. Troubleshooting & Common Questions
+## 11. Troubleshooting & FAQ
 
-### Q: Why did visiting `http://127.0.0.1:8000/` return `{"detail":"Not Found"}`?
-**A:** FastAPI serves API documentation at `/docs` or `/redoc`. A root route (`GET /`) is now added to provide an overview and immediate links to documentation and health endpoints.
+### Q: How do I verify offline mode is active?
+**A:** Query `GET /health`. The response `{"status":"ok","offline_mode":true}` confirms 100% sovereign air-gapped readiness.
 
-### Q: How do I verify the backend is running while in air-gapped mode?
-**A:** Query `GET /health`. The response `{"status":"ok","offline_mode":true}` confirms sovereign air-gapped readiness.
+### Q: What if `torch` or `onnx` is not installed?
+**A:** All foundation model adapters (`TerraMindEmbedder`, `SatMaePPEmbedder`, `GFMCompositionEmbedder`, `PrithviTemporalEmbedder`) include automatic offline fallback to deterministic multi-spectral semantic projection engines with zero crash risk.
 
-### Q: How do I pre-cache an Area of Interest (AOI) for field missions?
-**A:** Use the desktop studio's Area of Interest pre-cache function or invoke `HybridTileService.PrecacheRegionAsync(minLat, minLon, maxLat, maxLon, minZoom, maxZoom)` before deploying to an isolated network.
+### Q: Why do we never commit `bin/` or `obj/`?
+**A:** `bin/` and `obj/` directories are local build outputs. Always check `git status` before committing to keep the repository clean.

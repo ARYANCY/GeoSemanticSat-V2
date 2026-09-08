@@ -26,7 +26,7 @@ graph TD
         API[FastAPI Gateway :8000]
         RasterService[Raster & COG Service]
         CVAService[Multi-Band CVA Engine]
-        EmbService[96-dim Visual Embedder]
+        EmbService[Foundation Model Registry & Embedders<br/>• TerraMind-1.0-base (Any-to-Any)<br/>• SatMAE++ (Grouped MSI)<br/>• GFM Composition (SAR+Optical)<br/>• Prithvi-EO-2.0 (Temporal ViT)]
     end
 
     subgraph Core Engine - C# GeoSemanticSat
@@ -71,6 +71,7 @@ graph TD
 | **API Gateway Tier** | RESTful endpoints, request validation, spatial bounds transformations, task dispatch, session management. | FastAPI, Pydantic v2, Uvicorn, Starlette | $< 15\text{ms}$ endpoint response (p95) |
 | **Geospatial Processing** | Multi-band GeoTIFF decoding, WGS84 CRS reprojection, spectral index computation, COG pyramid streaming. | Rasterio, GDAL C++ Core, rio-tiler, Shapely 2.0 | Multi-gigabyte COG sub-region streaming in $< 50\text{ms}$ |
 | **Algorithmic Core** | Bi-temporal Change Vector Analysis (CVA), CUSUM onset estimation, sub-pixel jitter filtering, Tukey PIF normalization. | .NET Core C#, NumPy, SciPy | Sub-second multi-temporal time-series evaluation |
+| **Foundation Models Layer** | Any-to-Any multimodal embeddings (TerraMind-1.0-base), grouped multi-spectral encoding (SatMAE++), SAR+Optical composition (GFM), spatio-temporal sequence modeling (Prithvi-EO-2.0-600M-TL). | PyTorch CPU, TorchScript, ONNX Runtime | Zero-cloud offline edge inference $< 50\text{ms}$ |
 | **Vector Retrieval** | Spatiotemporal candidate pre-filtering, AVX2 SIMD dot-product matrix search, active learning Rocchio re-ranking. | HNSW, FAISS, SIMD Vector256 | $< 1.0\text{ms}$ search across 1,000,000 vectors |
 | **Storage & Persistence** | Relational data, geometry indexing, spatial joins (`ST_Intersects`), binary index snapshots. | PostGIS 3.4, SQLite WAL, Binary GSSV | Zero-copy memory-mapped file access |
 

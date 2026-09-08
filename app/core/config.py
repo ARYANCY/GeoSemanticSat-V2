@@ -19,6 +19,10 @@ class Settings(BaseSettings):
     model_root: Path = Field(default=PROJECT_ROOT / "models")
     index_root: Path = Field(default=PROJECT_ROOT / "indexes")
     remoteclip_weights_path: Path = Field(default=PROJECT_ROOT / "models" / "remoteclip" / "weights.pt")
+    terramind_model_path: Path = Field(default=PROJECT_ROOT / "models" / "terramind" / "terramind_base.pt")
+    satmae_pp_model_path: Path = Field(default=PROJECT_ROOT / "models" / "satmae_pp" / "satmae_pp_vit.pt")
+    gfm_model_path: Path = Field(default=PROJECT_ROOT / "models" / "gfm_composition" / "gfm_composition.pt")
+    prithvi_model_path: Path = Field(default=PROJECT_ROOT / "models" / "prithvi" / "prithvi_eo_2_600m_tl.pt")
     eo_model_name: str = "baseline"
     eo_model_weights_path: str = ""
     log_level: str = "INFO"
@@ -26,7 +30,15 @@ class Settings(BaseSettings):
 
     def ensure_directories(self) -> None:
         """Ensure runtime directories exist."""
-        for p in (self.data_root, self.model_root, self.index_root):
+        for p in (
+            self.data_root,
+            self.model_root,
+            self.index_root,
+            self.model_root / "terramind",
+            self.model_root / "satmae_pp",
+            self.model_root / "gfm_composition",
+            self.model_root / "prithvi",
+        ):
             p.mkdir(parents=True, exist_ok=True)
 
 

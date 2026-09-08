@@ -3,76 +3,58 @@
 
   <!-- ==============================================================
        DESIGN TOKENS . single source of truth
-       Views reference the LAYER 2 semantic names only, never a hex
-       value and never a primitive. Changing the accent is one edit here.
        ============================================================== -->
 
-  <!-- LAYER 1 . primitives. Never referenced from a view. -->
-  <Color x:Key="Graphite950">#0D0F13</Color>
-  <Color x:Key="Graphite900">#14171C</Color>
-  <Color x:Key="Graphite850">#181C22</Color>
-  <Color x:Key="Graphite800">#1E232A</Color>
-  <Color x:Key="Graphite700">#2A303A</Color>
-  <Color x:Key="Graphite600">#3A424F</Color>
-  <Color x:Key="Graphite400">#78828F</Color>
-  <Color x:Key="Graphite300">#A6AEBA</Color>
-  <Color x:Key="Graphite200">#CDD3DB</Color>
-  <Color x:Key="Graphite050">#F4F6F8</Color>
+  <!-- LAYER 1 . primitives -->
+  <!-- Dark Primitives -->
+  <Color x:Key="DarkGraphite950">#0D0F13</Color>
+  <Color x:Key="DarkGraphite900">#14171C</Color>
+  <Color x:Key="DarkGraphite850">#181C22</Color>
+  <Color x:Key="DarkGraphite800">#1E232A</Color>
+  <Color x:Key="DarkGraphite700">#2A303A</Color>
+  <Color x:Key="DarkGraphite600">#3A424F</Color>
+  <Color x:Key="DarkGraphite400">#78828F</Color>
+  <Color x:Key="DarkGraphite300">#A6AEBA</Color>
+  <Color x:Key="DarkGraphite200">#CDD3DB</Color>
+  <Color x:Key="DarkGraphite050">#F4F6F8</Color>
 
-  <Color x:Key="Cyan400">#38BDF8</Color>
-  <Color x:Key="Cyan500">#0EA5E9</Color>
-  <Color x:Key="Cyan950">#0A2536</Color>
+  <!-- Light Primitives -->
+  <Color x:Key="LightBg">#F1F5F9</Color>
+  <Color x:Key="LightSurface">#FFFFFF</Color>
+  <Color x:Key="LightSurfaceRaised">#F8FAFC</Color>
+  <Color x:Key="LightSurfaceInset">#E2E8F0</Color>
+  <Color x:Key="LightSurfaceSunken">#F1F5F9</Color>
+  <Color x:Key="LightTextPrimary">#0F172A</Color>
+  <Color x:Key="LightTextSecondary">#334155</Color>
+  <Color x:Key="LightTextMuted">#64748B</Color>
+  <Color x:Key="LightTextFaint">#94A3B8</Color>
+  <Color x:Key="LightRule">#CBD5E1</Color>
+  <Color x:Key="LightRuleStrong">#94A3B8</Color>
 
-  <Color x:Key="Mint400">#34D399</Color>
-  <Color x:Key="Mint950">#0A2A20</Color>
-  <Color x:Key="Rose400">#FB7185</Color>
-  <Color x:Key="Rose950">#33141B</Color>
-  <Color x:Key="Amber400">#FBBF24</Color>
-  <Color x:Key="Amber950">#2E2208</Color>
+  <!-- Accents -->
+  <Color x:Key="Cyan400">#0284C7</Color>
+  <Color x:Key="Cyan500">#0369A1</Color>
+  <Color x:Key="Cyan950">#E0F2FE</Color>
+  <Color x:Key="DarkCyan400">#38BDF8</Color>
+  <Color x:Key="DarkCyan500">#0EA5E9</Color>
+  <Color x:Key="DarkCyan950">#0A2536</Color>
 
-  <!-- LAYER 2 . semantic. This is the vocabulary views use. -->
+  <Color x:Key="Mint400">#059669</Color>
+  <Color x:Key="Mint950">#D1FAE5</Color>
+  <Color x:Key="DarkMint400">#34D399</Color>
+  <Color x:Key="DarkMint950">#0A2A20</Color>
 
-  <!-- Surfaces -->
-  <SolidColorBrush x:Key="AppBackgroundBrush"  Color="{StaticResource Graphite950}"/>
-  <SolidColorBrush x:Key="SurfaceBrush"        Color="{StaticResource Graphite900}"/>
-  <SolidColorBrush x:Key="SurfaceRaisedBrush"  Color="{StaticResource Graphite850}"/>
-  <SolidColorBrush x:Key="SurfaceInsetBrush"   Color="{StaticResource Graphite800}"/>
-  <SolidColorBrush x:Key="SurfaceSunkenBrush"  Color="{StaticResource Graphite950}"/>
+  <Color x:Key="Rose400">#DC2626</Color>
+  <Color x:Key="Rose950">#FFE4E6</Color>
+  <Color x:Key="DarkRose400">#FB7185</Color>
+  <Color x:Key="DarkRose950">#33141B</Color>
 
-  <!-- Text -->
-  <SolidColorBrush x:Key="TextPrimaryBrush"    Color="{StaticResource Graphite050}"/>
-  <SolidColorBrush x:Key="TextSecondaryBrush"  Color="{StaticResource Graphite200}"/>
-  <SolidColorBrush x:Key="TextMutedBrush"      Color="{StaticResource Graphite300}"/>
-  <SolidColorBrush x:Key="TextFaintBrush"      Color="{StaticResource Graphite400}"/>
-  <SolidColorBrush x:Key="TextOnAccentBrush"   Color="{StaticResource Graphite950}"/>
+  <Color x:Key="Amber400">#D97706</Color>
+  <Color x:Key="Amber950">#FEF3C7</Color>
+  <Color x:Key="DarkAmber400">#FBBF24</Color>
+  <Color x:Key="DarkAmber950">#2E2208</Color>
 
-  <!-- Rules and dividers -->
-  <SolidColorBrush x:Key="RuleBrush"           Color="{StaticResource Graphite700}"/>
-  <SolidColorBrush x:Key="RuleStrongBrush"     Color="{StaticResource Graphite600}"/>
-
-  <!-- One accent. Everything that needs a human uses this and nothing else. -->
-  <SolidColorBrush x:Key="AccentBrush"         Color="{StaticResource Cyan400}"/>
-  <SolidColorBrush x:Key="AccentPressedBrush"  Color="{StaticResource Cyan500}"/>
-  <SolidColorBrush x:Key="AccentDeepBrush"     Color="{StaticResource Cyan500}"/>
-  <SolidColorBrush x:Key="AccentSurfaceBrush"  Color="{StaticResource Cyan950}"/>
-
-  <!-- Workflow states. See CONTEXT.md: Result, Candidate, Verified. -->
-  <SolidColorBrush x:Key="VerifiedBrush"        Color="{StaticResource Mint400}"/>
-  <SolidColorBrush x:Key="VerifiedSurfaceBrush" Color="{StaticResource Mint950}"/>
-  <SolidColorBrush x:Key="CandidateBrush"       Color="{StaticResource Amber400}"/>
-  <SolidColorBrush x:Key="CandidateSurfaceBrush" Color="{StaticResource Amber950}"/>
-  <SolidColorBrush x:Key="RejectedBrush"        Color="{StaticResource Rose400}"/>
-  <SolidColorBrush x:Key="RejectedSurfaceBrush" Color="{StaticResource Rose950}"/>
-  <SolidColorBrush x:Key="AlertBrush"           Color="{StaticResource Rose400}"/>
-
-  <!-- Map canvas -->
-  <SolidColorBrush x:Key="MapVoidBrush"        Color="#0B1520"/>
-  <SolidColorBrush x:Key="MapLandBrush"        Color="#10202D"/>
-  <SolidColorBrush x:Key="MapLandAltBrush"     Color="#122634"/>
-
-  <!-- TYPE SCALE
-       12 is the floor. Below that, text is unreadable once a laptop is
-       mirrored to a projector, which is how this gets demonstrated. -->
+  <!-- TYPE SCALE -->
   <x:Double x:Key="FontMicro">12</x:Double>
   <x:Double x:Key="FontBody">13</x:Double>
   <x:Double x:Key="FontBodyLg">15</x:Double>
@@ -82,7 +64,7 @@
   <FontFamily x:Key="UiFont">Inter, Segoe UI, sans-serif</FontFamily>
   <FontFamily x:Key="MonoFont">Cascadia Mono, Consolas, monospace</FontFamily>
 
-  <!-- SPACING . 4px rhythm -->
+  <!-- SPACING -->
   <x:Double x:Key="Space1">4</x:Double>
   <x:Double x:Key="Space2">8</x:Double>
   <x:Double x:Key="Space3">12</x:Double>
@@ -92,6 +74,128 @@
 
   <Thickness x:Key="PadCard">16</Thickness>
   <Thickness x:Key="PadZone">20,16</Thickness>
-
   <CornerRadius x:Key="RadiusNone">0</CornerRadius>
+
+  <!-- Theme Dictionaries for Dark and Light Modes -->
+  <ResourceDictionary.ThemeDictionaries>
+    <ResourceDictionary x:Key="Dark">
+      <!-- Surfaces -->
+      <SolidColorBrush x:Key="AppBackgroundBrush"  Color="{StaticResource DarkGraphite950}"/>
+      <SolidColorBrush x:Key="SurfaceBrush"        Color="{StaticResource DarkGraphite900}"/>
+      <SolidColorBrush x:Key="SurfaceRaisedBrush"  Color="{StaticResource DarkGraphite850}"/>
+      <SolidColorBrush x:Key="SurfaceInsetBrush"   Color="{StaticResource DarkGraphite800}"/>
+      <SolidColorBrush x:Key="SurfaceSunkenBrush"  Color="{StaticResource DarkGraphite950}"/>
+
+      <!-- Text -->
+      <SolidColorBrush x:Key="TextPrimaryBrush"    Color="{StaticResource DarkGraphite050}"/>
+      <SolidColorBrush x:Key="TextSecondaryBrush"  Color="{StaticResource DarkGraphite200}"/>
+      <SolidColorBrush x:Key="TextMutedBrush"      Color="{StaticResource DarkGraphite300}"/>
+      <SolidColorBrush x:Key="TextFaintBrush"      Color="{StaticResource DarkGraphite400}"/>
+      <SolidColorBrush x:Key="TextOnAccentBrush"   Color="{StaticResource DarkGraphite950}"/>
+
+      <!-- Rules -->
+      <SolidColorBrush x:Key="RuleBrush"           Color="{StaticResource DarkGraphite700}"/>
+      <SolidColorBrush x:Key="RuleStrongBrush"     Color="{StaticResource DarkGraphite600}"/>
+
+      <!-- Accent -->
+      <SolidColorBrush x:Key="AccentBrush"         Color="{StaticResource DarkCyan400}"/>
+      <SolidColorBrush x:Key="AccentPressedBrush"  Color="{StaticResource DarkCyan500}"/>
+      <SolidColorBrush x:Key="AccentDeepBrush"     Color="{StaticResource DarkCyan500}"/>
+      <SolidColorBrush x:Key="AccentSurfaceBrush"  Color="{StaticResource DarkCyan950}"/>
+
+      <!-- Workflow states -->
+      <SolidColorBrush x:Key="VerifiedBrush"        Color="{StaticResource DarkMint400}"/>
+      <SolidColorBrush x:Key="VerifiedSurfaceBrush" Color="{StaticResource DarkMint950}"/>
+      <SolidColorBrush x:Key="CandidateBrush"       Color="{StaticResource DarkAmber400}"/>
+      <SolidColorBrush x:Key="CandidateSurfaceBrush" Color="{StaticResource DarkAmber950}"/>
+      <SolidColorBrush x:Key="RejectedBrush"        Color="{StaticResource DarkRose400}"/>
+      <SolidColorBrush x:Key="RejectedSurfaceBrush" Color="{StaticResource DarkRose950}"/>
+      <SolidColorBrush x:Key="AlertBrush"           Color="{StaticResource DarkRose400}"/>
+
+      <!-- Map canvas -->
+      <SolidColorBrush x:Key="MapVoidBrush"        Color="#0B1520"/>
+      <SolidColorBrush x:Key="MapLandBrush"        Color="#10202D"/>
+      <SolidColorBrush x:Key="MapLandAltBrush"     Color="#122634"/>
+    </ResourceDictionary>
+
+    <ResourceDictionary x:Key="Light">
+      <!-- Surfaces -->
+      <SolidColorBrush x:Key="AppBackgroundBrush"  Color="{StaticResource LightBg}"/>
+      <SolidColorBrush x:Key="SurfaceBrush"        Color="{StaticResource LightSurface}"/>
+      <SolidColorBrush x:Key="SurfaceRaisedBrush"  Color="{StaticResource LightSurfaceRaised}"/>
+      <SolidColorBrush x:Key="SurfaceInsetBrush"   Color="{StaticResource LightSurfaceInset}"/>
+      <SolidColorBrush x:Key="SurfaceSunkenBrush"  Color="{StaticResource LightSurfaceSunken}"/>
+
+      <!-- Text -->
+      <SolidColorBrush x:Key="TextPrimaryBrush"    Color="{StaticResource LightTextPrimary}"/>
+      <SolidColorBrush x:Key="TextSecondaryBrush"  Color="{StaticResource LightTextSecondary}"/>
+      <SolidColorBrush x:Key="TextMutedBrush"      Color="{StaticResource LightTextMuted}"/>
+      <SolidColorBrush x:Key="TextFaintBrush"      Color="{StaticResource LightTextFaint}"/>
+      <SolidColorBrush x:Key="TextOnAccentBrush"   Color="#FFFFFF"/>
+
+      <!-- Rules -->
+      <SolidColorBrush x:Key="RuleBrush"           Color="{StaticResource LightRule}"/>
+      <SolidColorBrush x:Key="RuleStrongBrush"     Color="{StaticResource LightRuleStrong}"/>
+
+      <!-- Accent -->
+      <SolidColorBrush x:Key="AccentBrush"         Color="{StaticResource Cyan400}"/>
+      <SolidColorBrush x:Key="AccentPressedBrush"  Color="{StaticResource Cyan500}"/>
+      <SolidColorBrush x:Key="AccentDeepBrush"     Color="{StaticResource Cyan500}"/>
+      <SolidColorBrush x:Key="AccentSurfaceBrush"  Color="{StaticResource Cyan950}"/>
+
+      <!-- Workflow states -->
+      <SolidColorBrush x:Key="VerifiedBrush"        Color="{StaticResource Mint400}"/>
+      <SolidColorBrush x:Key="VerifiedSurfaceBrush" Color="{StaticResource Mint950}"/>
+      <SolidColorBrush x:Key="CandidateBrush"       Color="{StaticResource Amber400}"/>
+      <SolidColorBrush x:Key="CandidateSurfaceBrush" Color="{StaticResource Amber950}"/>
+      <SolidColorBrush x:Key="RejectedBrush"        Color="{StaticResource Rose400}"/>
+      <SolidColorBrush x:Key="RejectedSurfaceBrush" Color="{StaticResource Rose950}"/>
+      <SolidColorBrush x:Key="AlertBrush"           Color="{StaticResource Rose400}"/>
+
+      <!-- Map canvas -->
+      <SolidColorBrush x:Key="MapVoidBrush"        Color="#E2E8F0"/>
+      <SolidColorBrush x:Key="MapLandBrush"        Color="#F1F5F9"/>
+      <SolidColorBrush x:Key="MapLandAltBrush"     Color="#CBD5E1"/>
+    </ResourceDictionary>
+
+    <ResourceDictionary x:Key="Default">
+      <!-- Surfaces -->
+      <SolidColorBrush x:Key="AppBackgroundBrush"  Color="{StaticResource DarkGraphite950}"/>
+      <SolidColorBrush x:Key="SurfaceBrush"        Color="{StaticResource DarkGraphite900}"/>
+      <SolidColorBrush x:Key="SurfaceRaisedBrush"  Color="{StaticResource DarkGraphite850}"/>
+      <SolidColorBrush x:Key="SurfaceInsetBrush"   Color="{StaticResource DarkGraphite800}"/>
+      <SolidColorBrush x:Key="SurfaceSunkenBrush"  Color="{StaticResource DarkGraphite950}"/>
+
+      <!-- Text -->
+      <SolidColorBrush x:Key="TextPrimaryBrush"    Color="{StaticResource DarkGraphite050}"/>
+      <SolidColorBrush x:Key="TextSecondaryBrush"  Color="{StaticResource DarkGraphite200}"/>
+      <SolidColorBrush x:Key="TextMutedBrush"      Color="{StaticResource DarkGraphite300}"/>
+      <SolidColorBrush x:Key="TextFaintBrush"      Color="{StaticResource DarkGraphite400}"/>
+      <SolidColorBrush x:Key="TextOnAccentBrush"   Color="{StaticResource DarkGraphite950}"/>
+
+      <!-- Rules -->
+      <SolidColorBrush x:Key="RuleBrush"           Color="{StaticResource DarkGraphite700}"/>
+      <SolidColorBrush x:Key="RuleStrongBrush"     Color="{StaticResource DarkGraphite600}"/>
+
+      <!-- Accent -->
+      <SolidColorBrush x:Key="AccentBrush"         Color="{StaticResource DarkCyan400}"/>
+      <SolidColorBrush x:Key="AccentPressedBrush"  Color="{StaticResource DarkCyan500}"/>
+      <SolidColorBrush x:Key="AccentDeepBrush"     Color="{StaticResource DarkCyan500}"/>
+      <SolidColorBrush x:Key="AccentSurfaceBrush"  Color="{StaticResource DarkCyan950}"/>
+
+      <!-- Workflow states -->
+      <SolidColorBrush x:Key="VerifiedBrush"        Color="{StaticResource DarkMint400}"/>
+      <SolidColorBrush x:Key="VerifiedSurfaceBrush" Color="{StaticResource DarkMint950}"/>
+      <SolidColorBrush x:Key="CandidateBrush"       Color="{StaticResource DarkAmber400}"/>
+      <SolidColorBrush x:Key="CandidateSurfaceBrush" Color="{StaticResource DarkAmber950}"/>
+      <SolidColorBrush x:Key="RejectedBrush"        Color="{StaticResource DarkRose400}"/>
+      <SolidColorBrush x:Key="RejectedSurfaceBrush" Color="{StaticResource DarkRose950}"/>
+      <SolidColorBrush x:Key="AlertBrush"           Color="{StaticResource DarkRose400}"/>
+
+      <!-- Map canvas -->
+      <SolidColorBrush x:Key="MapVoidBrush"        Color="#0B1520"/>
+      <SolidColorBrush x:Key="MapLandBrush"        Color="#10202D"/>
+      <SolidColorBrush x:Key="MapLandAltBrush"     Color="#122634"/>
+    </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
 </ResourceDictionary>

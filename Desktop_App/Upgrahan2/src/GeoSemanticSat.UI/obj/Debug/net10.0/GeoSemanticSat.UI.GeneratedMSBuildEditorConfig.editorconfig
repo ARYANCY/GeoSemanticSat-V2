@@ -15,19 +15,20 @@ build_property.ProjectTypeGuids =
 build_property.InvariantGlobalization = 
 build_property.PlatformNeutralAssembly = 
 build_property.EnforceExtendedAnalyzerRules = 
+build_property.EntryPointFilePath = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = GeoSemanticSat.UI
-build_property.ProjectDir = /home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/
+build_property.ProjectDir = F:\Hackathon\SIH(2026)\ps_227\Unified-RSanalytics\Desktop_App\Upgrahan2\src\GeoSemanticSat.UI\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.EffectiveAnalysisLevelStyle = 10.0
 build_property.EnableCodeStyleSeverity = 
 
-[/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/App.axaml]
+[F:/Hackathon/SIH(2026)/ps_227/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.UI/App.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/MainWindow.axaml]
+[F:/Hackathon/SIH(2026)/ps_227/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.UI/MainWindow.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/Resources/Tokens.axaml]
+[F:/Hackathon/SIH(2026)/ps_227/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.UI/Resources/Tokens.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml

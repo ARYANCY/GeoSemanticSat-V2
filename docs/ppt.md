@@ -73,7 +73,7 @@ graph TD
 | **Geospatial & Remote Sensing Core** | **Rasterio, GDAL C++, Shapely 2.0, rio-tiler** | Native multi-band raster streaming, WGS84 (EPSG:4326) transforms, affine matrix inversion, and windowed COG tile reads. |
 | **Vector Indexing & Retrieval** | **AVX2 SIMD Kernels + FAISS + Binary GSSV Format** | Sub-millisecond vector similarity search across 128-dimensional multi-spectral and text embedding spaces. |
 | **Spatial & Relational Database** | **PostgreSQL 16 + PostGIS 3.4 & SQLite (WAL Mode)** | Production spatial indexing (`ST_Intersects`, GiST indexes) and standalone zero-service air-gapped single-file storage. |
-| **Offline Neural Inference** | **ONNX Runtime (CPU/DirectML Execution Providers)** | Zero-cloud local execution of dual-encoder vision-language models (RemoteCLIP, Prithvi, Clay). |
+| **Offline Neural Inference & Foundation Models** | **ONNX Runtime + PyTorch CPU (DirectML Providers)** | Zero-cloud local execution of Geospatial Foundation Models: **TerraMind-1.0-base** (Any-to-Any multimodal), **SatMAE++** (grouped multi-spectral MAE), **GFM Composition** (SAR+Optical fusion), and **Prithvi-EO-2.0-600M-TL** (spatio-temporal sequence modeling). |
 | **Audit & Security Standard** | **W3C PROV-O Standard & SHA-256 Hashes** | Cryptographically chained provenance audit trails recording analyst IDs, sensor parameters, and pipeline decisions. |
 
 ---

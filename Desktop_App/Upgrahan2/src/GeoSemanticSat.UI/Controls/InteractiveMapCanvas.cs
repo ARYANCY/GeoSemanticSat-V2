@@ -327,8 +327,11 @@ public class InteractiveMapCanvas : Control
         double h = Bounds.Height;
         if (w <= 0 || h <= 0) return;
 
-        // 1. Draw Map Canvas Dark Background
-        context.DrawRectangle(new SolidColorBrush(Color.Parse("#08090C")), null, new Rect(0, 0, w, h));
+        bool isLight = ActualThemeVariant == Avalonia.Styling.ThemeVariant.Light;
+
+        // 1. Draw Map Canvas Background
+        var bgBrush = new SolidColorBrush(isLight ? Color.Parse("#E2E8F0") : Color.Parse("#08090C"));
+        context.DrawRectangle(bgBrush, null, new Rect(0, 0, w, h));
 
         // 2. Draw Hybrid Basemap Tiles (Offline Disk Cache + Background Online Fetch)
         DrawBasemapTiles(context, w, h);
@@ -358,6 +361,7 @@ public class InteractiveMapCanvas : Control
 
     private void DrawBasemapTiles(DrawingContext context, double w, double h)
     {
+        bool isLight = ActualThemeVariant == Avalonia.Styling.ThemeVariant.Light;
         int z = Math.Clamp((int)Math.Floor(_zoomLevel), 1, _tileService.ActiveProvider.MaxZoom);
 
         var topLeftGeo = ScreenToGeo(new Point(0, 0));
@@ -395,8 +399,8 @@ public class InteractiveMapCanvas : Control
                 }
                 else
                 {
-                    var tileBrush = new SolidColorBrush(Color.FromArgb(255, 13, 15, 20));
-                    var tilePen = new Pen(new SolidColorBrush(Color.FromArgb(25, 56, 189, 248)), 0.5);
+                    var tileBrush = new SolidColorBrush(isLight ? Color.FromArgb(255, 241, 245, 249) : Color.FromArgb(255, 13, 15, 20));
+                    var tilePen = new Pen(new SolidColorBrush(isLight ? Color.FromArgb(25, 2, 132, 199) : Color.FromArgb(25, 56, 189, 248)), 0.5);
                     context.DrawRectangle(tileBrush, tilePen, destRect);
                 }
             }
@@ -429,7 +433,8 @@ public class InteractiveMapCanvas : Control
 
     private void DrawCoordinateGrid(DrawingContext context, double w, double h)
     {
-        var gridPen = new Pen(new SolidColorBrush(Color.FromArgb(35, 255, 255, 255)), 1.0, DashStyle.Dash);
+        bool isLight = ActualThemeVariant == Avalonia.Styling.ThemeVariant.Light;
+        var gridPen = new Pen(new SolidColorBrush(isLight ? Color.FromArgb(30, 0, 0, 0) : Color.FromArgb(35, 255, 255, 255)), 1.0, DashStyle.Dash);
 
         double stepDeg = Math.Max(0.005, 0.5 / Math.Pow(2.0, _zoomLevel - 10.0));
 
@@ -688,8 +693,11 @@ public class InteractiveMapCanvas : Control
 
     private void DrawMapTelemetry(DrawingContext context, double w, double h)
     {
+        bool isLight = ActualThemeVariant == Avalonia.Styling.ThemeVariant.Light;
         var hudRect = new Rect(10, h - 34, 520, 24);
-        context.DrawRectangle(new SolidColorBrush(Color.FromArgb(210, 15, 15, 18)), new Pen(new SolidColorBrush(Color.Parse("#27272A")), 1), hudRect);
+        var hudBg = new SolidColorBrush(isLight ? Color.FromArgb(235, 255, 255, 255) : Color.FromArgb(210, 15, 15, 18));
+        var hudBorder = new SolidColorBrush(isLight ? Color.Parse("#CBD5E1") : Color.Parse("#27272A"));
+        context.DrawRectangle(hudBg, new Pen(hudBorder, 1), hudRect);
 
         string modeStr = _tileService.Mode switch
         {
@@ -698,22 +706,25 @@ public class InteractiveMapCanvas : Control
             _ => "HYBRID AUTO"
         };
 
-        var coordsText = new FormattedText($"Center: {_centerLat:F4} N, {_centerLon:F4} E | Z: {_zoomLevel:F1} | {_tileService.ActiveProvider.Name} | [{modeStr}] | [{_networkStatusText}]", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, TypefaceRegular, 9.5, new SolidColorBrush(Color.Parse("#A1A1AA")));
+        var hudTextColor = new SolidColorBrush(isLight ? Color.Parse("#334155") : Color.Parse("#A1A1AA"));
+        var coordsText = new FormattedText($"Center: {_centerLat:F4} N, {_centerLon:F4} E | Z: {_zoomLevel:F1} | {_tileService.ActiveProvider.Name} | [{modeStr}] | [{_networkStatusText}]", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, TypefaceRegular, 9.5, hudTextColor);
         context.DrawText(coordsText, new Point(18, h - 28));
 
         var legendRect = new Rect(w - 230, 10, 220, 80);
-        context.DrawRectangle(new SolidColorBrush(Color.FromArgb(220, 15, 15, 18)), new Pen(new SolidColorBrush(Color.Parse("#27272A")), 1), legendRect);
+        context.DrawRectangle(hudBg, new Pen(hudBorder, 1), legendRect);
 
-        var legTitle = new FormattedText("LEGEND", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, TypefaceSans, 9.5, new SolidColorBrush(Color.Parse("#71717A")));
+        var legTitleColor = new SolidColorBrush(isLight ? Color.Parse("#64748B") : Color.Parse("#71717A"));
+        var legTitle = new FormattedText("LEGEND", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, TypefaceSans, 9.5, legTitleColor);
         context.DrawText(legTitle, new Point(w - 220, 16));
 
+        var legItemTextColor = new SolidColorBrush(isLight ? Color.Parse("#1E293B") : Color.Parse("#D4D4D8"));
         context.DrawEllipse(new SolidColorBrush(Color.Parse("#38BDF8")), null, new Point(w - 215, 36), 4, 4);
-        context.DrawText(new FormattedText("Result", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, TypefaceRegular, 9.5, new SolidColorBrush(Color.Parse("#D4D4D8"))), new Point(w - 205, 30));
+        context.DrawText(new FormattedText("Result", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, TypefaceRegular, 9.5, legItemTextColor), new Point(w - 205, 30));
 
         context.DrawEllipse(new SolidColorBrush(Color.Parse("#F43F5E")), null, new Point(w - 215, 52), 4, 4);
-        context.DrawText(new FormattedText("Candidate", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, TypefaceRegular, 9.5, new SolidColorBrush(Color.Parse("#D4D4D8"))), new Point(w - 205, 46));
+        context.DrawText(new FormattedText("Candidate", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, TypefaceRegular, 9.5, legItemTextColor), new Point(w - 205, 46));
 
         context.DrawEllipse(new SolidColorBrush(Color.Parse("#10B981")), null, new Point(w - 215, 68), 4, 4);
-        context.DrawText(new FormattedText("Verified", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, TypefaceRegular, 9.5, new SolidColorBrush(Color.Parse("#D4D4D8"))), new Point(w - 205, 62));
+        context.DrawText(new FormattedText("Verified", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, TypefaceRegular, 9.5, legItemTextColor), new Point(w - 205, 62));
     }
 }

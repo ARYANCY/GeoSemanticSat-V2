@@ -117,3 +117,20 @@ $$\Delta x_{\text{ground}} = \text{GSD} \cdot \cos(\phi)$$
 $$\Delta y_{\text{ground}} = \text{GSD}$$
 $$\text{Area}(\text{meters}^2) = W \cdot H \cdot \text{GSD}^2 \cdot \cos(\phi)$$
 $$\text{Area}(\text{hectares}) = \frac{\text{Area}(\text{meters}^2)}{10,000}$$
+
+---
+
+## 7. Geospatial Foundation Models Mathematical Formulations
+
+### 7.1 Any-to-Any Multimodal Cosine Similarity (TerraMind-1.0-base)
+For normalized text representation $\vec{u}_{\text{text}} \in \mathbb{R}^{D}$ and multi-spectral patch embedding $\vec{v}_{\text{image}} \in \mathbb{R}^{D}$ across shared semantic subspace $\mathcal{S}$:
+$$\text{Sim}_{\text{semantic}}(\vec{u}, \vec{v}) = \frac{\sum_{i \in \mathcal{S}} u_i \cdot v_i}{\sqrt{\sum_{i \in \mathcal{S}} u_i^2} \cdot \sqrt{\sum_{i \in \mathcal{S}} v_i^2}}$$
+
+### 7.2 Spatio-Temporal Sequence & Velocity Dynamics (Prithvi-EO-2.0-600M-TL)
+For observation sequence $\mathbf{X} = \{X_{T_1}, X_{T_2}, \dots, X_{T_K}\}$ with latent state embeddings $\vec{e}_k = \Phi(X_{T_k})$:
+$$\vec{v}_{\text{temporal}} = \frac{1}{K-1} \sum_{k=1}^{K-1} \|\vec{e}_{k+1} - \vec{e}_k\|_1, \quad \vec{a}_{\text{onset}} = \frac{1}{K-2} \sum_{k=1}^{K-2} \|(\vec{e}_{k+2} - \vec{e}_{k+1}) - (\vec{e}_{k+1} - \vec{e}_k)\|_1$$
+
+### 7.3 Multi-Sensor SAR + Optical Composition (GFM Composition Pretraining)
+For optical reflectance matrix $\mathbf{O} \in \mathbb{R}^{B_{\text{opt}} \times H \times W}$ and polarimetric radar backscatter $\mathbf{S} \in \mathbb{R}^{2 \times H \times W}$ (VV, VH):
+$$\vec{z}_{\text{composed}} = \text{Normalize}\left( \mathbf{W}_{\text{opt}} \text{Pool}(\mathbf{O}) \oplus \mathbf{W}_{\text{sar}} \left[ \mu(\text{VV}), \sigma(\text{VV}), \mu(\text{VH}), \frac{\mu(\text{VH})}{\mu(\text{VV}) + \epsilon} \right] \right)$$
+
