@@ -37,7 +37,7 @@
         ]
       },
       "properties": {
-        "changeId": "7ecad8b8565c4fe09314f2148f5670e6",
+        "changeId": "053a26012c2b40bf86a7c23c9aad1a3d",
         "tileId": "S2_20240320_T3",
         "changeType": "Construction",
         "confidence": 0.99,
@@ -52,7 +52,7 @@
         "analystNotes": "",
         "provenance": {
           "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
-          "prov:generatedAtTime": "2026-09-08T17:04:57Z",
+          "prov:generatedAtTime": "2026-09-08T17:54:42Z",
           "prov:primarySource": "S2_20240320_T3"
         },
         "DeltaNDVI": -1.1879,
@@ -100,7 +100,7 @@
         ]
       },
       "properties": {
-        "changeId": "b7af080cda374878817193e27212bc34",
+        "changeId": "34f411eb27e0494c8ba575f2e3031dc5",
         "tileId": "S2_20240320_T3",
         "changeType": "Construction",
         "confidence": 0.99,
@@ -115,7 +115,7 @@
         "analystNotes": "",
         "provenance": {
           "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
-          "prov:generatedAtTime": "2026-09-08T17:04:57Z",
+          "prov:generatedAtTime": "2026-09-08T17:54:42Z",
           "prov:primarySource": "S2_20240320_T3"
         },
         "DeltaNDVI": -1.1879,
@@ -163,7 +163,7 @@
         ]
       },
       "properties": {
-        "changeId": "8edefde9a45040e4b65eabd2dfed6036",
+        "changeId": "8e2c2a087ed64df5a3c00d31122cde3d",
         "tileId": "S2_20240320_T3",
         "changeType": "Construction",
         "confidence": 0.99,
@@ -178,7 +178,7 @@
         "analystNotes": "",
         "provenance": {
           "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
-          "prov:generatedAtTime": "2026-09-08T17:04:57Z",
+          "prov:generatedAtTime": "2026-09-08T17:54:42Z",
           "prov:primarySource": "S2_20240320_T3"
         },
         "DeltaNDVI": -1.2087,
@@ -226,7 +226,7 @@
         ]
       },
       "properties": {
-        "changeId": "81268e02724b4805875453bf3eb72e34",
+        "changeId": "dee65c1be2e4404e9ac4c2ce9306d545",
         "tileId": "S2_20240320_T3",
         "changeType": "Construction",
         "confidence": 0.99,
@@ -241,7 +241,7 @@
         "analystNotes": "",
         "provenance": {
           "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
-          "prov:generatedAtTime": "2026-09-08T17:04:57Z",
+          "prov:generatedAtTime": "2026-09-08T17:54:42Z",
           "prov:primarySource": "S2_20240320_T3"
         },
         "DeltaNDVI": -1.2087,
@@ -289,7 +289,7 @@
         ]
       },
       "properties": {
-        "changeId": "7374bf061538472a81f2bdaa580ce38a",
+        "changeId": "92fac61b84064fdfa0468f7fa0ee87df",
         "tileId": "S2_20240320_T3",
         "changeType": "Construction",
         "confidence": 0.99,
@@ -304,7 +304,7 @@
         "analystNotes": "",
         "provenance": {
           "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
-          "prov:generatedAtTime": "2026-09-08T17:04:57Z",
+          "prov:generatedAtTime": "2026-09-08T17:54:42Z",
           "prov:primarySource": "S2_20240320_T3"
         },
         "DeltaNDVI": -1.1879,
@@ -352,7 +352,7 @@
         ]
       },
       "properties": {
-        "changeId": "9ae9d577f0ea4ce1b71fbc9f9c6dfe74",
+        "changeId": "cf609bbbb5de440f900c7e7cf10b6ef8",
         "tileId": "S2_20240320_T3",
         "changeType": "Construction",
         "confidence": 0.99,
@@ -367,7 +367,7 @@
         "analystNotes": "",
         "provenance": {
           "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
-          "prov:generatedAtTime": "2026-09-08T17:04:57Z",
+          "prov:generatedAtTime": "2026-09-08T17:54:42Z",
           "prov:primarySource": "S2_20240320_T3"
         },
         "DeltaNDVI": -1.1879,
@@ -415,7 +415,7 @@
         ]
       },
       "properties": {
-        "changeId": "a8d242a5057d468099b035274a88c76b",
+        "changeId": "8c2bfe165293456692db22bc74969990",
         "tileId": "S2_20240320_T3",
         "changeType": "Construction",
         "confidence": 0.99,
@@ -430,7 +430,7 @@
         "analystNotes": "",
         "provenance": {
           "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
-          "prov:generatedAtTime": "2026-09-08T17:04:57Z",
+          "prov:generatedAtTime": "2026-09-08T17:54:42Z",
           "prov:primarySource": "S2_20240320_T3"
         },
         "DeltaNDVI": -1.2087,
@@ -478,7 +478,7 @@
         ]
       },
       "properties": {
-        "changeId": "d54de1fcf33d4ff3abc3be0f9ec2661d",
+        "changeId": "da04979d17c24b258c95f38c89c6e4c7",
         "tileId": "S2_20240320_T3",
         "changeType": "Construction",
         "confidence": 0.99,
@@ -493,7 +493,7 @@
         "analystNotes": "",
         "provenance": {
           "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
-          "prov:generatedAtTime": "2026-09-08T17:04:57Z",
+          "prov:generatedAtTime": "2026-09-08T17:54:42Z",
           "prov:primarySource": "S2_20240320_T3"
         },
         "DeltaNDVI": -1.2087,
@@ -541,7 +541,7 @@
         ]
       },
       "properties": {
-        "changeId": "ea020bc2d9364379b65ba8c7322f9835",
+        "changeId": "00e281bdfc3e43f5ac9e5a745a5ba56f",
         "tileId": "S2_20240320_T3",
         "changeType": "WaterExtentVariation",
         "confidence": 0.99,
@@ -556,7 +556,7 @@
         "analystNotes": "",
         "provenance": {
           "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
-          "prov:generatedAtTime": "2026-09-08T17:04:57Z",
+          "prov:generatedAtTime": "2026-09-08T17:54:42Z",
           "prov:primarySource": "S2_20240320_T3"
         },
         "DeltaNDVI": -1.7333,
@@ -604,7 +604,7 @@
         ]
       },
       "properties": {
-        "changeId": "80dfeef661994df288bca43d5e1d319e",
+        "changeId": "ab8cf4fbd25f4a0fa781fa53346531dd",
         "tileId": "S2_20240320_T3",
         "changeType": "WaterExtentVariation",
         "confidence": 0.99,
@@ -619,7 +619,7 @@
         "analystNotes": "",
         "provenance": {
           "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
-          "prov:generatedAtTime": "2026-09-08T17:04:57Z",
+          "prov:generatedAtTime": "2026-09-08T17:54:42Z",
           "prov:primarySource": "S2_20240320_T3"
         },
         "DeltaNDVI": -1.7333,
@@ -667,7 +667,7 @@
         ]
       },
       "properties": {
-        "changeId": "bca28e2f8ee04b399f87e7e02e71c57c",
+        "changeId": "b1d60ac52eb04585b224484d8348a266",
         "tileId": "S2_20240320_T3",
         "changeType": "WaterExtentVariation",
         "confidence": 0.99,
@@ -682,7 +682,7 @@
         "analystNotes": "",
         "provenance": {
           "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
-          "prov:generatedAtTime": "2026-09-08T17:04:57Z",
+          "prov:generatedAtTime": "2026-09-08T17:54:42Z",
           "prov:primarySource": "S2_20240320_T3"
         },
         "DeltaNDVI": -0.8783,
@@ -730,7 +730,7 @@
         ]
       },
       "properties": {
-        "changeId": "d3307af59262491eb97743d61977a21d",
+        "changeId": "ddf2e61dab2e41839622dece9133f438",
         "tileId": "S2_20240320_T3",
         "changeType": "WaterExtentVariation",
         "confidence": 0.886,
@@ -745,7 +745,7 @@
         "analystNotes": "",
         "provenance": {
           "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
-          "prov:generatedAtTime": "2026-09-08T17:04:57Z",
+          "prov:generatedAtTime": "2026-09-08T17:54:42Z",
           "prov:primarySource": "S2_20240320_T3"
         },
         "DeltaNDVI": -0.3196,
@@ -793,7 +793,7 @@
         ]
       },
       "properties": {
-        "changeId": "bb020f91f908451dab389982d80e3943",
+        "changeId": "53a8a8c64ffc430981e6cc1415c6fec6",
         "tileId": "S2_20240320_T3",
         "changeType": "WaterExtentVariation",
         "confidence": 0.886,
@@ -808,7 +808,7 @@
         "analystNotes": "",
         "provenance": {
           "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
-          "prov:generatedAtTime": "2026-09-08T17:04:57Z",
+          "prov:generatedAtTime": "2026-09-08T17:54:42Z",
           "prov:primarySource": "S2_20240320_T3"
         },
         "DeltaNDVI": -0.3196,
@@ -856,7 +856,7 @@
         ]
       },
       "properties": {
-        "changeId": "cbcadc7c0b014ebda030887f88951ee5",
+        "changeId": "4bb95fea303a46fca21b8939b15bb42b",
         "tileId": "S2_20240320_T3",
         "changeType": "WaterExtentVariation",
         "confidence": 0.886,
@@ -871,7 +871,7 @@
         "analystNotes": "",
         "provenance": {
           "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
-          "prov:generatedAtTime": "2026-09-08T17:04:57Z",
+          "prov:generatedAtTime": "2026-09-08T17:54:42Z",
           "prov:primarySource": "S2_20240320_T3"
         },
         "DeltaNDVI": -0.3196,
@@ -919,7 +919,7 @@
         ]
       },
       "properties": {
-        "changeId": "84e13b24d5dc43e48ddcd7c4f078ffbf",
+        "changeId": "d4d70de631514b66ae95b27a5c8b7922",
         "tileId": "S2_20240320_T3",
         "changeType": "WaterExtentVariation",
         "confidence": 0.886,
@@ -934,7 +934,7 @@
         "analystNotes": "",
         "provenance": {
           "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
-          "prov:generatedAtTime": "2026-09-08T17:04:57Z",
+          "prov:generatedAtTime": "2026-09-08T17:54:42Z",
           "prov:primarySource": "S2_20240320_T3"
         },
         "DeltaNDVI": -0.3196,
@@ -982,7 +982,7 @@
         ]
       },
       "properties": {
-        "changeId": "1155177982044dc087632e24baa3944a",
+        "changeId": "466e42d8e1834d35bfb8a4df4e9ba05a",
         "tileId": "S2_20240320_T3",
         "changeType": "WaterExtentVariation",
         "confidence": 0.886,
@@ -997,7 +997,7 @@
         "analystNotes": "",
         "provenance": {
           "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
-          "prov:generatedAtTime": "2026-09-08T17:04:57Z",
+          "prov:generatedAtTime": "2026-09-08T17:54:42Z",
           "prov:primarySource": "S2_20240320_T3"
         },
         "DeltaNDVI": -0.3196,
@@ -1045,7 +1045,7 @@
         ]
       },
       "properties": {
-        "changeId": "1795bf38ae9748d68300ada464d28f8e",
+        "changeId": "4d267b274d5c4ab28e0d5fa34387b409",
         "tileId": "S2_20240320_T3",
         "changeType": "WaterExtentVariation",
         "confidence": 0.886,
@@ -1060,7 +1060,7 @@
         "analystNotes": "",
         "provenance": {
           "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
-          "prov:generatedAtTime": "2026-09-08T17:04:57Z",
+          "prov:generatedAtTime": "2026-09-08T17:54:42Z",
           "prov:primarySource": "S2_20240320_T3"
         },
         "DeltaNDVI": -0.3196,
@@ -1108,7 +1108,7 @@
         ]
       },
       "properties": {
-        "changeId": "6781e31fb4954744b9b8a39de6da03f4",
+        "changeId": "004a3cfd7c9744a9b09c9f6049c88c8c",
         "tileId": "S2_20240320_T3",
         "changeType": "WaterExtentVariation",
         "confidence": 0.886,
@@ -1123,7 +1123,7 @@
         "analystNotes": "",
         "provenance": {
           "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
-          "prov:generatedAtTime": "2026-09-08T17:04:57Z",
+          "prov:generatedAtTime": "2026-09-08T17:54:42Z",
           "prov:primarySource": "S2_20240320_T3"
         },
         "DeltaNDVI": -0.3196,
@@ -1171,7 +1171,7 @@
         ]
       },
       "properties": {
-        "changeId": "ac8cdfa8a4e2440d87b7283a04968954",
+        "changeId": "c961f063904847889c2aaf111647be24",
         "tileId": "S2_20240320_T3",
         "changeType": "WaterExtentVariation",
         "confidence": 0.886,
@@ -1186,7 +1186,7 @@
         "analystNotes": "",
         "provenance": {
           "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
-          "prov:generatedAtTime": "2026-09-08T17:04:57Z",
+          "prov:generatedAtTime": "2026-09-08T17:54:42Z",
           "prov:primarySource": "S2_20240320_T3"
         },
         "DeltaNDVI": -0.3196,
@@ -1234,7 +1234,7 @@
         ]
       },
       "properties": {
-        "changeId": "921624faf478427ea05f57bf2ae81781",
+        "changeId": "c1ff0ca02164483ca56a31d3e5d27ea5",
         "tileId": "S2_20240320_T3",
         "changeType": "WaterExtentVariation",
         "confidence": 0.8311,
@@ -1249,7 +1249,7 @@
         "analystNotes": "",
         "provenance": {
           "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
-          "prov:generatedAtTime": "2026-09-08T17:04:57Z",
+          "prov:generatedAtTime": "2026-09-08T17:54:42Z",
           "prov:primarySource": "S2_20240320_T3"
         },
         "DeltaNDVI": -0.237,
@@ -1297,7 +1297,7 @@
         ]
       },
       "properties": {
-        "changeId": "e406c9fb08a847f19b0ef3becc386ae1",
+        "changeId": "2ef38e4833fb4238be15cfba2f258608",
         "tileId": "S2_20240320_T3",
         "changeType": "WaterExtentVariation",
         "confidence": 0.8311,
@@ -1312,7 +1312,7 @@
         "analystNotes": "",
         "provenance": {
           "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
-          "prov:generatedAtTime": "2026-09-08T17:04:57Z",
+          "prov:generatedAtTime": "2026-09-08T17:54:42Z",
           "prov:primarySource": "S2_20240320_T3"
         },
         "DeltaNDVI": -0.237,
