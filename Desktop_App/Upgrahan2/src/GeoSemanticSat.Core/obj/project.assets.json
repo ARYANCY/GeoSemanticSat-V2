@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj",
+      "projectUniqueName": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj",
       "projectName": "GeoSemanticSat.Core",
-      "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj",
+      "projectPath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj",
       "packagesPath": "/home/non_qualities/.nuget/packages/",
-      "outputPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/obj/",
+      "outputPath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/non_qualities/.nuget/NuGet/NuGet.Config"
