@@ -1,11 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "m7zRUveq7vs=",
+  "dgSpecHash": "8TmLcIbHaKs=",
   "success": true,
-  "projectFilePath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj",
+  "projectFilePath": "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Engine\\GeoSemanticSat.Engine.csproj",
   "expectedPackageFiles": [
-    "/home/non_qualities/.nuget/packages/microsoft.ml.onnxruntime/1.20.1/microsoft.ml.onnxruntime.1.20.1.nupkg.sha512",
-    "/home/non_qualities/.nuget/packages/microsoft.ml.onnxruntime.managed/1.20.1/microsoft.ml.onnxruntime.managed.1.20.1.nupkg.sha512"
+    "C:\\Users\\Rajdeep\\.nuget\\packages\\microsoft.ml.onnxruntime\\1.20.1\\microsoft.ml.onnxruntime.1.20.1.nupkg.sha512",
+    "C:\\Users\\Rajdeep\\.nuget\\packages\\microsoft.ml.onnxruntime.managed\\1.20.1\\microsoft.ml.onnxruntime.managed.1.20.1.nupkg.sha512"
   ],
   "logs": []
 }

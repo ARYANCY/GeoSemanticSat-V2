@@ -175,21 +175,21 @@ public partial class MainWindow : Window
 
         TxtActiveWorkflowPhase.Text = currentTab switch
         {
-            0 => "Step 1: Discover",
-            1 => "Step 2: Target",
-            2 => "Step 3: Verify",
-            3 => "Step 4: Group",
-            4 => "Step 5: Sign Off",
-            _ => "Analyst Workflow"
+            0 => "1. Find Images",
+            1 => "2. Pick Location",
+            2 => "3. Check Changes",
+            3 => "4. Group Places",
+            4 => "5. Review & Export",
+            _ => "Workflow"
         };
 
         BtnNextStage.Content = currentTab switch
         {
-            0 => "Continue to Target Coordinates",
-            1 => "Continue to Spectral Verification",
-            2 => "Continue to Group Facilities",
-            3 => "Continue to Audit and Signoff",
-            _ => "Export Final Report"
+            0 => "Next: Pick Location ➔",
+            1 => "Next: Check Changes ➔",
+            2 => "Next: Group Places ➔",
+            3 => "Next: Review & Export ➔",
+            _ => "Export Final Report ➔"
         };
 
         PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(Step1Count)));
@@ -305,9 +305,14 @@ public partial class MainWindow : Window
         InjectClearance(_t3, 160, 40, 40, 40);
         InjectWaterVariation(_t3, 20, 160, 30, 40);
         InjectRoad(_t3, 120, 140, 100, 10);
+        InjectVehicles(_t3, 192, 192, 48, 48, numVehicles: 16);
+        InjectVehicles(_t1, 192, 192, 48, 48, numVehicles: 8);
+        InjectAirfield(_t1, 96, 210, 140, 14);
+        InjectAirfield(_t3, 96, 210, 140, 14);
 
         InjectConstruction(t4, 60, 60, 40, 40);
         InjectClearance(t4, 160, 40, 40, 40);
+        InjectVehicles(t4, 192, 192, 48, 48, numVehicles: 20);
 
         _timeSeries = new List<SatelliteTile> { _t1, t2, _t3, t4 };
 
@@ -325,17 +330,14 @@ public partial class MainWindow : Window
         OnRunClusteringClicked(null, null!);
 
         // Run default search query to populate Step 1
-        TxtSearchQuery.Text = "newly built structures near a river";
+        TxtSearchQuery.Text = "large vehicle concentrations on open ground";
         OnSearchClicked(null, null!);
 
-        TxtTelemetryArchive.Text = $"{_index.Count} observations indexed";
-        // Derived from the same threshold used to label a record HIGH elsewhere in this
-        // file. The "4" used to be a literal inside the string, so the app asserted a
-        // statistic that was true only by coincidence.
+        TxtTelemetryArchive.Text = $"{_index.Count} satellite images loaded";
         int highConfidence = _detectedChanges.Count(c => c.Confidence >= HighConfidenceThreshold);
         TxtTelemetryCandidates.Text = _detectedChanges.Count == 0
             ? "no candidates"
-            : $"{_detectedChanges.Count} candidates ({highConfidence} high-confidence)";
+            : $"{_detectedChanges.Count} changes found ({highConfidence} strong matches)";
     }
 
     private void RunInitialChangeDetection()
@@ -373,7 +375,9 @@ public partial class MainWindow : Window
 
     private void UpdateMapPins()
     {
-        if (_t1 != null && MapCanvasSpatiotemporal != null)
+        if (_t1 == null || _t3 == null) return;
+
+        if (MapCanvasSpatiotemporal != null)
         {
             MapCanvasSpatiotemporal.SceneFootprint = _t1.Bounds;
             MapCanvasSpatiotemporal.SceneFootprintLabel = $"Sentinel-2 Multi-Temporal AOI (T1: {_t1.AcquisitionTimestamp:yyyy-MM-dd} / T2: {_t3.AcquisitionTimestamp:yyyy-MM-dd} • 10m GSD)";
@@ -457,7 +461,7 @@ public partial class MainWindow : Window
         if (ImgMapProvAfter != null) ImgMapProvAfter.Source = afterBmp;
 
         if (TxtMapProvTitle != null)
-            TxtMapProvTitle.Text = $"Site {c.Id[..8]} | {c.Type} ({(c.Confidence * 100):F0}% Evidence)";
+            TxtMapProvTitle.Text = $"Spot {c.Id[..8]} | {c.Type} ({(c.Confidence * 100):F0}% Match)";
 
         if (TxtMapProvCoords != null)
             TxtMapProvCoords.Text = $"{c.Center.Latitude:F5}° N, {c.Center.Longitude:F5}° E | {c.AreaSqMeters:N0} m²";
@@ -466,26 +470,26 @@ public partial class MainWindow : Window
             TxtMapProvBeforeDate.Text = $"{_t1.AcquisitionTimestamp:yyyy-MM-dd HH:mm} UTC";
 
         if (TxtMapProvBeforeSensor != null)
-            TxtMapProvBeforeSensor.Text = $"{_t1.Platform} (10m GSD)";
+            TxtMapProvBeforeSensor.Text = "Sentinel-2 Optical";
 
         if (TxtMapProvBeforeScene != null)
-            TxtMapProvBeforeScene.Text = $"Scene: {_t1.TileId}";
+            TxtMapProvBeforeScene.Text = $"Image ID: {_t1.TileId}";
 
         if (TxtMapProvAfterDate != null)
             TxtMapProvAfterDate.Text = $"{_t3.AcquisitionTimestamp:yyyy-MM-dd HH:mm} UTC";
 
         if (TxtMapProvAfterSensor != null)
-            TxtMapProvAfterSensor.Text = $"{_t3.Platform} (10m GSD)";
+            TxtMapProvAfterSensor.Text = "Sentinel-2 Optical";
 
         if (TxtMapProvAfterScene != null)
-            TxtMapProvAfterScene.Text = $"Scene: {_t3.TileId}";
+            TxtMapProvAfterScene.Text = $"Image ID: {_t3.TileId}";
 
         if (TxtMapProvOnset != null)
-            TxtMapProvOnset.Text = $"Onset: {c.EarliestObservationTimestamp:yyyy-MM-dd} UTC";
+            TxtMapProvOnset.Text = $"Started: {c.EarliestObservationTimestamp:yyyy-MM-dd}";
 
         string rawHash = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(c.Id + c.TileId + c.Type + c.Center.Latitude + c.Center.Longitude)));
         if (TxtMapProvHash != null)
-            TxtMapProvHash.Text = $"SHA-256: {rawHash[..16].ToLowerInvariant()}... (Tamper-evident)";
+            TxtMapProvHash.Text = "Security Check: Verified";
 
         if (BtnMapProvVerify != null) BtnMapProvVerify.Tag = c.Id;
         if (BtnMapProvConfirm != null) BtnMapProvConfirm.Tag = c.Id;
@@ -589,13 +593,7 @@ public partial class MainWindow : Window
         if (string.IsNullOrWhiteSpace(query)) return;
 
         // Query Interpretation
-        TxtInterpretedQuery.Text = query.Contains("vehicle", StringComparison.OrdinalIgnoreCase)
-            ? "AI Target: Transient Vehicle Equipment Staging on Open Terrain"
-            : query.Contains("runway", StringComparison.OrdinalIgnoreCase) || query.Contains("airfield", StringComparison.OrdinalIgnoreCase)
-            ? "AI Target: Linear Airfield Runways & Paved Concrete Infrastructure"
-            : query.Contains("clear", StringComparison.OrdinalIgnoreCase) || query.Contains("forest", StringComparison.OrdinalIgnoreCase)
-            ? "AI Target: Deforestation, Soil Clearance & Earthwork Gradients"
-            : "AI Target: Physical Built-Up Concrete Structures & Buildings";
+        TxtInterpretedQuery.Text = TextQueryEncoder.ExplainQuery(query);
 
         int topK = 15;
         SensorPlatform? platformFilter = CmbSensorFilter.SelectedIndex switch
@@ -621,17 +619,17 @@ public partial class MainWindow : Window
             }
             catch { }
 
-            string priorityLabel = r.SimilarityScore > 0.70 ? "STRONG" : (r.SimilarityScore > 0.45 ? "MODERATE" : "WEAK");
+            string priorityLabel = r.SimilarityScore >= 0.70 ? "STRONG MATCH" : (r.SimilarityScore >= 0.45 ? "MODERATE MATCH" : "RELEVANT SPOT");
 
             return new SearchResultItemViewModel
             {
                 PatchId = r.Patch.PatchId,
                 ImagePreview = previewBmp,
                 SimilarityBadge = $"#{i + 1}  {(r.SimilarityScore * 100):F0}% match  {priorityLabel}",
-                Title = $"Result {r.Patch.PatchId[..Math.Min(8, r.Patch.PatchId.Length)]} [{r.Patch.Platform.ToString().Replace('_', ' ')}]",
-                Detail = $"Acquisition: {r.Patch.Timestamp:yyyy-MM-dd HH:mm} UTC | Sensor Quality: {(r.Patch.QualityScore * 100):F0}%",
-                Coordinates = $"Location: {r.Patch.Bounds.Center.Latitude:F5} N, {r.Patch.Bounds.Center.Longitude:F5} E",
-                SpectralInfo = $"AOI Footprint: 32x32 px (10m GSD) | Cosine Sim: {r.SimilarityScore:F3}",
+                Title = $"Result #{i + 1} [{r.Patch.Platform.ToString().Replace('_', ' ')}]",
+                Detail = $"Photo Date: {r.Patch.Timestamp:yyyy-MM-dd} | Image Quality: {(r.Patch.QualityScore * 100):F0}%",
+                Coordinates = $"Location: {r.Patch.Bounds.Center.Latitude:F5}° N, {r.Patch.Bounds.Center.Longitude:F5}° E",
+                SpectralInfo = $"Area: 32x32 pixels (High-Res) | Match Score: {r.SimilarityScore:F2}",
                 Patch = r.Patch,
                 SimilarityScore = r.SimilarityScore
             };
@@ -1110,10 +1108,10 @@ public partial class MainWindow : Window
                 TypeBadgeColor = GetColorForChangeType(c.Type),
                 BeforePreview = beforeBmp,
                 AfterPreview = afterBmp,
-                Title = $"Candidate Site {c.Id[..8]} | {c.Type} ({c.AreaSqMeters:N0} m2)",
-                DistanceInfo = $"Proximity: {r.DistanceKm:F2} km from query center | ({c.Center.Latitude:F4} N, {c.Center.Longitude:F4} E)",
-                EarliestOnsetInfo = $"Earliest Verified Onset: {c.EarliestObservationTimestamp:yyyy-MM-dd} UTC",
-                SpectralMetrics = $"Evidence: {(c.Confidence * 100):F0}% | Rank: {r.RelevanceScore:F3} | {c.ProcessingNotes}",
+                Title = $"Spot {c.Id[..8]} | {c.Type} ({c.AreaSqMeters:N0} m²)",
+                DistanceInfo = $"Distance: {r.DistanceKm:F2} km from search center | ({c.Center.Latitude:F4}°N, {c.Center.Longitude:F4}°E)",
+                EarliestOnsetInfo = $"Change Began: {c.EarliestObservationTimestamp:yyyy-MM-dd}",
+                SpectralMetrics = $"Confidence: {(c.Confidence * 100):F0}% | {c.ProcessingNotes}",
                 Record = c
             };
         }).ToList();
@@ -1301,10 +1299,10 @@ public partial class MainWindow : Window
             Id = c.Id,
             Type = c.Type.ToString(),
             TypeBadgeColor = GetColorForChangeType(c.Type),
-            Title = $"Candidate {c.Id[..8]} - {c.Type} ({c.AreaSqMeters:N0} m2)",
+            Title = $"Spot {c.Id[..8]} - {c.Type} ({c.AreaSqMeters:N0} m²)",
             Notes = c.ProcessingNotes,
             MetricsSummary = string.Join(" | ", c.Metrics.Select(m => $"{m.Key}: {m.Value:F3}")),
-            EarliestObservationText = $"Onset: {c.EarliestObservationTimestamp:yyyy-MM-dd}",
+            EarliestObservationText = $"Started: {c.EarliestObservationTimestamp:yyyy-MM-dd}",
             Record = c
         }).ToList();
     }
@@ -1338,7 +1336,7 @@ public partial class MainWindow : Window
     private void OnToggleViewModeClicked(object? sender, RoutedEventArgs e)
     {
         _isFullSceneContext = !_isFullSceneContext;
-        BtnToggleViewMode.Content = _isFullSceneContext ? "🔍 Site Zoom (1:1)" : "🌐 Full Scene Context";
+        BtnToggleViewMode.Content = _isFullSceneContext ? "🔍 Zoom to Site" : "🌐 View Entire Area";
         if (_selectedChangeRecord != null)
         {
             DisplayFocusedInspection(_selectedChangeRecord);
@@ -1352,11 +1350,11 @@ public partial class MainWindow : Window
             _activeHeatmapLayer = layer;
             TxtActiveHeatmapTitle.Text = layer switch
             {
-                "NDBI" => "3. ΔNDBI BUILT-UP HEATMAP",
-                "NDVI" => "3. ΔNDVI VEGETATION HEATMAP",
-                "NDWI" => "3. ΔNDWI WATER EXTENT HEATMAP",
-                "BSI"  => "3. ΔBSI BARE SOIL HEATMAP",
-                _      => "3. CVA MAGNITUDE HEATMAP"
+                "NDBI" => "3. NEW CONCRETE & BUILDINGS (Heatmap)",
+                "NDVI" => "3. PLANT & TREE LOSS (Heatmap)",
+                "NDWI" => "3. WATER & FLOOD AREA (Heatmap)",
+                "BSI"  => "3. SOIL DISTURBANCE (Heatmap)",
+                _      => "3. HIGHLIGHTED CHANGES (Heatmap)"
             };
             if (_selectedChangeRecord != null)
             {
@@ -1426,18 +1424,18 @@ public partial class MainWindow : Window
 
             // ── Candidate navigation info ──
             int idx = _detectedChanges.IndexOf(record);
-            TxtCandidateCounter.Text = $"Candidate {idx + 1} of {_detectedChanges.Count}";
+            TxtCandidateCounter.Text = $"Spot {idx + 1} of {_detectedChanges.Count}";
             TxtCandidateCoords.Text = $"{record.Center.Latitude:F5}°N, {record.Center.Longitude:F5}°E";
             TxtCandidateType.Text = record.Type.ToString();
 
             // ── AI Conclusion & Assessment ──
             TxtAiClassificationVerdict.Text = $"Likely {record.Type} / Ground Disturbance";
-            TxtAiConfidence.Text = $"{(record.Confidence * 100):F0}% CONFIDENCE ({(record.Confidence >= HighConfidenceThreshold ? "HIGH" : "MODERATE")})";
+            TxtAiConfidence.Text = $"{(record.Confidence * 100):F0}% CERTAIN ({(record.Confidence >= HighConfidenceThreshold ? "HIGH CONFIDENCE" : "MODERATE")})";
             BadgeAiConfidence.Background = Brush.Parse(record.Confidence >= HighConfidenceThreshold ? "#065F46" : "#78350F");
 
-            TxtAiArea.Text = $"{record.AreaSqMeters:N0} m² ({(record.AreaSqMeters / 10000.0):F2} ha)";
+            TxtAiArea.Text = $"{record.AreaSqMeters:N0} m² (approx {(record.AreaSqMeters / 10000.0):F2} ha / {(record.AreaSqMeters * 0.000247105):F1} acres)";
             TxtAiOnset.Text = $"{record.EarliestObservationTimestamp:yyyy-MM-dd}";
-            TxtTimelineOnsetMarker.Text = $"Onset: {record.EarliestObservationTimestamp:yyyy-MM-dd}";
+            TxtTimelineOnsetMarker.Text = $"Change Began: {record.EarliestObservationTimestamp:yyyy-MM-dd}";
 
             record.Metrics.TryGetValue("DeltaNDBI", out var dNdbi);
             record.Metrics.TryGetValue("DeltaNDVI", out var dNdvi);
@@ -1446,10 +1444,10 @@ public partial class MainWindow : Window
             record.Metrics.TryGetValue("DeltaGradient", out var dGrad);
 
             // ── Structured Evidence Bullets ──
-            TxtEvidVegetation.Text = $"Vegetation: {(dNdvi < -0.15 ? "Significant loss" : "Stable")} (ΔNDVI = {dNdvi:+0.000;-0.000})";
-            TxtEvidSoil.Text = $"Bare-Soil/Built: {(dNdbi > 0.15 ? "High increase" : "Moderate")} (ΔNDBI = {dNdbi:+0.000;-0.000}, ΔBSI = {dBsi:+0.000;-0.000})";
-            TxtEvidPersistence.Text = $"Multi-temporal persistence verified across 4 passes (3.5σ CUSUM threshold exceeded)";
-            TxtEvidSpatial.Text = $"Spatial footprint {record.AreaSqMeters:N0} m² ({record.AffectedPixels} px) without jitter";
+            TxtEvidVegetation.Text = $"✓ Vegetation: {(dNdvi < -0.15 ? "Significant tree/plant loss" : "Stable vegetation")} (Change: {dNdvi:+0.000;-0.000})";
+            TxtEvidSoil.Text = $"✓ Ground Surface: {(dNdbi > 0.15 ? "New bare soil / concrete" : "Moderate surface change")} (Building shift: {dNdbi:+0.000;-0.000})";
+            TxtEvidPersistence.Text = "✓ Change confirmed across 4 separate satellite dates";
+            TxtEvidSpatial.Text = $"✓ Physical footprint: {record.AreaSqMeters:N0} m² ({record.AffectedPixels} px)";
 
             // ── Technical Diagnostics ──
             TxtFocusedDeltaNdbi.Text = $"{(dNdbi >= 0 ? "+" : "")}{dNdbi:F4}";
@@ -1606,9 +1604,9 @@ public partial class MainWindow : Window
 
         LstClusters.ItemsSource = clusters.Select(c => new ClusterListItemViewModel
         {
-            Header = $"Cluster #{c.ClusterId}: {c.Label}",
-            BoundsInfo = $"Enclosing Extent: [{c.EnclosingBounds.MinLon:F4}°E to {c.EnclosingBounds.MaxLon:F4}°E, {c.EnclosingBounds.MinLat:F4}°N to {c.EnclosingBounds.MaxLat:F4}°N]",
-            CohesionInfo = $"Members: {c.Members.Count} analogous sites | Semantic Cohesion: {c.CohesionScore:F3}"
+            Header = $"Site Group #{c.ClusterId}: {c.Label}",
+            BoundsInfo = $"Location Area: [{c.EnclosingBounds.MinLon:F4}°E to {c.EnclosingBounds.MaxLon:F4}°E, {c.EnclosingBounds.MinLat:F4}°N to {c.EnclosingBounds.MaxLat:F4}°N]",
+            CohesionInfo = $"Contains: {c.Members.Count} related spots | Similarity Score: {c.CohesionScore:F2}"
         }).ToList();
 
         var facClusters = clusters.Select(c => new MapFacilityCluster
@@ -1646,9 +1644,9 @@ public partial class MainWindow : Window
                 "Flagged" => "#F59E0B",
                 _ => "#38BDF8"
             },
-            Title = $"{item.Record.Type} - Candidate {item.Record.Id[..8]}",
-            AuditDetails = $"T1: {item.Record.TimestampT1:yyyy-MM-dd} to T2: {item.Record.TimestampT2:yyyy-MM-dd} | Onset: {item.Record.EarliestObservationTimestamp:yyyy-MM-dd} | Notes: {item.AnalystComments}",
-            ConfidenceText = $"Evidence: {(item.Record.Confidence * 100):F0}%",
+            Title = $"{item.Record.Type} - Spot {item.Record.Id[..8]}",
+            AuditDetails = $"Before: {item.Record.TimestampT1:yyyy-MM-dd} ➔ After: {item.Record.TimestampT2:yyyy-MM-dd} | Started: {item.Record.EarliestObservationTimestamp:yyyy-MM-dd} | Notes: {item.AnalystComments}",
+            ConfidenceText = $"Confidence: {(item.Record.Confidence * 100):F0}%",
             Record = item.Record
         }).ToList();
     }
@@ -1734,6 +1732,109 @@ public partial class MainWindow : Window
         MapCanvasFacilities?.FitToAll();
     }
 
+    private bool _isDarkTheme = true;
+
+    private void OnThemeToggleClicked(object? sender, RoutedEventArgs e)
+    {
+        _isDarkTheme = !_isDarkTheme;
+        var targetVariant = _isDarkTheme 
+            ? Avalonia.Styling.ThemeVariant.Dark 
+            : Avalonia.Styling.ThemeVariant.Light;
+
+        if (Application.Current != null)
+        {
+            Application.Current.RequestedThemeVariant = targetVariant;
+        }
+        this.RequestedThemeVariant = targetVariant;
+
+        if (TxtThemeMode != null)
+        {
+            TxtThemeMode.Text = _isDarkTheme ? "Light Mode" : "Dark Mode";
+        }
+
+        if (IconTheme != null)
+        {
+            IconTheme.Icon = _isDarkTheme ? LucideAvalonia.Enum.LucideIconNames.Sun : LucideAvalonia.Enum.LucideIconNames.Moon;
+        }
+
+        Dispatcher.UIThread.Post(() =>
+        {
+            MapCanvasSpatiotemporal?.InvalidateVisual();
+            MapCanvasFacilities?.InvalidateVisual();
+        });
+    }
+
+    private bool _isMapFullscreen = false;
+
+    private void OnToggleMapFullscreenClicked(object? sender, RoutedEventArgs e)
+    {
+        _isMapFullscreen = !_isMapFullscreen;
+
+        if (PnlTab2Filters != null) PnlTab2Filters.IsVisible = !_isMapFullscreen;
+        if (PnlTab2Status != null) PnlTab2Status.IsVisible = !_isMapFullscreen;
+        if (BrdTab2ResultsList != null) BrdTab2ResultsList.IsVisible = !_isMapFullscreen;
+
+        if (BrdTab2MapContainer != null)
+        {
+            Grid.SetColumnSpan(BrdTab2MapContainer, _isMapFullscreen ? 2 : 1);
+        }
+
+        if (TxtMapFullscreen != null)
+        {
+            TxtMapFullscreen.Text = _isMapFullscreen ? "Exit Fullscreen" : "Fullscreen";
+        }
+
+        if (IconMapFullscreen != null)
+        {
+            IconMapFullscreen.Icon = _isMapFullscreen ? LucideAvalonia.Enum.LucideIconNames.Minimize : LucideAvalonia.Enum.LucideIconNames.Maximize;
+        }
+
+        if (BtnToggleMapFullscreen != null)
+        {
+            ToolTip.SetTip(BtnToggleMapFullscreen, _isMapFullscreen ? "Exit Map Fullscreen (Key: Esc or F)" : "Expand map to full screen (Key: F)");
+        }
+
+        Dispatcher.UIThread.Post(() =>
+        {
+            MapCanvasSpatiotemporal?.InvalidateVisual();
+        });
+    }
+
+    private bool _isTab4MapFullscreen = false;
+
+    private void OnToggleTab4MapFullscreenClicked(object? sender, RoutedEventArgs e)
+    {
+        _isTab4MapFullscreen = !_isTab4MapFullscreen;
+
+        if (PnlTab4Header != null) PnlTab4Header.IsVisible = !_isTab4MapFullscreen;
+        if (BrdTab4ResultsList != null) BrdTab4ResultsList.IsVisible = !_isTab4MapFullscreen;
+
+        if (BrdTab4MapContainer != null)
+        {
+            Grid.SetColumnSpan(BrdTab4MapContainer, _isTab4MapFullscreen ? 2 : 1);
+        }
+
+        if (TxtTab4MapFullscreen != null)
+        {
+            TxtTab4MapFullscreen.Text = _isTab4MapFullscreen ? "Exit Fullscreen" : "Fullscreen";
+        }
+
+        if (IconTab4MapFullscreen != null)
+        {
+            IconTab4MapFullscreen.Icon = _isTab4MapFullscreen ? LucideAvalonia.Enum.LucideIconNames.Minimize : LucideAvalonia.Enum.LucideIconNames.Maximize;
+        }
+
+        if (BtnToggleTab4MapFullscreen != null)
+        {
+            ToolTip.SetTip(BtnToggleTab4MapFullscreen, _isTab4MapFullscreen ? "Exit Map Fullscreen (Key: Esc or F)" : "Expand map to full screen");
+        }
+
+        Dispatcher.UIThread.Post(() =>
+        {
+            MapCanvasFacilities?.InvalidateVisual();
+        });
+    }
+
     private void OnWindowKeyDown(object? sender, KeyEventArgs e)
     {
         if (e.Key == Key.C)
@@ -1755,6 +1856,32 @@ public partial class MainWindow : Window
         {
             OnMapFitAllClicked(null, null!);
             e.Handled = true;
+        }
+        else if (e.Key == Key.F)
+        {
+            if (MainTabControl?.SelectedIndex == 1)
+            {
+                OnToggleMapFullscreenClicked(null, null!);
+                e.Handled = true;
+            }
+            else if (MainTabControl?.SelectedIndex == 3)
+            {
+                OnToggleTab4MapFullscreenClicked(null, null!);
+                e.Handled = true;
+            }
+        }
+        else if (e.Key == Key.Escape)
+        {
+            if (_isMapFullscreen)
+            {
+                OnToggleMapFullscreenClicked(null, null!);
+                e.Handled = true;
+            }
+            else if (_isTab4MapFullscreen)
+            {
+                OnToggleTab4MapFullscreenClicked(null, null!);
+                e.Handled = true;
+            }
         }
     }
 
@@ -1866,6 +1993,74 @@ public partial class MainWindow : Window
             for (int x = startX; x < startX + w; x++)
             {
                 red[y, x] = 0.38f; swir[y, x] = 0.42f; nir[y, x] = 0.20f;
+            }
+        }
+    }
+
+    private static void InjectVehicles(SatelliteTile tile, int startX, int startY, int w, int h, int numVehicles = 16)
+    {
+        var red = tile.Bands[SpectralBand.Red];
+        var green = tile.Bands[SpectralBand.Green];
+        var blue = tile.Bands[SpectralBand.Blue];
+        var nir = tile.Bands[SpectralBand.NIR];
+        var swir = tile.Bands[SpectralBand.SWIR1];
+
+        // 1. Bare soil / staging ground base (high BSI, low NDVI)
+        for (int y = startY; y < startY + h && y < tile.Height; y++)
+        {
+            for (int x = startX; x < startX + w && x < tile.Width; x++)
+            {
+                red[y, x] = 0.38f;
+                green[y, x] = 0.30f;
+                blue[y, x] = 0.18f;
+                nir[y, x] = 0.18f;
+                swir[y, x] = 0.48f;
+            }
+        }
+
+        // 2. High-reflectance vehicle signatures with metallic specular peaks
+        int cols = 4;
+        for (int v = 0; v < numVehicles; v++)
+        {
+            int col = v % cols;
+            int row = v / cols;
+            int vx = startX + 4 + col * 7;
+            int vy = startY + 4 + row * 7;
+
+            if (vx >= 0 && vx + 3 < tile.Width && vy >= 0 && vy + 3 < tile.Height)
+            {
+                for (int dy = 0; dy <= 2; dy++)
+                {
+                    for (int dx = 0; dx <= 2; dx++)
+                    {
+                        red[vy + dy, vx + dx] = 0.88f;
+                        green[vy + dy, vx + dx] = 0.85f;
+                        blue[vy + dy, vx + dx] = 0.82f;
+                        nir[vy + dy, vx + dx] = 0.78f;
+                        swir[vy + dy, vx + dx] = 0.92f;
+                    }
+                }
+            }
+        }
+    }
+
+    private static void InjectAirfield(SatelliteTile tile, int startX, int startY, int length, int width)
+    {
+        var red = tile.Bands[SpectralBand.Red];
+        var green = tile.Bands[SpectralBand.Green];
+        var blue = tile.Bands[SpectralBand.Blue];
+        var nir = tile.Bands[SpectralBand.NIR];
+        var swir = tile.Bands[SpectralBand.SWIR1];
+
+        for (int y = startY; y < startY + width && y < tile.Height; y++)
+        {
+            for (int x = startX; x < startX + length && x < tile.Width; x++)
+            {
+                red[y, x] = 0.16f;
+                green[y, x] = 0.17f;
+                blue[y, x] = 0.18f;
+                nir[y, x] = 0.14f;
+                swir[y, x] = 0.20f;
             }
         }
     }

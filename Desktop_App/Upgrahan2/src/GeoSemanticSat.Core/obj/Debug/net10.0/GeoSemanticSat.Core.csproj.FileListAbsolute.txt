@@ -21,3 +21,15 @@
 /mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/obj/Debug/net10.0/refint/GeoSemanticSat.Core.dll
 /mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/obj/Debug/net10.0/GeoSemanticSat.Core.pdb
 /mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/obj/Debug/net10.0/ref/GeoSemanticSat.Core.dll
+F:\Hackathon\SIH(2026)\ps_227\Unified-RSanalytics\Desktop_App\Upgrahan2\src\GeoSemanticSat.Core\bin\Debug\net10.0\GeoSemanticSat.Core.deps.json
+F:\Hackathon\SIH(2026)\ps_227\Unified-RSanalytics\Desktop_App\Upgrahan2\src\GeoSemanticSat.Core\bin\Debug\net10.0\GeoSemanticSat.Core.dll
+F:\Hackathon\SIH(2026)\ps_227\Unified-RSanalytics\Desktop_App\Upgrahan2\src\GeoSemanticSat.Core\bin\Debug\net10.0\GeoSemanticSat.Core.pdb
+F:\Hackathon\SIH(2026)\ps_227\Unified-RSanalytics\Desktop_App\Upgrahan2\src\GeoSemanticSat.Core\obj\Debug\net10.0\GeoSemanticSat.Core.GeneratedMSBuildEditorConfig.editorconfig
+F:\Hackathon\SIH(2026)\ps_227\Unified-RSanalytics\Desktop_App\Upgrahan2\src\GeoSemanticSat.Core\obj\Debug\net10.0\GeoSemanticSat.Core.AssemblyInfoInputs.cache
+F:\Hackathon\SIH(2026)\ps_227\Unified-RSanalytics\Desktop_App\Upgrahan2\src\GeoSemanticSat.Core\obj\Debug\net10.0\GeoSemanticSat.Core.AssemblyInfo.cs
+F:\Hackathon\SIH(2026)\ps_227\Unified-RSanalytics\Desktop_App\Upgrahan2\src\GeoSemanticSat.Core\obj\Debug\net10.0\GeoSemanticSat.Core.csproj.CoreCompileInputs.cache
+F:\Hackathon\SIH(2026)\ps_227\Unified-RSanalytics\Desktop_App\Upgrahan2\src\GeoSemanticSat.Core\obj\Debug\net10.0\GeoSemanticSat.Core.sourcelink.json
+F:\Hackathon\SIH(2026)\ps_227\Unified-RSanalytics\Desktop_App\Upgrahan2\src\GeoSemanticSat.Core\obj\Debug\net10.0\GeoSemanticSat.Core.dll
+F:\Hackathon\SIH(2026)\ps_227\Unified-RSanalytics\Desktop_App\Upgrahan2\src\GeoSemanticSat.Core\obj\Debug\net10.0\refint\GeoSemanticSat.Core.dll
+F:\Hackathon\SIH(2026)\ps_227\Unified-RSanalytics\Desktop_App\Upgrahan2\src\GeoSemanticSat.Core\obj\Debug\net10.0\GeoSemanticSat.Core.pdb
+F:\Hackathon\SIH(2026)\ps_227\Unified-RSanalytics\Desktop_App\Upgrahan2\src\GeoSemanticSat.Core\obj\Debug\net10.0\ref\GeoSemanticSat.Core.dll

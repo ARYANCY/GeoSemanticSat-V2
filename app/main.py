@@ -55,7 +55,7 @@ from app.schemas.api import (
     ReviewItem,
     ChangeProvenanceResponse,
 )
-from app.services.embeddings.service import embedder, norm
+from app.services.embeddings.service import embedder, norm, get_available_models_status, PrithviTemporalEmbedder
 
 
 @asynccontextmanager
@@ -157,12 +157,14 @@ def health():
 @app.get("/system/status", response_model=SystemStatusResponse, tags=["System"])
 def system_status(db: Session = Depends(get_db)):
     """System health, record counts, and model readiness status."""
+    status_info = get_available_models_status()
+    active = status_info["active_model"]
     return SystemStatusResponse(
         database="connected",
         observations=db.query(Observation).count(),
         embeddings=db.query(Embedding).count(),
         runtime_network=False,
-        semantic_model="RemoteCLIP local adapter required for text search",
+        semantic_model=f"Active: {active} | Pretrained backbones: TerraMind-1.0-base, SatMAE++, GFM Composition, Prithvi-EO-2.0-600M-TL",
     )
 
 
@@ -254,11 +256,12 @@ def ingest_geotiff(request: IngestRequest, db: Session = Depends(get_db)):
             db.flush()
 
             # Compute and persist embedding
-            vector = embedder().image(raster_data).tolist()
+            active_model = embedder()
+            vector = active_model.image(raster_data).tolist()
             embedding = Embedding(
                 observation_id=observation.id,
                 vector=vector,
-                model_name="histogram-baseline",
+                model_name=getattr(active_model, "MODEL_NAME", "histogram-baseline"),
                 model_version="v2",
                 run_id=run.id,
             )
@@ -375,14 +378,34 @@ def search_by_image(request: ImageSearchRequest, db: Session = Depends(get_db)):
     return SearchResponse(results=results)
 
 
-@app.post("/api/v1/search/text", tags=["Search"])
-@app.post("/api/v1/search/hybrid", tags=["Search"])
-def search_by_text(request: SearchRequest):
-    """Semantic text and hybrid search (Requires staged RemoteCLIP model)."""
-    raise HTTPException(
-        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-        detail="RemoteCLIP local weights and adapter are required for text retrieval; runtime downloads are disabled.",
+@app.post(
+    "/api/v1/search/text",
+    response_model=SearchResponse,
+    tags=["Search"],
+)
+@app.post(
+    "/api/v1/search/hybrid",
+    response_model=SearchResponse,
+    tags=["Search"],
+)
+def search_by_text(request: SearchRequest, db: Session = Depends(get_db)):
+    """Semantic text and hybrid search using active foundation model (TerraMind-1.0-base)."""
+    try:
+        active_emb = embedder()
+        query_vector = active_emb.text(request.query)
+    except (RuntimeError, NotImplementedError) as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Semantic text search requires staged foundation model weights (TerraMind-1.0-base / RemoteCLIP): {exc}",
+        )
+
+    results = search_vectors(
+        db=db,
+        query_vector=query_vector,
+        top_k=request.top_k,
+        sensor=request.sensor,
     )
+    return SearchResponse(results=results)
 
 
 # ==============================================================================
@@ -584,6 +607,9 @@ def analyze_change(request: ChangeRequest, db: Session = Depends(get_db)):
         db.add(run)
         db.flush()
 
+        # Compute Prithvi-EO-2.0 temporal sequence dynamics
+        prithvi_metrics = PrithviTemporalEmbedder().analyze_temporal_change(data_before, data_after)
+
         event = ChangeEvent(
             location_id=obs_before.location_id,
             before_observation_id=obs_before.id,
@@ -597,6 +623,7 @@ def analyze_change(request: ChangeRequest, db: Session = Depends(get_db)):
                 "false_alarm_risk": round(1.0 - quality_factor, 4),
                 "evaluated_bands": num_eval_bands,
                 "mask_available": False,
+                "prithvi_temporal_metrics": prithvi_metrics,
             },
             run_id=run.id,
         )

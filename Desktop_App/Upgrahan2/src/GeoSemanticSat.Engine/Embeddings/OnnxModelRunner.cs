@@ -62,6 +62,39 @@ public class OnnxModelRunner : IDisposable
         return null;
     }
 
+    /// <summary>
+    /// Execute inference over multiple named inputs (e.g., optical + SAR, or temporal token sequences).
+    /// </summary>
+    public float[]? RunMultiInputInference(System.Collections.Generic.Dictionary<string, (float[] Data, int[] Dimensions)> namedInputs)
+    {
+        if (_session == null || namedInputs == null || namedInputs.Count == 0) return null;
+
+        try
+        {
+            var inputValues = new System.Collections.Generic.List<NamedOnnxValue>();
+            foreach (var kvp in namedInputs)
+            {
+                var tensor = new DenseTensor<float>(kvp.Value.Data, kvp.Value.Dimensions);
+                inputValues.Add(NamedOnnxValue.CreateFromTensor(kvp.Key, tensor));
+            }
+
+            using var results = _session.Run(inputValues);
+            foreach (var r in results)
+            {
+                if (r.Value is DenseTensor<float> outTensor)
+                {
+                    return outTensor.ToArray();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[OnnxModelRunner] Multi-input inference error: {ex.Message}");
+        }
+
+        return null;
+    }
+
     public void Dispose()
     {
         _session?.Dispose();

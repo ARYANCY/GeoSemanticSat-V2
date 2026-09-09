@@ -1,5 +1,10 @@
 # 04. FastAPI Gateway & Endpoint Reference
 
+> The source-aligned API reference is maintained in
+> [00_developer_guide.md](00_developer_guide.md) and
+> [07_implementation_reference.md](07_implementation_reference.md). Verify
+> request and response details against `app/schemas/api.py` before integrating.
+
 **Service:** Unified-RSanalytics REST API  
 **Default Host & Port:** `http://127.0.0.1:8000` | OpenAPI Docs: `http://127.0.0.1:8000/docs`  
 **API Version:** `v1` (FastAPI 0.110+)

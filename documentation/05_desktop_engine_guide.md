@@ -1,5 +1,9 @@
 # 05. Desktop Intelligence Engine & C# Architecture
 
+> For current desktop behavior, index format, and limitations, use
+> [07_implementation_reference.md](07_implementation_reference.md). This page
+> contains historical design material and may describe planned components.
+
 **Core System:** GeoSemanticSat (.NET Core / C# Engine)  
 **UI Framework:** Avalonia UI (Cross-Platform XAML Desktop Canvas)  
 **Performance Subsystem:** Hardware-Accelerated SIMD AVX2 Intrinsics

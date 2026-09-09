@@ -1,37 +1,37 @@
 {
   "format": 1,
   "restore": {
-    "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj": {}
+    "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.UI\\GeoSemanticSat.UI.csproj": {}
   },
   "projects": {
-    "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Cli/GeoSemanticSat.Cli.csproj": {
+    "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Cli\\GeoSemanticSat.Cli.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Cli/GeoSemanticSat.Cli.csproj",
+        "projectUniqueName": "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Cli\\GeoSemanticSat.Cli.csproj",
         "projectName": "GeoSemanticSat.Cli",
-        "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Cli/GeoSemanticSat.Cli.csproj",
-        "packagesPath": "/home/non_qualities/.nuget/packages/",
-        "outputPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Cli/obj/",
+        "projectPath": "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Cli\\GeoSemanticSat.Cli.csproj",
+        "packagesPath": "C:\\Users\\Rajdeep\\.nuget\\packages\\",
+        "outputPath": "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Cli\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/non_qualities/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\Rajdeep\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "/usr/lib64/dotnet/library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net10.0": {
+            "framework": "net10.0",
             "targetAlias": "net10.0",
             "projectReferences": {
-              "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj": {
-                "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj"
+              "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Core\\GeoSemanticSat.Core.csproj": {
+                "projectPath": "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Core\\GeoSemanticSat.Core.csproj"
               },
-              "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj": {
-                "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj"
+              "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Engine\\GeoSemanticSat.Engine.csproj": {
+                "projectPath": "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Engine\\GeoSemanticSat.Engine.csproj"
               }
             }
           }
@@ -46,10 +46,11 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.100"
+        "SdkAnalysisLevel": "10.0.400"
       },
       "frameworks": {
         "net10.0": {
+          "framework": "net10.0",
           "targetAlias": "net10.0",
           "imports": [
             "net461",
@@ -67,7 +68,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/lib64/dotnet/sdk/10.0.111/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.400/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -345,27 +346,27 @@
         }
       }
     },
-    "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj": {
+    "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Core\\GeoSemanticSat.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj",
+        "projectUniqueName": "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Core\\GeoSemanticSat.Core.csproj",
         "projectName": "GeoSemanticSat.Core",
-        "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj",
-        "packagesPath": "/home/non_qualities/.nuget/packages/",
-        "outputPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/obj/",
+        "projectPath": "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Core\\GeoSemanticSat.Core.csproj",
+        "packagesPath": "C:\\Users\\Rajdeep\\.nuget\\packages\\",
+        "outputPath": "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Core\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/non_qualities/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\Rajdeep\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "/usr/lib64/dotnet/library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net10.0": {
+            "framework": "net10.0",
             "targetAlias": "net10.0",
             "projectReferences": {}
           }
@@ -380,10 +381,11 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.100"
+        "SdkAnalysisLevel": "10.0.400"
       },
       "frameworks": {
         "net10.0": {
+          "framework": "net10.0",
           "targetAlias": "net10.0",
           "imports": [
             "net461",
@@ -401,7 +403,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/lib64/dotnet/sdk/10.0.111/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.400/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -679,31 +681,31 @@
         }
       }
     },
-    "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj": {
+    "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Engine\\GeoSemanticSat.Engine.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj",
+        "projectUniqueName": "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Engine\\GeoSemanticSat.Engine.csproj",
         "projectName": "GeoSemanticSat.Engine",
-        "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj",
-        "packagesPath": "/home/non_qualities/.nuget/packages/",
-        "outputPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/obj/",
+        "projectPath": "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Engine\\GeoSemanticSat.Engine.csproj",
+        "packagesPath": "C:\\Users\\Rajdeep\\.nuget\\packages\\",
+        "outputPath": "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Engine\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/non_qualities/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\Rajdeep\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "/usr/lib64/dotnet/library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net10.0": {
+            "framework": "net10.0",
             "targetAlias": "net10.0",
             "projectReferences": {
-              "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj": {
-                "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj"
+              "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Core\\GeoSemanticSat.Core.csproj": {
+                "projectPath": "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Core\\GeoSemanticSat.Core.csproj"
               }
             }
           }
@@ -718,10 +720,11 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.100"
+        "SdkAnalysisLevel": "10.0.400"
       },
       "frameworks": {
         "net10.0": {
+          "framework": "net10.0",
           "targetAlias": "net10.0",
           "dependencies": {
             "Microsoft.ML.OnnxRuntime": {
@@ -745,7 +748,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/lib64/dotnet/sdk/10.0.111/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.400/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -1023,37 +1026,37 @@
         }
       }
     },
-    "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj": {
+    "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.UI\\GeoSemanticSat.UI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj",
+        "projectUniqueName": "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.UI\\GeoSemanticSat.UI.csproj",
         "projectName": "GeoSemanticSat.UI",
-        "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj",
-        "packagesPath": "/home/non_qualities/.nuget/packages/",
-        "outputPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/obj/",
+        "projectPath": "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.UI\\GeoSemanticSat.UI.csproj",
+        "packagesPath": "C:\\Users\\Rajdeep\\.nuget\\packages\\",
+        "outputPath": "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.UI\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/non_qualities/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\Rajdeep\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "/usr/lib64/dotnet/library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net10.0": {
+            "framework": "net10.0",
             "targetAlias": "net10.0",
             "projectReferences": {
-              "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Cli/GeoSemanticSat.Cli.csproj": {
-                "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Cli/GeoSemanticSat.Cli.csproj"
+              "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Cli\\GeoSemanticSat.Cli.csproj": {
+                "projectPath": "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Cli\\GeoSemanticSat.Cli.csproj"
               },
-              "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj": {
-                "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj"
+              "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Core\\GeoSemanticSat.Core.csproj": {
+                "projectPath": "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Core\\GeoSemanticSat.Core.csproj"
               },
-              "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj": {
-                "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj"
+              "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Engine\\GeoSemanticSat.Engine.csproj": {
+                "projectPath": "F:\\Hackathon\\SIH(2026)\\ps_227\\Unified-RSanalytics\\Desktop_App\\Upgrahan2\\src\\GeoSemanticSat.Engine\\GeoSemanticSat.Engine.csproj"
               }
             }
           }
@@ -1068,10 +1071,11 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.100"
+        "SdkAnalysisLevel": "10.0.400"
       },
       "frameworks": {
         "net10.0": {
+          "framework": "net10.0",
           "targetAlias": "net10.0",
           "dependencies": {
             "Avalonia": {
@@ -1111,7 +1115,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/lib64/dotnet/sdk/10.0.111/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.400/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
