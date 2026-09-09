@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GeoSemanticSat.Cli")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d01bcb298c5379c05845bb0e4e487e65eef7e6a8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
 [assembly: System.Reflection.AssemblyProductAttribute("GeoSemanticSat.Cli")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GeoSemanticSat.Cli")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

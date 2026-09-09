@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj": {}
+    "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj": {}
   },
   "projects": {
-    "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Cli/GeoSemanticSat.Cli.csproj": {
+    "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Cli/GeoSemanticSat.Cli.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Cli/GeoSemanticSat.Cli.csproj",
+        "projectUniqueName": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Cli/GeoSemanticSat.Cli.csproj",
         "projectName": "GeoSemanticSat.Cli",
-        "projectPath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Cli/GeoSemanticSat.Cli.csproj",
+        "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Cli/GeoSemanticSat.Cli.csproj",
         "packagesPath": "/home/non_qualities/.nuget/packages/",
-        "outputPath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Cli/obj/",
+        "outputPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Cli/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/non_qualities/.nuget/NuGet/NuGet.Config"
@@ -27,11 +27,11 @@
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj": {
-                "projectPath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj"
+              "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj": {
+                "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj"
               },
-              "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj": {
-                "projectPath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj"
+              "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj": {
+                "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj"
               }
             }
           }
@@ -345,14 +345,14 @@
         }
       }
     },
-    "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj": {
+    "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj",
+        "projectUniqueName": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj",
         "projectName": "GeoSemanticSat.Core",
-        "projectPath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj",
+        "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj",
         "packagesPath": "/home/non_qualities/.nuget/packages/",
-        "outputPath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/obj/",
+        "outputPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/non_qualities/.nuget/NuGet/NuGet.Config"
@@ -679,14 +679,14 @@
         }
       }
     },
-    "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj": {
+    "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj",
+        "projectUniqueName": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj",
         "projectName": "GeoSemanticSat.Engine",
-        "projectPath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj",
+        "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj",
         "packagesPath": "/home/non_qualities/.nuget/packages/",
-        "outputPath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Engine/obj/",
+        "outputPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/non_qualities/.nuget/NuGet/NuGet.Config"
@@ -702,8 +702,8 @@
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj": {
-                "projectPath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj"
+              "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj": {
+                "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj"
               }
             }
           }
@@ -1023,14 +1023,14 @@
         }
       }
     },
-    "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj": {
+    "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj",
+        "projectUniqueName": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj",
         "projectName": "GeoSemanticSat.UI",
-        "projectPath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj",
+        "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj",
         "packagesPath": "/home/non_qualities/.nuget/packages/",
-        "outputPath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.UI/obj/",
+        "outputPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/non_qualities/.nuget/NuGet/NuGet.Config"
@@ -1046,14 +1046,14 @@
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Cli/GeoSemanticSat.Cli.csproj": {
-                "projectPath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Cli/GeoSemanticSat.Cli.csproj"
+              "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Cli/GeoSemanticSat.Cli.csproj": {
+                "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Cli/GeoSemanticSat.Cli.csproj"
               },
-              "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj": {
-                "projectPath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj"
+              "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj": {
+                "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj"
               },
-              "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj": {
-                "projectPath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj"
+              "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj": {
+                "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj"
               }
             }
           }

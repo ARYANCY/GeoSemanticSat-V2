@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "b+fw3PgOWWE=",
+  "dgSpecHash": "oYdok1d6uqo=",
   "success": true,
-  "projectFilePath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj",
+  "projectFilePath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj",
   "expectedPackageFiles": [
     "/home/non_qualities/.nuget/packages/avalonia/11.2.5/avalonia.11.2.5.nupkg.sha512",
     "/home/non_qualities/.nuget/packages/avalonia.angle.windows.natives/2.1.22045.20230930/avalonia.angle.windows.natives.2.1.22045.20230930.nupkg.sha512",
@@ -37,9 +37,9 @@
       "code": "NU1903",
       "level": "Warning",
       "message": "Package 'Tmds.DBus.Protocol' 0.20.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-xrw6-gwf8-vvr9",
-      "projectPath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj",
+      "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj",
       "warningLevel": 1,
-      "filePath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj",
+      "filePath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj",
       "libraryId": "Tmds.DBus.Protocol",
       "targetGraphs": [
         "net10.0"

@@ -1670,8 +1670,6 @@
       "path": "lucideavalonia/1.6.2",
       "files": [
         ".nupkg.metadata",
-        ".signature.p7s",
-        "icon.png",
         "lib/net8.0/LucideAvalonia.dll",
         "lucideavalonia.1.6.2.nupkg.sha512",
         "lucideavalonia.nuspec"
@@ -2438,19 +2436,19 @@
     ]
   },
   "packageFolders": {
-    "/home/non_qualities/.nuget/packages/": {}
+    "/home/non_qualities/.gemini/antigravity/scratch/.nuget/packages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Tests/GeoSemanticSat.Tests.csproj",
+      "projectUniqueName": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Tests/GeoSemanticSat.Tests.csproj",
       "projectName": "GeoSemanticSat.Tests",
-      "projectPath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Tests/GeoSemanticSat.Tests.csproj",
-      "packagesPath": "/home/non_qualities/.nuget/packages/",
-      "outputPath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Tests/obj/",
+      "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Tests/GeoSemanticSat.Tests.csproj",
+      "packagesPath": "/home/non_qualities/.gemini/antigravity/scratch/.nuget/packages",
+      "outputPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Tests/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/home/non_qualities/.nuget/NuGet/NuGet.Config"
+        "/home/non_qualities/.gemini/antigravity/scratch/.dotnet/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
@@ -2463,14 +2461,14 @@
         "net10.0": {
           "targetAlias": "net10.0",
           "projectReferences": {
-            "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj": {
-              "projectPath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj"
+            "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj": {
+              "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Core/GeoSemanticSat.Core.csproj"
             },
-            "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj": {
-              "projectPath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj"
+            "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj": {
+              "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.Engine/GeoSemanticSat.Engine.csproj"
             },
-            "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj": {
-              "projectPath": "/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj"
+            "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj": {
+              "projectPath": "/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj"
             }
           }
         }
@@ -2804,14 +2802,16 @@
   },
   "logs": [
     {
-      "code": "NU1903",
+      "code": "NU1801",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "Package 'Tmds.DBus.Protocol' 0.20.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-xrw6-gwf8-vvr9",
-      "libraryId": "Tmds.DBus.Protocol",
-      "targetGraphs": [
-        "net10.0"
-      ]
+      "message": "Unable to load the service index for source https://api.nuget.org/v3/index.json."
+    },
+    {
+      "code": "NU1900",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Error occurred while getting package vulnerability data: Unable to load the service index for source https://api.nuget.org/v3/index.json."
     }
   ]
 }

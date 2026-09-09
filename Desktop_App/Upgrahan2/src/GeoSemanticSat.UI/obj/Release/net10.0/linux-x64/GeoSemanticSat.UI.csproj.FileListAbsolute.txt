@@ -481,3 +481,6 @@
 /home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/bin/Release/net10.0/linux-x64/GeoSemanticSat.Cli
 /home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/bin/Release/net10.0/linux-x64/GeoSemanticSat.Cli.dll
 /home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/bin/Release/net10.0/linux-x64/GeoSemanticSat.Cli.pdb
+/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/obj/Release/net10.0/linux-x64/GeoSemanticSat.UI.dll
+/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/obj/Release/net10.0/linux-x64/refint/GeoSemanticSat.UI.dll
+/home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/obj/Release/net10.0/linux-x64/GeoSemanticSat.UI.pdb

@@ -2,87 +2,94 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
   <!-- ==============================================================
-       DESIGN TOKENS . single source of truth
-       Views reference the LAYER 2 semantic names only, never a hex
-       value and never a primitive. Changing the accent is one edit here.
+       GNOME HIG DESIGN TOKENS (Libadwaita / Adwaita Dark)
+       https://developer.gnome.org/hig/
        ============================================================== -->
 
-  <!-- LAYER 1 . primitives. Never referenced from a view. -->
-  <Color x:Key="Graphite950">#0D0F13</Color>
-  <Color x:Key="Graphite900">#14171C</Color>
-  <Color x:Key="Graphite850">#181C22</Color>
-  <Color x:Key="Graphite800">#1E232A</Color>
-  <Color x:Key="Graphite700">#2A303A</Color>
-  <Color x:Key="Graphite600">#3A424F</Color>
-  <Color x:Key="Graphite400">#78828F</Color>
-  <Color x:Key="Graphite300">#A6AEBA</Color>
-  <Color x:Key="Graphite200">#CDD3DB</Color>
-  <Color x:Key="Graphite050">#F4F6F8</Color>
+  <!-- LAYER 1: GNOME Palette Primitives -->
+  <Color x:Key="GnomeDarkWindow">#242424</Color>
+  <Color x:Key="GnomeDarkHeader">#2A2A2A</Color>
+  <Color x:Key="GnomeDarkCard">#303030</Color>
+  <Color x:Key="GnomeDarkCardHover">#383838</Color>
+  <Color x:Key="GnomeDarkInset">#1E1E1E</Color>
+  <Color x:Key="GnomeDarkSunken">#181818</Color>
 
-  <Color x:Key="Cyan400">#38BDF8</Color>
-  <Color x:Key="Cyan500">#0EA5E9</Color>
-  <Color x:Key="Cyan950">#0A2536</Color>
+  <Color x:Key="GnomeBorder">#383838</Color>
+  <Color x:Key="GnomeBorderStrong">#4A4A4A</Color>
 
-  <Color x:Key="Mint400">#34D399</Color>
-  <Color x:Key="Mint950">#0A2A20</Color>
-  <Color x:Key="Rose400">#FB7185</Color>
-  <Color x:Key="Rose950">#33141B</Color>
-  <Color x:Key="Amber400">#FBBF24</Color>
-  <Color x:Key="Amber950">#2E2208</Color>
+  <Color x:Key="GnomeBlue3">#3584E4</Color>
+  <Color x:Key="GnomeBlue4">#1C71D8</Color>
+  <Color x:Key="GnomeBlueSurface">#14325C</Color>
 
-  <!-- LAYER 2 . semantic. This is the vocabulary views use. -->
+  <Color x:Key="GnomeGreen3">#33D17A</Color>
+  <Color x:Key="GnomeGreen4">#2EC27E</Color>
+  <Color x:Key="GnomeGreenSurface">#123620</Color>
 
+  <Color x:Key="GnomeOrange3">#FF7800</Color>
+  <Color x:Key="GnomeYellow3">#F6D32D</Color>
+  <Color x:Key="GnomeOrangeSurface">#3D2104</Color>
+
+  <Color x:Key="GnomeRed3">#E01B24</Color>
+  <Color x:Key="GnomeRed4">#C01C28</Color>
+  <Color x:Key="GnomeRedSurface">#3D1014</Color>
+
+  <Color x:Key="GnomeLight1">#FFFFFF</Color>
+  <Color x:Key="GnomeLight2">#DEDDDA</Color>
+  <Color x:Key="GnomeLight3">#C0BFBC</Color>
+  <Color x:Key="GnomeGray1">#9A9996</Color>
+  <Color x:Key="GnomeGray2">#77767B</Color>
+
+  <!-- LAYER 2: Semantic Theme Vocabulary -->
   <!-- Surfaces -->
-  <SolidColorBrush x:Key="AppBackgroundBrush"  Color="{StaticResource Graphite950}"/>
-  <SolidColorBrush x:Key="SurfaceBrush"        Color="{StaticResource Graphite900}"/>
-  <SolidColorBrush x:Key="SurfaceRaisedBrush"  Color="{StaticResource Graphite850}"/>
-  <SolidColorBrush x:Key="SurfaceInsetBrush"   Color="{StaticResource Graphite800}"/>
-  <SolidColorBrush x:Key="SurfaceSunkenBrush"  Color="{StaticResource Graphite950}"/>
+  <SolidColorBrush x:Key="AppBackgroundBrush"  Color="{StaticResource GnomeDarkWindow}"/>
+  <SolidColorBrush x:Key="SurfaceBrush"        Color="{StaticResource GnomeDarkHeader}"/>
+  <SolidColorBrush x:Key="SurfaceRaisedBrush"  Color="{StaticResource GnomeDarkCard}"/>
+  <SolidColorBrush x:Key="SurfaceHoverBrush"   Color="{StaticResource GnomeDarkCardHover}"/>
+  <SolidColorBrush x:Key="SurfaceInsetBrush"   Color="{StaticResource GnomeDarkInset}"/>
+  <SolidColorBrush x:Key="SurfaceSunkenBrush"  Color="{StaticResource GnomeDarkSunken}"/>
 
   <!-- Text -->
-  <SolidColorBrush x:Key="TextPrimaryBrush"    Color="{StaticResource Graphite050}"/>
-  <SolidColorBrush x:Key="TextSecondaryBrush"  Color="{StaticResource Graphite200}"/>
-  <SolidColorBrush x:Key="TextMutedBrush"      Color="{StaticResource Graphite300}"/>
-  <SolidColorBrush x:Key="TextFaintBrush"      Color="{StaticResource Graphite400}"/>
-  <SolidColorBrush x:Key="TextOnAccentBrush"   Color="{StaticResource Graphite950}"/>
+  <SolidColorBrush x:Key="TextPrimaryBrush"    Color="{StaticResource GnomeLight1}"/>
+  <SolidColorBrush x:Key="TextSecondaryBrush"  Color="{StaticResource GnomeLight2}"/>
+  <SolidColorBrush x:Key="TextMutedBrush"      Color="{StaticResource GnomeLight3}"/>
+  <SolidColorBrush x:Key="TextFaintBrush"      Color="{StaticResource GnomeGray1}"/>
+  <SolidColorBrush x:Key="TextOnAccentBrush"   Color="#FFFFFF"/>
 
   <!-- Rules and dividers -->
-  <SolidColorBrush x:Key="RuleBrush"           Color="{StaticResource Graphite700}"/>
-  <SolidColorBrush x:Key="RuleStrongBrush"     Color="{StaticResource Graphite600}"/>
+  <SolidColorBrush x:Key="RuleBrush"           Color="{StaticResource GnomeBorder}"/>
+  <SolidColorBrush x:Key="RuleStrongBrush"     Color="{StaticResource GnomeBorderStrong}"/>
 
-  <!-- One accent. Everything that needs a human uses this and nothing else. -->
-  <SolidColorBrush x:Key="AccentBrush"         Color="{StaticResource Cyan400}"/>
-  <SolidColorBrush x:Key="AccentPressedBrush"  Color="{StaticResource Cyan500}"/>
-  <SolidColorBrush x:Key="AccentDeepBrush"     Color="{StaticResource Cyan500}"/>
-  <SolidColorBrush x:Key="AccentSurfaceBrush"  Color="{StaticResource Cyan950}"/>
+  <!-- Accents -->
+  <SolidColorBrush x:Key="AccentBrush"         Color="{StaticResource GnomeBlue3}"/>
+  <SolidColorBrush x:Key="AccentPressedBrush"  Color="{StaticResource GnomeBlue4}"/>
+  <SolidColorBrush x:Key="AccentDeepBrush"     Color="{StaticResource GnomeBlue4}"/>
+  <SolidColorBrush x:Key="AccentSurfaceBrush"  Color="{StaticResource GnomeBlueSurface}"/>
 
-  <!-- Workflow states. See CONTEXT.md: Result, Candidate, Verified. -->
-  <SolidColorBrush x:Key="VerifiedBrush"        Color="{StaticResource Mint400}"/>
-  <SolidColorBrush x:Key="VerifiedSurfaceBrush" Color="{StaticResource Mint950}"/>
-  <SolidColorBrush x:Key="CandidateBrush"       Color="{StaticResource Amber400}"/>
-  <SolidColorBrush x:Key="CandidateSurfaceBrush" Color="{StaticResource Amber950}"/>
-  <SolidColorBrush x:Key="RejectedBrush"        Color="{StaticResource Rose400}"/>
-  <SolidColorBrush x:Key="RejectedSurfaceBrush" Color="{StaticResource Rose950}"/>
-  <SolidColorBrush x:Key="AlertBrush"           Color="{StaticResource Rose400}"/>
+  <!-- Status / Verification -->
+  <SolidColorBrush x:Key="VerifiedBrush"        Color="{StaticResource GnomeGreen3}"/>
+  <SolidColorBrush x:Key="VerifiedSurfaceBrush" Color="{StaticResource GnomeGreenSurface}"/>
+  <SolidColorBrush x:Key="CandidateBrush"       Color="{StaticResource GnomeOrange3}"/>
+  <SolidColorBrush x:Key="CandidateSurfaceBrush" Color="{StaticResource GnomeOrangeSurface}"/>
+  <SolidColorBrush x:Key="RejectedBrush"        Color="{StaticResource GnomeRed3}"/>
+  <SolidColorBrush x:Key="RejectedSurfaceBrush" Color="{StaticResource GnomeRedSurface}"/>
+  <SolidColorBrush x:Key="AlertBrush"           Color="{StaticResource GnomeRed3}"/>
 
   <!-- Map canvas -->
-  <SolidColorBrush x:Key="MapVoidBrush"        Color="#0B1520"/>
-  <SolidColorBrush x:Key="MapLandBrush"        Color="#10202D"/>
-  <SolidColorBrush x:Key="MapLandAltBrush"     Color="#122634"/>
+  <SolidColorBrush x:Key="MapVoidBrush"        Color="#141920"/>
+  <SolidColorBrush x:Key="MapLandBrush"        Color="#1A222C"/>
+  <SolidColorBrush x:Key="MapLandAltBrush"     Color="#202A36"/>
 
-  <!-- TYPE SCALE
-       12 is the floor. Below that, text is unreadable once a laptop is
-       mirrored to a projector, which is how this gets demonstrated. -->
-  <x:Double x:Key="FontMicro">12</x:Double>
+  <!-- TYPE SCALE (GNOME HIG) -->
+  <x:Double x:Key="FontMicro">11</x:Double>
   <x:Double x:Key="FontBody">13</x:Double>
   <x:Double x:Key="FontBodyLg">15</x:Double>
   <x:Double x:Key="FontTitle">18</x:Double>
-  <x:Double x:Key="FontDisplay">26</x:Double>
+  <x:Double x:Key="FontDisplay">24</x:Double>
 
-  <FontFamily x:Key="UiFont">Inter, Segoe UI, sans-serif</FontFamily>
-  <FontFamily x:Key="MonoFont">Cascadia Mono, Consolas, monospace</FontFamily>
+  <FontFamily x:Key="UiFont">Inter, Cantarell, -apple-system, Segoe UI, sans-serif</FontFamily>
+  <FontFamily x:Key="MonoFont">Cascadia Mono, Source Code Pro, Consolas, monospace</FontFamily>
 
-  <!-- SPACING . 4px rhythm -->
+  <!-- SPACING & PADDING -->
   <x:Double x:Key="Space1">4</x:Double>
   <x:Double x:Key="Space2">8</x:Double>
   <x:Double x:Key="Space3">12</x:Double>
@@ -93,5 +100,10 @@
   <Thickness x:Key="PadCard">16</Thickness>
   <Thickness x:Key="PadZone">20,16</Thickness>
 
+  <!-- GNOME CORNER RADII -->
   <CornerRadius x:Key="RadiusNone">0</CornerRadius>
+  <CornerRadius x:Key="RadiusControl">6</CornerRadius>
+  <CornerRadius x:Key="RadiusCard">10</CornerRadius>
+  <CornerRadius x:Key="RadiusPill">18</CornerRadius>
+  <CornerRadius x:Key="RadiusWindow">12</CornerRadius>
 </ResourceDictionary>

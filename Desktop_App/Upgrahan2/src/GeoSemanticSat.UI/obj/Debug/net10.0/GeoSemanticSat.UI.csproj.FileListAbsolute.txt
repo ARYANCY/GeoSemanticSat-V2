@@ -180,3 +180,8 @@
 /home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/bin/Debug/net10.0/GeoSemanticSat.Cli
 /home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/bin/Debug/net10.0/GeoSemanticSat.Cli.dll
 /home/non_qualities/.gemini/antigravity/scratch/GeoSemanticSat/src/GeoSemanticSat.UI/bin/Debug/net10.0/GeoSemanticSat.Cli.pdb
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.UI/bin/Debug/net10.0/GeoSemanticSat.Cli.deps.json
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.UI/bin/Debug/net10.0/GeoSemanticSat.Cli.runtimeconfig.json
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.UI/bin/Debug/net10.0/GeoSemanticSat.Cli
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.UI/bin/Debug/net10.0/GeoSemanticSat.Cli.dll
+/mnt/fedora_disk2/Projects2/Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.UI/bin/Debug/net10.0/GeoSemanticSat.Cli.pdb
