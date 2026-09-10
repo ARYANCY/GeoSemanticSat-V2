@@ -1,0 +1,55 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Desktop_App/**'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'Desktop_App/**'
+      - '.github/workflows/ci.yml'
+
+jobs:
+  test-and-build:
+    name: Test & Build Desktop App
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10 SDK (Preview)
+        id: setup-dotnet-preview
+        continue-on-error: true
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+          dotnet-quality: 'preview'
+
+      - name: Setup .NET 10 SDK (GA Fallback)
+        if: steps.setup-dotnet-preview.outcome == 'failure'
+        id: setup-dotnet-ga
+        continue-on-error: true
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Setup .NET 10 SDK (Install Script Fallback)
+        if: steps.setup-dotnet-preview.outcome == 'failure' && steps.setup-dotnet-ga.outcome == 'failure'
+        run: |
+          curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 10.0
+          echo "$HOME/.dotnet" >> $GITHUB_PATH
+
+      - name: Ensure NuGet Package Source
+        run: dotnet nuget add source https://api.nuget.org/v3/index.json -n nuget.org || true
+
+      - name: Run Tests
+        run: dotnet test Desktop_App/Upgrahan2/src/GeoSemanticSat.Tests/GeoSemanticSat.Tests.csproj -c Release --nowarn:NU1903,NU1902,NU1904
+
+      - name: Validate Build
+        run: dotnet build Desktop_App/Upgrahan2/GeoSemanticSat.slnx -c Release --nowarn:NU1903,NU1902,NU1904

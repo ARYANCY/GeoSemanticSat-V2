@@ -1,0 +1,305 @@
+name: Release Desktop App
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release Tag (e.g., v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+        type: string
+      release_title:
+        description: 'Release Title (optional, defaults to "GeoSemanticSat Desktop Release <tag>")'
+        required: false
+        default: ''
+        type: string
+      draft:
+        description: 'Create as Draft Release'
+        required: false
+        default: false
+        type: boolean
+      prerelease:
+        description: 'Mark as Pre-release'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  test:
+    name: Run Automated Test Suite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET 10 SDK (Preview)
+        id: setup-dotnet-preview
+        continue-on-error: true
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+          dotnet-quality: 'preview'
+
+      - name: Setup .NET 10 SDK (GA Fallback)
+        if: steps.setup-dotnet-preview.outcome == 'failure'
+        id: setup-dotnet-ga
+        continue-on-error: true
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Setup .NET 10 SDK (Install Script Fallback)
+        if: steps.setup-dotnet-preview.outcome == 'failure' && steps.setup-dotnet-ga.outcome == 'failure'
+        run: |
+          curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 10.0
+          echo "$HOME/.dotnet" >> $GITHUB_PATH
+
+      - name: Ensure NuGet Package Source
+        run: dotnet nuget add source https://api.nuget.org/v3/index.json -n nuget.org || true
+
+      - name: Execute Tests
+        run: dotnet test Desktop_App/Upgrahan2/src/GeoSemanticSat.Tests/GeoSemanticSat.Tests.csproj -c Release --nowarn:NU1903,NU1902,NU1904
+
+  build:
+    name: Build ${{ matrix.platform_name }}
+    needs: test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+            platform_name: Windows x64
+          - os: ubuntu-latest
+            rid: linux-x64
+            platform_name: Linux x64
+          - os: macos-latest
+            rid: osx-arm64
+            platform_name: macOS Apple Silicon (ARM64)
+          - os: macos-latest
+            rid: osx-x64
+            platform_name: macOS Intel (x64)
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET 10 SDK (Preview)
+        id: setup-dotnet-preview
+        continue-on-error: true
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+          dotnet-quality: 'preview'
+
+      - name: Setup .NET 10 SDK (GA Fallback)
+        if: steps.setup-dotnet-preview.outcome == 'failure'
+        id: setup-dotnet-ga
+        continue-on-error: true
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Setup .NET 10 SDK (Install Script Fallback)
+        if: steps.setup-dotnet-preview.outcome == 'failure' && steps.setup-dotnet-ga.outcome == 'failure'
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            powershell -Command "& ([scriptblock]::Create((Invoke-WebRequest -UseBasicParsing 'https://dot.net/v1/dotnet-install.ps1').Content)) -Channel 10.0"
+            echo "$LOCALAPPDATA\Microsoft\dotnet" >> $GITHUB_PATH
+          else
+            curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 10.0
+            echo "$HOME/.dotnet" >> $GITHUB_PATH
+          fi
+
+      - name: Ensure NuGet Package Source
+        shell: bash
+        run: dotnet nuget add source https://api.nuget.org/v3/index.json -n nuget.org || true
+
+      - name: Build & Package Windows x64
+        if: matrix.rid == 'win-x64'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist/artifacts | Out-Null
+
+          # 1. Full self-contained directory release
+          dotnet publish Desktop_App/Upgrahan2/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj `
+            -c Release `
+            -r win-x64 `
+            --self-contained true `
+            -o dist/win-x64 `
+            --nowarn:NU1903,NU1902,NU1904
+
+          # Release file locks before compressing
+          dotnet build-server shutdown
+          Start-Sleep -Seconds 1
+          Compress-Archive -Path dist/win-x64/* -DestinationPath dist/artifacts/GeoSemanticSat-Desktop-win-x64.zip -CompressionLevel Optimal
+
+          # 2. Standalone single-file portable executable
+          dotnet publish Desktop_App/Upgrahan2/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj `
+            -c Release `
+            -r win-x64 `
+            --self-contained true `
+            -p:PublishSingleFile=true `
+            -p:IncludeNativeLibrariesForSelfExtract=true `
+            -o dist/standalone `
+            --nowarn:NU1903,NU1902,NU1904
+
+          dotnet build-server shutdown
+          Start-Sleep -Seconds 1
+          Copy-Item dist/standalone/GeoSemanticSat.UI.exe -Destination dist/artifacts/GeoSemanticSat-Desktop-win-x64-standalone.exe
+
+      - name: Build & Package Linux x64
+        if: matrix.rid == 'linux-x64'
+        shell: bash
+        run: |
+          mkdir -p dist/artifacts
+          dotnet publish Desktop_App/Upgrahan2/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj \
+            -c Release \
+            -r linux-x64 \
+            --self-contained true \
+            -o dist/linux-x64 \
+            --nowarn:NU1903,NU1902,NU1904
+
+          chmod +x dist/linux-x64/GeoSemanticSat.UI
+          tar -czvf dist/artifacts/GeoSemanticSat-Desktop-linux-x64.tar.gz -C dist/linux-x64 .
+
+      - name: Build & Package macOS (${{ matrix.rid }})
+        if: startsWith(matrix.rid, 'osx-')
+        shell: bash
+        run: |
+          mkdir -p dist/artifacts
+          dotnet publish Desktop_App/Upgrahan2/src/GeoSemanticSat.UI/GeoSemanticSat.UI.csproj \
+            -c Release \
+            -r ${{ matrix.rid }} \
+            --self-contained true \
+            -o dist/${{ matrix.rid }} \
+            --nowarn:NU1903,NU1902,NU1904
+
+          chmod +x dist/${{ matrix.rid }}/GeoSemanticSat.UI
+          tar -czvf dist/artifacts/GeoSemanticSat-Desktop-${{ matrix.rid }}.tar.gz -C dist/${{ matrix.rid }} .
+
+      - name: Upload Platform Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.rid }}
+          path: dist/artifacts/*
+          if-no-files-found: error
+
+  publish-release:
+    name: Publish GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Download Built Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: desktop-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: Generate Checksums & Release Notes
+        shell: bash
+        run: |
+          cd release-assets
+          sha256sum GeoSemanticSat-* > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+          cd ..
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ github.event.inputs.tag_name }}"
+            TITLE="${{ github.event.inputs.release_title }}"
+            if [ -z "$TITLE" ]; then
+              TITLE="GeoSemanticSat Desktop Release $TAG"
+            fi
+          else
+            TAG="${GITHUB_REF_NAME}"
+            TITLE="GeoSemanticSat Desktop Release $TAG"
+          fi
+          echo "RELEASE_TAG=$TAG" >> $GITHUB_ENV
+          echo "RELEASE_TITLE=$TITLE" >> $GITHUB_ENV
+
+          cat << 'EOF' > RELEASE_NOTES.md
+          # GeoSemanticSat — Sovereign Earth Observation Intelligence Studio
+
+          Official standalone desktop application releases for **GeoSemanticSat** (UpaGraha).
+          All binaries are self-contained and pre-packaged with the .NET runtime and native acceleration libraries (ONNX Runtime, SkiaSharp). No external runtime installation is required.
+
+          ---
+
+          ### Available Downloads
+
+          | Platform | Package | Description |
+          |:---|:---|:---|
+          | **Windows x64** | `GeoSemanticSat-Desktop-win-x64.zip` | Full portable directory bundle. Extract and launch `GeoSemanticSat.UI.exe`. |
+          | **Windows x64** | `GeoSemanticSat-Desktop-win-x64-standalone.exe` | Single standalone portable executable. Ready to run immediately. |
+          | **Linux x64** | `GeoSemanticSat-Desktop-linux-x64.tar.gz` | Self-contained Linux build (X11 / Wayland with automatic headless CLI fallback). |
+          | **macOS Apple Silicon** | `GeoSemanticSat-Desktop-osx-arm64.tar.gz` | Native Apple Silicon (M1/M2/M3/M4) self-contained archive. |
+          | **macOS Intel** | `GeoSemanticSat-Desktop-osx-x64.tar.gz` | Native Intel x64 self-contained archive. |
+          | **Verification** | `SHA256SUMS.txt` | SHA-256 cryptographic hashes for integrity verification. |
+
+          ---
+
+          ### Quick Start
+
+          #### Windows
+          - Option A: Download `GeoSemanticSat-Desktop-win-x64.zip`, extract to any folder, and double-click `GeoSemanticSat.UI.exe`.
+          - Option B: Download `GeoSemanticSat-Desktop-win-x64-standalone.exe` and run directly.
+
+          #### Linux
+          ```bash
+          tar -xzvf GeoSemanticSat-Desktop-linux-x64.tar.gz -C ./geosemanticsat
+          cd ./geosemanticsat
+          ./GeoSemanticSat.UI
+          ```
+          *(Note: When executed in an environment without X11/Wayland, the application automatically runs in CLI mode)*
+
+          #### macOS
+          ```bash
+          tar -xzvf GeoSemanticSat-Desktop-osx-arm64.tar.gz -C ./geosemanticsat # (or osx-x64 for Intel)
+          cd ./geosemanticsat
+          xattr -d com.apple.quarantine GeoSemanticSat.UI 2>/dev/null || true
+          ./GeoSemanticSat.UI
+          ```
+
+          ---
+
+          ### Integrity Verification (SHA-256)
+          Verify downloads using the bundled `SHA256SUMS.txt`:
+          ```bash
+          sha256sum -c SHA256SUMS.txt
+          ```
+          EOF
+
+      - name: Create or Update GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: ${{ env.RELEASE_TITLE }}
+          body_path: RELEASE_NOTES.md
+          draft: ${{ github.event.inputs.draft == 'true' }}
+          prerelease: ${{ github.event.inputs.prerelease == 'true' }}
+          files: |
+            release-assets/GeoSemanticSat-Desktop-win-x64.zip
+            release-assets/GeoSemanticSat-Desktop-win-x64-standalone.exe
+            release-assets/GeoSemanticSat-Desktop-linux-x64.tar.gz
+            release-assets/GeoSemanticSat-Desktop-osx-arm64.tar.gz
+            release-assets/GeoSemanticSat-Desktop-osx-x64.tar.gz
+            release-assets/SHA256SUMS.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
