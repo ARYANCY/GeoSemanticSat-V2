@@ -1747,14 +1747,16 @@ public partial class MainWindow : Window
         }
         this.RequestedThemeVariant = targetVariant;
 
-        if (TxtThemeMode != null)
+        var txtThemeMode = this.FindControl<TextBlock>("TxtThemeMode");
+        if (txtThemeMode != null)
         {
-            TxtThemeMode.Text = _isDarkTheme ? "Light Mode" : "Dark Mode";
+            txtThemeMode.Text = _isDarkTheme ? "Light Mode" : "Dark Mode";
         }
 
-        if (IconTheme != null)
+        var iconTheme = this.FindControl<LucideAvalonia.Lucide>("IconTheme");
+        if (iconTheme != null)
         {
-            IconTheme.Icon = _isDarkTheme ? LucideAvalonia.Enum.LucideIconNames.Sun : LucideAvalonia.Enum.LucideIconNames.Moon;
+            iconTheme.Icon = _isDarkTheme ? LucideAvalonia.Enum.LucideIconNames.Sun : LucideAvalonia.Enum.LucideIconNames.Moon;
         }
 
         Dispatcher.UIThread.Post(() =>
@@ -1770,28 +1772,36 @@ public partial class MainWindow : Window
     {
         _isMapFullscreen = !_isMapFullscreen;
 
-        if (PnlTab2Filters != null) PnlTab2Filters.IsVisible = !_isMapFullscreen;
-        if (PnlTab2Status != null) PnlTab2Status.IsVisible = !_isMapFullscreen;
-        if (BrdTab2ResultsList != null) BrdTab2ResultsList.IsVisible = !_isMapFullscreen;
+        var pnlTab2Filters = this.FindControl<Control>("PnlTab2Filters");
+        var pnlTab2Status = this.FindControl<Control>("PnlTab2Status");
+        var brdTab2ResultsList = this.FindControl<Control>("BrdTab2ResultsList");
+        var brdTab2MapContainer = this.FindControl<Control>("BrdTab2MapContainer");
+        var txtMapFullscreen = this.FindControl<TextBlock>("TxtMapFullscreen");
+        var iconMapFullscreen = this.FindControl<LucideAvalonia.Lucide>("IconMapFullscreen");
+        var btnToggleMapFullscreen = this.FindControl<Button>("BtnToggleMapFullscreen");
 
-        if (BrdTab2MapContainer != null)
+        if (pnlTab2Filters != null) pnlTab2Filters.IsVisible = !_isMapFullscreen;
+        if (pnlTab2Status != null) pnlTab2Status.IsVisible = !_isMapFullscreen;
+        if (brdTab2ResultsList != null) brdTab2ResultsList.IsVisible = !_isMapFullscreen;
+
+        if (brdTab2MapContainer != null)
         {
-            Grid.SetColumnSpan(BrdTab2MapContainer, _isMapFullscreen ? 2 : 1);
+            Grid.SetColumnSpan(brdTab2MapContainer, _isMapFullscreen ? 2 : 1);
         }
 
-        if (TxtMapFullscreen != null)
+        if (txtMapFullscreen != null)
         {
-            TxtMapFullscreen.Text = _isMapFullscreen ? "Exit Fullscreen" : "Fullscreen";
+            txtMapFullscreen.Text = _isMapFullscreen ? "Exit Fullscreen" : "Fullscreen";
         }
 
-        if (IconMapFullscreen != null)
+        if (iconMapFullscreen != null)
         {
-            IconMapFullscreen.Icon = _isMapFullscreen ? LucideAvalonia.Enum.LucideIconNames.Minimize : LucideAvalonia.Enum.LucideIconNames.Maximize;
+            iconMapFullscreen.Icon = _isMapFullscreen ? LucideAvalonia.Enum.LucideIconNames.Minimize : LucideAvalonia.Enum.LucideIconNames.Maximize;
         }
 
-        if (BtnToggleMapFullscreen != null)
+        if (btnToggleMapFullscreen != null)
         {
-            ToolTip.SetTip(BtnToggleMapFullscreen, _isMapFullscreen ? "Exit Map Fullscreen (Key: Esc or F)" : "Expand map to full screen (Key: F)");
+            ToolTip.SetTip(btnToggleMapFullscreen, _isMapFullscreen ? "Exit Map Fullscreen (Key: Esc or F)" : "Expand map to full screen (Key: F)");
         }
 
         Dispatcher.UIThread.Post(() =>
@@ -1806,27 +1816,34 @@ public partial class MainWindow : Window
     {
         _isTab4MapFullscreen = !_isTab4MapFullscreen;
 
-        if (PnlTab4Header != null) PnlTab4Header.IsVisible = !_isTab4MapFullscreen;
-        if (BrdTab4ResultsList != null) BrdTab4ResultsList.IsVisible = !_isTab4MapFullscreen;
+        var pnlTab4Header = this.FindControl<Control>("PnlTab4Header");
+        var brdTab4ResultsList = this.FindControl<Control>("BrdTab4ResultsList");
+        var brdTab4MapContainer = this.FindControl<Control>("BrdTab4MapContainer");
+        var txtTab4MapFullscreen = this.FindControl<TextBlock>("TxtTab4MapFullscreen");
+        var iconTab4MapFullscreen = this.FindControl<LucideAvalonia.Lucide>("IconTab4MapFullscreen");
+        var btnToggleTab4MapFullscreen = this.FindControl<Button>("BtnToggleTab4MapFullscreen");
 
-        if (BrdTab4MapContainer != null)
+        if (pnlTab4Header != null) pnlTab4Header.IsVisible = !_isTab4MapFullscreen;
+        if (brdTab4ResultsList != null) brdTab4ResultsList.IsVisible = !_isTab4MapFullscreen;
+
+        if (brdTab4MapContainer != null)
         {
-            Grid.SetColumnSpan(BrdTab4MapContainer, _isTab4MapFullscreen ? 2 : 1);
+            Grid.SetColumnSpan(brdTab4MapContainer, _isTab4MapFullscreen ? 2 : 1);
         }
 
-        if (TxtTab4MapFullscreen != null)
+        if (txtTab4MapFullscreen != null)
         {
-            TxtTab4MapFullscreen.Text = _isTab4MapFullscreen ? "Exit Fullscreen" : "Fullscreen";
+            txtTab4MapFullscreen.Text = _isTab4MapFullscreen ? "Exit Fullscreen" : "Fullscreen";
         }
 
-        if (IconTab4MapFullscreen != null)
+        if (iconTab4MapFullscreen != null)
         {
-            IconTab4MapFullscreen.Icon = _isTab4MapFullscreen ? LucideAvalonia.Enum.LucideIconNames.Minimize : LucideAvalonia.Enum.LucideIconNames.Maximize;
+            iconTab4MapFullscreen.Icon = _isTab4MapFullscreen ? LucideAvalonia.Enum.LucideIconNames.Minimize : LucideAvalonia.Enum.LucideIconNames.Maximize;
         }
 
-        if (BtnToggleTab4MapFullscreen != null)
+        if (btnToggleTab4MapFullscreen != null)
         {
-            ToolTip.SetTip(BtnToggleTab4MapFullscreen, _isTab4MapFullscreen ? "Exit Map Fullscreen (Key: Esc or F)" : "Expand map to full screen");
+            ToolTip.SetTip(btnToggleTab4MapFullscreen, _isTab4MapFullscreen ? "Exit Map Fullscreen (Key: Esc or F)" : "Expand map to full screen");
         }
 
         Dispatcher.UIThread.Post(() =>
