@@ -1,5 +1,7 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:suki="clr-namespace:SukiUI;assembly=SukiUI"
+             xmlns:sukic="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              x:Class="GeoSemanticSat.UI.App"
              RequestedThemeVariant="Dark">
 
@@ -12,12 +14,31 @@
     </Application.Resources>
 
     <Application.Styles>
-        <FluentTheme />
+        <suki:SukiTheme ThemeColor="Blue" />
 
-        <!-- GNOME HIG BASE RADII & TRANSITIONS -->
         <Style Selector=":is(TemplatedControl)">
             <Setter Property="CornerRadius" Value="{DynamicResource RadiusControl}"/>
         </Style>
+
+        <!-- =====================================================================
+             SUKIWINDOW CHROME
+
+             SukiUI paints a SukiBackground layer across the whole client area,
+             under our content. Its default is a blue gradient, and that is what
+             put a blue cast over every surface in the app - the gaps between
+             cards were never our page colour, they were Suki's.
+
+             It is not reachable by style: its template part does not match
+             "#PART_Background", and overriding a "SukiBackground" resource key
+             does nothing either. BackgroundStyle="Flat" on the window stops the
+             gradient, and RootWindowPanel then paints our own page colour over
+             the top, which is what actually makes the app neutral.
+
+             Worth knowing if you add SukiWindow styles here: MainWindow derives
+             from SukiWindow, and a bare Avalonia type selector matches the exact
+             type only - "sukic|SukiWindow" silently matches nothing. Use :is().
+             ===================================================================== -->
+
 
         <!-- ===================== TYPOGRAPHY ===================== -->
         <Style Selector="TextBlock">
@@ -26,11 +47,24 @@
             <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
         </Style>
 
-        <!-- GNOME Caption / Subtitle: Natural sentence case, high legibility -->
-        <Style Selector="TextBlock.label">
+        <!--
+          Section header. Structure is signalled by case, tracking and weight -
+          NOT by hue. This class replaces the accent-blue bold captions that
+          previously marked every group, which made ten sibling groups all read
+          as the most important thing on screen.
+        -->
+        <Style Selector="TextBlock.sectionHeader">
             <Setter Property="FontSize" Value="{DynamicResource FontMicro}"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="LetterSpacing" Value="0.7"/>
             <Setter Property="Foreground" Value="{DynamicResource TextFaintBrush}"/>
+        </Style>
+
+        <!-- Field label above an input -->
+        <Style Selector="TextBlock.label">
+            <Setter Property="FontSize" Value="{DynamicResource FontMicro}"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
         </Style>
 
         <Style Selector="TextBlock.subtitle">
@@ -46,17 +80,18 @@
 
         <Style Selector="TextBlock.title">
             <Setter Property="FontSize" Value="{DynamicResource FontTitle}"/>
-            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
         </Style>
 
         <Style Selector="TextBlock.display">
             <Setter Property="FontSize" Value="{DynamicResource FontDisplay}"/>
-            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
         </Style>
 
-        <!-- Monospace measurements: coordinates, hashes, timestamps -->
+        <!-- Measurements: coordinates, hashes, timestamps, deltas.
+             Tabular figures so columns of numbers line up. -->
         <Style Selector="TextBlock.mono">
             <Setter Property="FontFamily" Value="{DynamicResource MonoFont}"/>
             <Setter Property="FontSize" Value="{DynamicResource FontMicro}"/>
@@ -70,33 +105,61 @@
             <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
         </Style>
 
-        <!-- ===================== GNOME SURFACES & CONTAINERS ===================== -->
+        <!-- The one number a panel exists to show. -->
+        <Style Selector="TextBlock.metric">
+            <Setter Property="FontFamily" Value="{DynamicResource MonoFont}"/>
+            <Setter Property="FontSize" Value="{DynamicResource FontTitle}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+        </Style>
+
+        <!-- ===================== SURFACES & CONTAINERS ===================== -->
         <Style Selector="Border.headerbar">
-            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource ChromeBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource RuleBrush}"/>
             <Setter Property="BorderThickness" Value="0,0,0,1"/>
-            <Setter Property="Padding" Value="14,8"/>
-            <Setter Property="MinHeight" Value="50"/>
+            <Setter Property="Padding" Value="14,6"/>
+            <Setter Property="MinHeight" Value="44"/>
+        </Style>
+
+        <Style Selector="Border.statusbar">
+            <Setter Property="Background" Value="{DynamicResource ChromeBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource RuleBrush}"/>
+            <Setter Property="BorderThickness" Value="0,1,0,0"/>
+            <Setter Property="Padding" Value="16,5"/>
+            <Setter Property="MinHeight" Value="28"/>
         </Style>
 
         <Style Selector="Border.card">
-            <Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource SurfaceCardBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource RuleBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="{DynamicResource RadiusCard}"/>
             <Setter Property="Padding" Value="{DynamicResource PadCard}"/>
         </Style>
 
+        <!--
+          Compact grouping inside a card. Borderless on purpose: a bordered box
+          inside a bordered box inside a bordered box is the single loudest
+          "generated UI" tell. Depth here comes from a 3% fill and spacing.
+        -->
         <Style Selector="Border.cardCompact">
-            <Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource RuleBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+            <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="CornerRadius" Value="{DynamicResource RadiusControl}"/>
             <Setter Property="Padding" Value="10,8"/>
         </Style>
 
+        <!-- Compact group sitting directly on the page (not nested) still needs
+             a hairline to separate it from the backdrop. -->
+        <Style Selector="Border.cardCompact.onPage">
+            <Setter Property="Background" Value="{DynamicResource SurfaceCardBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource RuleBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
         <Style Selector="Border.boxedList">
-            <Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource RuleBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="{DynamicResource RadiusCard}"/>
@@ -108,144 +171,201 @@
             <Setter Property="Padding" Value="10,4"/>
         </Style>
 
-        <!-- ===================== GNOME BUTTONS ===================== -->
+        <!-- Quiet metadata chip: fill only, no border, no accent text. -->
+        <Style Selector="Border.badge">
+            <Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="6,2"/>
+        </Style>
+
+        <!-- =====================================================================
+             BUTTONS
+
+             ROOT-CAUSE NOTE (square hover halo):
+             SukiUI's Button ControlTheme paints its hover/pressed state onto the
+             inner ContentPresenter. That element sits *inside* the button's
+             padding and carries no CornerRadius, so every hover drew a hard
+             square block behind the label - inside a rounded button. The fix is
+             to stop anything painting there and move all state colour onto the
+             control itself, whose template root border is the thing that
+             actually has the corner radius.
+             ===================================================================== -->
+        <Style Selector=":is(Button) /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ClearBrush}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="0"/>
+        </Style>
+
         <Style Selector="Button">
             <Setter Property="FontFamily" Value="{DynamicResource UiFont}"/>
             <Setter Property="FontSize" Value="{DynamicResource FontBody}"/>
-            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="FontWeight" Value="Normal"/>
             <Setter Property="CornerRadius" Value="{DynamicResource RadiusControl}"/>
-            <Setter Property="Padding" Value="12,7"/>
-            <Setter Property="MinHeight" Value="34"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="MinHeight" Value="32"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
-            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource RuleBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Transitions">
                 <Transitions>
-                    <BrushTransition Property="Background" Duration="0:0:0.1" Easing="CubicEaseOut"/>
-                    <BrushTransition Property="BorderBrush" Duration="0:0:0.1" Easing="CubicEaseOut"/>
+                    <BrushTransition Property="Background" Duration="0:0:0.09" Easing="CubicEaseOut"/>
+                    <BrushTransition Property="BorderBrush" Duration="0:0:0.09" Easing="CubicEaseOut"/>
+                    <BrushTransition Property="Foreground" Duration="0:0:0.09" Easing="CubicEaseOut"/>
                 </Transitions>
             </Setter>
         </Style>
 
-        <Style Selector="Button:pointerover /template/ ContentPresenter">
+        <Style Selector="Button:pointerover">
             <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource RuleStrongBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
         </Style>
 
-        <!-- Suggested action (Primary Accent Blue) -->
+        <Style Selector="Button:pressed">
+            <Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
+            <Setter Property="RenderTransform" Value="none"/>
+        </Style>
+
+        <Style Selector="Button:disabled">
+            <Setter Property="Opacity" Value="0.4"/>
+        </Style>
+
+        <!-- Keyboard focus must stay visible: accessibility, not decoration. -->
+        <Style Selector="Button:focus-visible">
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <!-- Suggested action. One filled accent button per view, maximum. -->
         <Style Selector="Button.suggested, Button.primary">
             <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource TextOnAccentBrush}"/>
-            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
         </Style>
-        <Style Selector="Button.suggested /template/ ContentPresenter, Button.primary /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+        <Style Selector="Button.suggested:pointerover, Button.primary:pointerover">
+            <Setter Property="Background" Value="{DynamicResource AccentHoverBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentHoverBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource TextOnAccentBrush}"/>
         </Style>
-        <Style Selector="Button.suggested:pointerover /template/ ContentPresenter, Button.primary:pointerover /template/ ContentPresenter">
+        <Style Selector="Button.suggested:pressed, Button.primary:pressed">
             <Setter Property="Background" Value="{DynamicResource AccentPressedBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentPressedBrush}"/>
         </Style>
 
-        <!-- Destructive action (Red) -->
+        <!-- Destructive action: outlined, not filled. A solid red block competes
+             with the accent for "do this next", which is exactly wrong. -->
         <Style Selector="Button.destructive">
-            <Setter Property="Background" Value="{DynamicResource RejectedBrush}"/>
-            <Setter Property="Foreground" Value="#FFFFFF"/>
-            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="{DynamicResource ClearBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource RejectedBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource RejectedBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
         </Style>
-        <Style Selector="Button.destructive /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource RejectedBrush}"/>
-            <Setter Property="Foreground" Value="#FFFFFF"/>
-        </Style>
-        <Style Selector="Button.destructive:pointerover /template/ ContentPresenter">
+        <Style Selector="Button.destructive:pointerover">
             <Setter Property="Background" Value="{DynamicResource RejectedSurfaceBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource RejectedBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource RejectedBrush}"/>
         </Style>
 
-        <!-- Verified / Confirm action (Green) -->
+        <!-- Confirm / verify action: outlined green, same weight as destructive
+             so the pair reads as a balanced choice. -->
         <Style Selector="Button.verify">
-            <Setter Property="Background" Value="{DynamicResource VerifiedSurfaceBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource ClearBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource VerifiedBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource VerifiedBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
         </Style>
-        <Style Selector="Button.verify /template/ ContentPresenter">
+        <Style Selector="Button.verify:pointerover">
             <Setter Property="Background" Value="{DynamicResource VerifiedSurfaceBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource VerifiedBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource VerifiedBrush}"/>
         </Style>
 
-        <!-- Flat / Ghost Button -->
+        <!-- Flat / ghost: default weight for secondary and tertiary actions. -->
         <Style Selector="Button.flat, Button.ghost">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="{DynamicResource ClearBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ClearBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
+        </Style>
+        <Style Selector="Button.flat:pointerover, Button.ghost:pointerover">
+            <Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ClearBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+        </Style>
+
+        <!-- Quiet outline: the default for row-level actions so a list of
+             results is not a wall of saturated blue. -->
+        <Style Selector="Button.quiet">
+            <Setter Property="Background" Value="{DynamicResource ClearBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource RuleStrongBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
         </Style>
-        <Style Selector="Button.flat /template/ ContentPresenter, Button.ghost /template/ ContentPresenter">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-        </Style>
-        <Style Selector="Button.flat:pointerover /template/ ContentPresenter, Button.ghost:pointerover /template/ ContentPresenter">
+        <Style Selector="Button.quiet:pointerover">
             <Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
         </Style>
 
-        <!-- Pill Chip Button -->
+        <!-- Pill chip -->
         <Style Selector="Button.chip">
             <Setter Property="CornerRadius" Value="{DynamicResource RadiusPill}"/>
-            <Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource ClearBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource RuleBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
             <Setter Property="FontSize" Value="{DynamicResource FontMicro}"/>
-            <Setter Property="FontWeight" Value="Medium"/>
-            <Setter Property="Padding" Value="11,5"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="Padding" Value="11,4"/>
             <Setter Property="MinHeight" Value="0"/>
         </Style>
-        <Style Selector="Button.chip:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}"/>
+        <Style Selector="Button.chip:pointerover">
+            <Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource RuleStrongBrush}"/>
         </Style>
 
-        <!-- ===================== ADW VIEW SWITCHER (PILL SEGMENTS) ===================== -->
+        <!-- ===================== VIEW SWITCHER (SEGMENTED) ===================== -->
         <Style Selector="Button.stage, Button.switcher">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="{DynamicResource ClearBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ClearBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="{DynamicResource RadiusControl}"/>
-            <Setter Property="Padding" Value="12,6"/>
-            <Setter Property="MinHeight" Value="32"/>
+            <Setter Property="Padding" Value="12,5"/>
+            <Setter Property="MinHeight" Value="28"/>
             <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
-            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="FontWeight" Value="Normal"/>
         </Style>
-        <Style Selector="Button.stage /template/ ContentPresenter, Button.switcher /template/ ContentPresenter">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
-        </Style>
-        <Style Selector="Button.stage:pointerover /template/ ContentPresenter, Button.switcher:pointerover /template/ ContentPresenter">
+        <Style Selector="Button.stage:pointerover, Button.switcher:pointerover">
             <Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ClearBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
         </Style>
+        <!-- Selected segment: a raised neutral chip, not a saturated blue fill.
+             The blue is spent once, on the step number badge. -->
         <Style Selector="Button.stage.current, Button.switcher.current">
-            <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
-            <Setter Property="Foreground" Value="#FFFFFF"/>
-            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource RuleStrongBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
         </Style>
-        <Style Selector="Button.stage.current /template/ ContentPresenter, Button.switcher.current /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
-            <Setter Property="Foreground" Value="#FFFFFF"/>
+        <Style Selector="Button.stage.current:pointerover, Button.switcher.current:pointerover">
+            <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}"/>
         </Style>
         <Style Selector="Button.stage:disabled, Button.switcher:disabled">
-            <Setter Property="Opacity" Value="0.4"/>
+            <Setter Property="Opacity" Value="0.35"/>
         </Style>
 
-        <!-- Chromeless TabControl (controlled by header ViewSwitcher) -->
+        <!-- Chromeless TabControl (navigation lives in the header ViewSwitcher) -->
         <Style Selector="TabControl.chromeless /template/ ItemsPresenter#PART_ItemsPresenter">
             <Setter Property="IsVisible" Value="False"/>
         </Style>
 
-        <!-- ===================== GNOME INPUTS ===================== -->
+        <!-- ===================== INPUTS ===================== -->
         <Style Selector="TextBox">
             <Setter Property="CornerRadius" Value="{DynamicResource RadiusControl}"/>
             <Setter Property="Background" Value="{DynamicResource SurfaceInsetBrush}"/>
@@ -253,12 +373,12 @@
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
             <Setter Property="FontSize" Value="{DynamicResource FontBody}"/>
-            <Setter Property="Padding" Value="12,8"/>
-            <Setter Property="MinHeight" Value="36"/>
+            <Setter Property="Padding" Value="10,7"/>
+            <Setter Property="MinHeight" Value="32"/>
         </Style>
         <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
             <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
-            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="BorderThickness" Value="1"/>
         </Style>
 
         <Style Selector="ComboBox">
@@ -268,8 +388,8 @@
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
             <Setter Property="FontSize" Value="{DynamicResource FontBody}"/>
-            <Setter Property="MinHeight" Value="34"/>
-            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="MinHeight" Value="32"/>
+            <Setter Property="Padding" Value="10,5"/>
         </Style>
 
         <Style Selector="ComboBoxItem:disabled">
@@ -277,16 +397,20 @@
             <Setter Property="Opacity" Value="0.5"/>
         </Style>
 
+        <Style Selector="CheckBox">
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+        </Style>
+
         <Style Selector="Expander">
             <Setter Property="CornerRadius" Value="{DynamicResource RadiusControl}"/>
-            <Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource RuleBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
             <Setter Property="FontSize" Value="{DynamicResource FontMicro}"/>
         </Style>
 
         <Style Selector="ListBox">
-            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Background" Value="{DynamicResource ClearBrush}"/>
         </Style>
 
         <Style Selector="ListBoxItem">

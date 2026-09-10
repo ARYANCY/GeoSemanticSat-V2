@@ -42,6 +42,15 @@ class Program
             }
         }
 
+        // Single instance guard for GUI (Audit Item 64)
+        const string mutexName = @"Global\GeoSemanticSat_Desktop_SingleInstance_Mutex";
+        using var mutex = new System.Threading.Mutex(true, mutexName, out bool createdNew);
+        if (!createdNew)
+        {
+            Console.WriteLine("[GeoSemanticSat] Another instance is already running.");
+            return 0;
+        }
+
         return BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
     }
 

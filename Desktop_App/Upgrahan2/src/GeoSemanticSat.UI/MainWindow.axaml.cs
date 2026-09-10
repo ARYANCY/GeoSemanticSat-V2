@@ -30,7 +30,7 @@ public class ChangeListItemViewModel
 {
     public required string Id { get; init; }
     public required string Type { get; init; }
-    public required string TypeBadgeColor { get; init; }
+    public required IBrush TypeBadgeColor { get; init; }
     public required string Title { get; init; }
     public required string Notes { get; init; }
     public required string MetricsSummary { get; init; }
@@ -55,7 +55,7 @@ public class SpatiotemporalResultItemViewModel
 {
     public required string Id { get; init; }
     public required string ChangeType { get; init; }
-    public required string TypeBadgeColor { get; init; }
+    public required IBrush TypeBadgeColor { get; init; }
     public Bitmap? BeforePreview { get; init; }
     public Bitmap? AfterPreview { get; init; }
     public required string Title { get; init; }
@@ -75,14 +75,14 @@ public class ClusterListItemViewModel
 public class ReviewQueueItemViewModel
 {
     public required string StatusBadge { get; init; }
-    public required string StatusColor { get; init; }
+    public required IBrush StatusColor { get; init; }
     public required string Title { get; init; }
     public required string AuditDetails { get; init; }
     public required string ConfidenceText { get; init; }
     public required ChangeRecord Record { get; init; }
 }
 
-public partial class MainWindow : Window
+public partial class MainWindow : SukiUI.Controls.SukiWindow
 {
     /// <summary>
     /// Evidence score at or above which a Candidate is reported as high-confidence.
@@ -114,7 +114,7 @@ public partial class MainWindow : Window
     private bool _clusteringCompleted = false;
 
     // UI-bound properties
-    public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
+    public new event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
     private void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 
     public int Step1Count => _currentSearchResults.Count;
@@ -160,17 +160,34 @@ public partial class MainWindow : Window
         for (int i = 0; i < stageBadges.Length; i++)
         {
             bool isCurrent = i == currentTab;
+            bool isDone = i < currentTab;
             if (stageBadges[i] is { } badge)
             {
-                badge.Background = (IBrush?)Application.Current?.FindResource(
-                    isCurrent ? "AccentBrush" : "SurfaceInsetBrush");
+                // The accent is spent once, on the step you are actually in.
+                badge.Background = Themed(isCurrent ? "AccentBrush"
+                                        : isDone ? "SurfaceHoverBrush"
+                                        : "SurfaceRaisedBrush");
             }
             if (stageLabels[i] is { } label)
             {
-                label.Foreground = (IBrush?)Application.Current?.FindResource(
-                    isCurrent ? "TextPrimaryBrush" : "TextMutedBrush");
-                label.FontWeight = isCurrent ? FontWeight.Bold : FontWeight.SemiBold;
+                label.Foreground = Themed(isCurrent ? "TextPrimaryBrush"
+                                        : isDone ? "TextSecondaryBrush"
+                                        : "TextMutedBrush");
+                label.FontWeight = isCurrent ? FontWeight.SemiBold : FontWeight.Normal;
             }
+        }
+
+        if (TxtStageCaption != null)
+        {
+            TxtStageCaption.Text = currentTab switch
+            {
+                0 => "STAGE 1 — FIND IMAGES",
+                1 => "STAGE 2 — PICK LOCATION",
+                2 => "STAGE 3 — CHECK CHANGES",
+                3 => "STAGE 4 — GROUP PLACES",
+                4 => "STAGE 5 — REVIEW & EXPORT",
+                _ => "WORKFLOW"
+            };
         }
 
         TxtActiveWorkflowPhase.Text = currentTab switch
@@ -183,14 +200,29 @@ public partial class MainWindow : Window
             _ => "Workflow"
         };
 
-        BtnNextStage.Content = currentTab switch
+        if (TxtNextStageLabel != null)
         {
-            0 => "Next: Pick Location ➔",
-            1 => "Next: Check Changes ➔",
-            2 => "Next: Group Places ➔",
-            3 => "Next: Review & Export ➔",
-            _ => "Export Final Report ➔"
-        };
+            TxtNextStageLabel.Text = currentTab switch
+            {
+                0 => "Pick",
+                1 => "Verify",
+                2 => "Group",
+                3 => "Review",
+                _ => "Export"
+            };
+        }
+
+        if (BtnNextStage != null)
+        {
+            ToolTip.SetTip(BtnNextStage, currentTab switch
+            {
+                0 => "Next: Pick Location ➔",
+                1 => "Next: Check Changes ➔",
+                2 => "Next: Group Places ➔",
+                3 => "Next: Review & Export ➔",
+                _ => "Export Final Report ➔"
+            });
+        }
 
         PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(Step1Count)));
         PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(Step2Count)));
@@ -199,13 +231,43 @@ public partial class MainWindow : Window
         PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(Step5Count)));
     }
 
+    private void UpdateAdaptiveLayout(double windowWidth)
+    {
+        bool isCompact = windowWidth < 1320;
+        bool isUltraCompact = windowWidth < 1120;
+        bool isTiny = windowWidth < 1000;
+
+        // Shed in order of least usefulness: count chips, then button labels,
+        // then the stage names.
+        foreach (var chip in new[] { ChipStep1Count, ChipStep2Count, ChipStep3Count, ChipStep4Count, ChipStep5Count })
+        {
+            if (chip != null) chip.IsVisible = !isCompact;
+        }
+
+        if (TxtBenchmarkLabel != null) TxtBenchmarkLabel.IsVisible = !isUltraCompact;
+        if (TxtHelpLabel != null) TxtHelpLabel.IsVisible = !isUltraCompact;
+        if (TxtTelemetrySensor != null) TxtTelemetrySensor.IsVisible = !isUltraCompact;
+        if (TxtStageCaption != null) TxtStageCaption.IsVisible = !isUltraCompact;
+
+        if (TxtStep1Label != null) TxtStep1Label.IsVisible = !isTiny;
+        if (TxtStep2Label != null) TxtStep2Label.IsVisible = !isTiny;
+        if (TxtStep3Label != null) TxtStep3Label.IsVisible = !isTiny;
+        if (TxtStep4Label != null) TxtStep4Label.IsVisible = !isTiny;
+        if (TxtStep5Label != null) TxtStep5Label.IsVisible = !isTiny;
+        if (TxtNextStageLabel != null) TxtNextStageLabel.IsVisible = !isTiny;
+    }
+
     private readonly NetworkConnectivityMonitor _connectivityMonitor = new();
 
     public MainWindow()
     {
         InitializeComponent();
+
+        this.SizeChanged += (s, e) => UpdateAdaptiveLayout(e.NewSize.Width);
+        InitializeDragAndDrop();
         InitializeArchive();
         InitializeMapControls();
+        UpdateAdaptiveLayout(this.Bounds.Width > 0 ? this.Bounds.Width : 1280);
     }
 
     private void InitializeMapControls()
@@ -220,9 +282,10 @@ public partial class MainWindow : Window
         };
         _ = _connectivityMonitor.CheckConnectivityAsync();
 
-        // Window size change synchronization
-        this.SizeChanged += (_, _) =>
+        // Window size change synchronization & adaptive layout
+        this.SizeChanged += (_, e) =>
         {
+            UpdateAdaptiveLayout(e.NewSize.Width);
             Dispatcher.UIThread.Post(() =>
             {
                 MapCanvasSpatiotemporal?.InvalidateVisual();
@@ -337,7 +400,7 @@ public partial class MainWindow : Window
         int highConfidence = _detectedChanges.Count(c => c.Confidence >= HighConfidenceThreshold);
         TxtTelemetryCandidates.Text = _detectedChanges.Count == 0
             ? "no candidates"
-            : $"{_detectedChanges.Count} changes found ({highConfidence} strong matches)";
+            : $"{_detectedChanges.Count} changes \u00b7 {highConfidence} strong";
     }
 
     private void RunInitialChangeDetection()
@@ -756,8 +819,9 @@ public partial class MainWindow : Window
         if (TxtCandidateType != null) TxtCandidateType.Text = "None";
         if (TxtAiClassificationVerdict != null) TxtAiClassificationVerdict.Text = "No satellite observations for active spatiotemporal query.";
         if (TxtAiConfidence != null) TxtAiConfidence.Text = "0% DATA COVERAGE";
-        if (BadgeAiConfidence != null) BadgeAiConfidence.Background = Brush.Parse("#374151");
+        if (BadgeAiConfidence != null) BadgeAiConfidence.Background = Themed("SurfaceRaisedBrush");
         if (TxtAiArea != null) TxtAiArea.Text = "0 m²";
+        if (TxtAiAreaSecondary != null) TxtAiAreaSecondary.Text = "no coverage";
         if (TxtAiOnset != null) TxtAiOnset.Text = "N/A";
         if (TxtTimelineOnsetMarker != null) TxtTimelineOnsetMarker.Text = "N/A";
         if (TxtEvidVegetation != null) TxtEvidVegetation.Text = "Vegetation: No coverage";
@@ -1350,11 +1414,11 @@ public partial class MainWindow : Window
             _activeHeatmapLayer = layer;
             TxtActiveHeatmapTitle.Text = layer switch
             {
-                "NDBI" => "3. NEW CONCRETE & BUILDINGS (Heatmap)",
-                "NDVI" => "3. PLANT & TREE LOSS (Heatmap)",
-                "NDWI" => "3. WATER & FLOOD AREA (Heatmap)",
-                "BSI"  => "3. SOIL DISTURBANCE (Heatmap)",
-                _      => "3. HIGHLIGHTED CHANGES (Heatmap)"
+                "NDBI" => "NEW CONCRETE & BUILDINGS",
+                "NDVI" => "PLANT & TREE LOSS",
+                "NDWI" => "WATER & FLOOD EXTENT",
+                "BSI"  => "SOIL DISTURBANCE",
+                _      => "CVA MAGNITUDE"
             };
             if (_selectedChangeRecord != null)
             {
@@ -1369,7 +1433,7 @@ public partial class MainWindow : Window
         {
             _activePassIndex = Math.Clamp(passIdx, 0, _timeSeries.Count - 1);
             var tile = _timeSeries[_activePassIndex];
-            TxtTargetPanelSubtitle.Text = $"2. TARGET OBSERVATION ({tile.AcquisitionTimestamp:yyyy-MM-dd})";
+            TxtTargetPanelSubtitle.Text = $"TARGET · T2 · {tile.AcquisitionTimestamp:yyyy-MM-dd}";
             if (_selectedChangeRecord != null)
             {
                 DisplayFocusedInspection(_selectedChangeRecord);
@@ -1431,11 +1495,12 @@ public partial class MainWindow : Window
             // ── AI Conclusion & Assessment ──
             TxtAiClassificationVerdict.Text = $"Likely {record.Type} / Ground Disturbance";
             TxtAiConfidence.Text = $"{(record.Confidence * 100):F0}% CERTAIN ({(record.Confidence >= HighConfidenceThreshold ? "HIGH CONFIDENCE" : "MODERATE")})";
-            BadgeAiConfidence.Background = Brush.Parse(record.Confidence >= HighConfidenceThreshold ? "#065F46" : "#78350F");
+            BadgeAiConfidence.Background = Themed(record.Confidence >= HighConfidenceThreshold ? "VerifiedSurfaceBrush" : "CandidateSurfaceBrush");
 
-            TxtAiArea.Text = $"{record.AreaSqMeters:N0} m² (approx {(record.AreaSqMeters / 10000.0):F2} ha / {(record.AreaSqMeters * 0.000247105):F1} acres)";
+            TxtAiArea.Text = $"{record.AreaSqMeters:N0} m²";
+            TxtAiAreaSecondary.Text = $"{(record.AreaSqMeters / 10000.0):F2} ha · {(record.AreaSqMeters * 0.000247105):F1} acres";
             TxtAiOnset.Text = $"{record.EarliestObservationTimestamp:yyyy-MM-dd}";
-            TxtTimelineOnsetMarker.Text = $"Change Began: {record.EarliestObservationTimestamp:yyyy-MM-dd}";
+            TxtTimelineOnsetMarker.Text = $"onset {record.EarliestObservationTimestamp:yyyy-MM-dd}";
 
             record.Metrics.TryGetValue("DeltaNDBI", out var dNdbi);
             record.Metrics.TryGetValue("DeltaNDVI", out var dNdvi);
@@ -1456,16 +1521,16 @@ public partial class MainWindow : Window
             TxtFocusedDeltaGrad.Text = $"{(dGrad >= 0 ? "+" : "")}{dGrad:F4}";
 
             // ── Update Badges on Individual Index Cards ──
-            TxtBadgeDeltaNdvi.Text = $"Δ = {dNdvi:+0.000;-0.000}";
-            TxtBadgeDeltaNdbi.Text = $"Δ = {dNdbi:+0.000;-0.000}";
-            TxtBadgeDeltaNdwi.Text = $"Δ = {dNdwi:+0.000;-0.000}";
-            TxtBadgeDeltaBsi.Text  = $"Δ = {dBsi:+0.000;-0.000}";
+            TxtBadgeDeltaNdvi.Text = $"{dNdvi:+0.000;-0.000}";
+            TxtBadgeDeltaNdbi.Text = $"{dNdbi:+0.000;-0.000}";
+            TxtBadgeDeltaNdwi.Text = $"{dNdwi:+0.000;-0.000}";
+            TxtBadgeDeltaBsi.Text  = $"{dBsi:+0.000;-0.000}";
 
             var targetTile = (_timeSeries != null && _activePassIndex >= 0 && _activePassIndex < _timeSeries.Count)
                 ? _timeSeries[_activePassIndex]
                 : _t3;
 
-            TxtTargetPanelSubtitle.Text = $"2. TARGET OBSERVATION ({targetTile.AcquisitionTimestamp:yyyy-MM-dd})";
+            TxtTargetPanelSubtitle.Text = $"TARGET · T2 · {targetTile.AcquisitionTimestamp:yyyy-MM-dd}";
 
             // ── Render Primary 3-Panel Visualizations ──
             if (_isFullSceneContext)
@@ -1524,22 +1589,22 @@ public partial class MainWindow : Window
         if (onsetDate <= new DateTime(2024, 1, 20))
         {
             BorderPass1.BorderThickness = new Thickness(2);
-            BorderPass1.BorderBrush = Brush.Parse("#F59E0B");
+            BorderPass1.BorderBrush = Themed("CandidateBrush");
         }
         else if (onsetDate <= new DateTime(2024, 2, 28))
         {
             BorderPass2.BorderThickness = new Thickness(2);
-            BorderPass2.BorderBrush = Brush.Parse("#F59E0B");
+            BorderPass2.BorderBrush = Themed("CandidateBrush");
         }
         else if (onsetDate <= new DateTime(2024, 3, 31))
         {
             BorderPass3.BorderThickness = new Thickness(2);
-            BorderPass3.BorderBrush = Brush.Parse("#EF4444");
+            BorderPass3.BorderBrush = Themed("RejectedBrush");
         }
         else
         {
             BorderPass4.BorderThickness = new Thickness(2);
-            BorderPass4.BorderBrush = Brush.Parse("#F87171");
+            BorderPass4.BorderBrush = Themed("RejectedBrush");
         }
     }
 
@@ -1637,13 +1702,13 @@ public partial class MainWindow : Window
         LstReviewQueue.ItemsSource = items.Select(item => new ReviewQueueItemViewModel
         {
             StatusBadge = $"[{item.Status.ToUpperInvariant()}]",
-            StatusColor = item.Status switch
+            StatusColor = Themed(item.Status switch
             {
-                "Confirmed" => "#10B981",
-                "Rejected" => "#EF4444",
-                "Flagged" => "#F59E0B",
-                _ => "#38BDF8"
-            },
+                "Confirmed" => "VerifiedBrush",
+                "Rejected" => "RejectedBrush",
+                "Flagged" => "CandidateBrush",
+                _ => "TextMutedBrush"
+            }),
             Title = $"{item.Record.Type} - Spot {item.Record.Id[..8]}",
             AuditDetails = $"Before: {item.Record.TimestampT1:yyyy-MM-dd} ➔ After: {item.Record.TimestampT2:yyyy-MM-dd} | Started: {item.Record.EarliestObservationTimestamp:yyyy-MM-dd} | Notes: {item.AnalystComments}",
             ConfidenceText = $"Confidence: {(item.Record.Confidence * 100):F0}%",
@@ -1664,6 +1729,72 @@ public partial class MainWindow : Window
             string outDir = Path.Combine(Directory.GetCurrentDirectory(), "benchmark_results");
             BenchmarkRunner.Run(outDir);
         });
+    }
+
+    private void IngestGeoTiffFile(string localPath)
+    {
+        try
+        {
+            if (File.Exists(localPath))
+            {
+                var tile = GeoTiffReader.Read(localPath);
+                _searchEngine.IngestTile(tile);
+                if (TxtTelemetryArchive != null)
+                {
+                    TxtTelemetryArchive.Text = $"{_index.Count} satellite images loaded";
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ingest error for {localPath}: {ex.Message}");
+        }
+    }
+
+    private void InitializeDragAndDrop()
+    {
+        AddHandler(DragDrop.DragOverEvent, OnWindowDragOver);
+        AddHandler(DragDrop.DropEvent, OnWindowFileDrop);
+    }
+
+    private void OnWindowDragOver(object? sender, DragEventArgs e)
+    {
+        if (e.Data.Contains(DataFormats.Files))
+        {
+            e.DragEffects = DragDropEffects.Copy;
+            e.Handled = true;
+        }
+        else
+        {
+            e.DragEffects = DragDropEffects.None;
+        }
+    }
+
+    private void OnWindowFileDrop(object? sender, DragEventArgs e)
+    {
+        if (e.Data.Contains(DataFormats.Files))
+        {
+            var files = e.Data.GetFiles();
+            if (files != null)
+            {
+                foreach (var file in files)
+                {
+                    string? path = file.TryGetLocalPath();
+                    if (string.IsNullOrEmpty(path) && file.Path.IsAbsoluteUri)
+                    {
+                        path = file.Path.LocalPath;
+                    }
+
+                    if (!string.IsNullOrEmpty(path) &&
+                        (path.EndsWith(".tif", StringComparison.OrdinalIgnoreCase) ||
+                         path.EndsWith(".tiff", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        IngestGeoTiffFile(path);
+                    }
+                }
+            }
+            e.Handled = true;
+        }
     }
 
     private async void OnLoadGeoTiffClicked(object? sender, RoutedEventArgs e)
@@ -1694,11 +1825,15 @@ public partial class MainWindow : Window
             {
                 foreach (var file in files)
                 {
-                    string localPath = file.Path.LocalPath;
-                    if (File.Exists(localPath))
+                    string? localPath = file.TryGetLocalPath();
+                    if (string.IsNullOrEmpty(localPath) && file.Path.IsAbsoluteUri)
                     {
-                        var tile = GeoTiffReader.Read(localPath);
-                        _searchEngine.IngestTile(tile);
+                        localPath = file.Path.LocalPath;
+                    }
+
+                    if (!string.IsNullOrEmpty(localPath))
+                    {
+                        IngestGeoTiffFile(localPath);
                     }
                 }
             }
@@ -1711,7 +1846,10 @@ public partial class MainWindow : Window
 
     private void OnHelpGuideClicked(object? sender, RoutedEventArgs e)
     {
-        // Cycle active workflow stage or show help guide
+        if (BtnHelpGuide?.Flyout != null)
+        {
+            BtnHelpGuide.Flyout.ShowAt(BtnHelpGuide);
+        }
     }
 
     private void OnMapZoomInClicked(object? sender, RoutedEventArgs e)
@@ -1854,63 +1992,151 @@ public partial class MainWindow : Window
 
     private void OnWindowKeyDown(object? sender, KeyEventArgs e)
     {
-        if (e.Key == Key.C)
+        // Global shortcuts with modifiers
+        if (e.KeyModifiers.HasFlag(KeyModifiers.Control) || e.KeyModifiers.HasFlag(KeyModifiers.Meta))
         {
-            OnFocusedConfirmClicked(null, null!);
-            e.Handled = true;
-        }
-        else if (e.Key == Key.R)
-        {
-            OnFocusedRejectClicked(null, null!);
-            e.Handled = true;
-        }
-        else if (e.Key == Key.N)
-        {
-            OnFocusedNeedsReviewClicked(null, null!);
-            e.Handled = true;
-        }
-        else if (e.Key == Key.M)
-        {
-            OnMapFitAllClicked(null, null!);
-            e.Handled = true;
-        }
-        else if (e.Key == Key.F)
-        {
-            if (MainTabControl?.SelectedIndex == 1)
+            switch (e.Key)
             {
-                OnToggleMapFullscreenClicked(null, null!);
-                e.Handled = true;
-            }
-            else if (MainTabControl?.SelectedIndex == 3)
-            {
-                OnToggleTab4MapFullscreenClicked(null, null!);
-                e.Handled = true;
+                case Key.O:
+                    OnLoadGeoTiffClicked(null, null!);
+                    e.Handled = true;
+                    return;
+                case Key.F:
+                    NavigateToStep(0);
+                    TxtSearchQuery?.Focus();
+                    TxtSearchQuery?.SelectAll();
+                    e.Handled = true;
+                    return;
+                case Key.D1:
+                case Key.NumPad1:
+                    NavigateToStep(0);
+                    e.Handled = true;
+                    return;
+                case Key.D2:
+                case Key.NumPad2:
+                    NavigateToStep(1);
+                    e.Handled = true;
+                    return;
+                case Key.D3:
+                case Key.NumPad3:
+                    NavigateToStep(2);
+                    e.Handled = true;
+                    return;
+                case Key.D4:
+                case Key.NumPad4:
+                    NavigateToStep(3);
+                    e.Handled = true;
+                    return;
+                case Key.D5:
+                case Key.NumPad5:
+                    NavigateToStep(4);
+                    e.Handled = true;
+                    return;
+                case Key.W:
+                    Close();
+                    e.Handled = true;
+                    return;
             }
         }
-        else if (e.Key == Key.Escape)
+
+        // Functional keys & dialog dismissal
+        if (e.Key == Key.Escape)
         {
+            if (DlgMissingDataModal != null && DlgMissingDataModal.IsVisible)
+            {
+                DlgMissingDataModal.IsVisible = false;
+                e.Handled = true;
+                return;
+            }
             if (_isMapFullscreen)
             {
                 OnToggleMapFullscreenClicked(null, null!);
                 e.Handled = true;
+                return;
             }
-            else if (_isTab4MapFullscreen)
+            if (_isTab4MapFullscreen)
             {
                 OnToggleTab4MapFullscreenClicked(null, null!);
                 e.Handled = true;
+                return;
+            }
+        }
+        else if (e.Key == Key.F1)
+        {
+            OnHelpGuideClicked(null, null!);
+            e.Handled = true;
+            return;
+        }
+        else if (e.Key == Key.F5)
+        {
+            OnRunBenchmarkClicked(null, null!);
+            e.Handled = true;
+            return;
+        }
+
+        // Guard: do not hijack single keys when typing into an input field
+        var focused = FocusManager?.GetFocusedElement();
+        if (e.Source is TextBox || focused is TextBox)
+        {
+            return;
+        }
+
+        // Single key triage and map shortcuts
+        if (e.KeyModifiers == KeyModifiers.None)
+        {
+            if (e.Key == Key.C)
+            {
+                OnFocusedConfirmClicked(null, null!);
+                e.Handled = true;
+            }
+            else if (e.Key == Key.R)
+            {
+                OnFocusedRejectClicked(null, null!);
+                e.Handled = true;
+            }
+            else if (e.Key == Key.N)
+            {
+                OnFocusedNeedsReviewClicked(null, null!);
+                e.Handled = true;
+            }
+            else if (e.Key == Key.M)
+            {
+                OnMapFitAllClicked(null, null!);
+                e.Handled = true;
+            }
+            else if (e.Key == Key.F)
+            {
+                if (MainTabControl?.SelectedIndex == 1)
+                {
+                    OnToggleMapFullscreenClicked(null, null!);
+                    e.Handled = true;
+                }
+                else if (MainTabControl?.SelectedIndex == 3)
+                {
+                    OnToggleTab4MapFullscreenClicked(null, null!);
+                    e.Handled = true;
+                }
             }
         }
     }
 
-    private static string GetColorForChangeType(ChangeType type) => type switch
+    /// <summary>
+    /// Resolves a brush from Resources/Tokens.axaml. Colours belong in the
+    /// token file; hard-coded hex in code-behind is how a palette drifts out
+    /// of sync with the one the XAML uses.
+    /// </summary>
+    private static IBrush Themed(string key) =>
+        Application.Current?.FindResource(key) as IBrush ?? Brushes.Transparent;
+
+    private static IBrush GetColorForChangeType(ChangeType type) => Themed(type switch
     {
-        ChangeType.Construction => "#DC2626",
-        ChangeType.Clearance => "#D97706",
-        ChangeType.WaterExtentVariation => "#0284C7",
-        ChangeType.RoadDevelopment => "#9333EA",
-        ChangeType.ActivityConcentration => "#F59E0B",
-        _ => "#4B5563"
-    };
+        ChangeType.Construction => "TypeConstructionBrush",
+        ChangeType.Clearance => "TypeClearanceBrush",
+        ChangeType.WaterExtentVariation => "TypeWaterBrush",
+        ChangeType.RoadDevelopment => "TypeRoadBrush",
+        ChangeType.ActivityConcentration => "TypeActivityBrush",
+        _ => "TypeNeutralBrush"
+    });
 
     private static SatelliteTile CreateTile(string id, SensorPlatform platform, DateTime timestamp, int w, int h, AffineGeoTransform transform)
     {
@@ -2082,12 +2308,20 @@ public partial class MainWindow : Window
         }
     }
 
+    private void NavigateToStep(int tabIndex)
+    {
+        if (MainTabControl == null) return;
+        if (tabIndex >= 0 && tabIndex < MainTabControl.ItemCount && CanProceedToStep(tabIndex))
+        {
+            MainTabControl.SelectedIndex = tabIndex;
+        }
+    }
+
     private void OnNavigateToStepClicked(object? sender, RoutedEventArgs e)
     {
         if (sender is not Button btn) return;
         if (!int.TryParse(btn.Tag?.ToString(), out int tabIndex)) return;
-        if (!CanProceedToStep(tabIndex)) return;
-        MainTabControl.SelectedIndex = tabIndex;
+        NavigateToStep(tabIndex);
     }
 
     private void OnAdvanceWorkflowClicked(object? sender, RoutedEventArgs e)
