@@ -29,9 +29,10 @@ Jyotirmoy_SETUP.md
 
 .preview/
 
-# Build output. Tracked historically; ignored for new files.
+# Build output and local SDK caches
 [Bb]in/
 [Oo]bj/
+.dotnet/
 
 # Local agent tooling, not part of the project
 .agents/
