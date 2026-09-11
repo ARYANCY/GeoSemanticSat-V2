@@ -267,4 +267,5 @@ dotnet test Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Tests
 
 *UpaGraha Enterprise Geospatial Intelligence Suite. Designed for mission-critical offline operations.*
 #   G e o S e m a n t i c S a t - V 2  
+ #   G e o S e m a n t i c S a t - V 2  
  
