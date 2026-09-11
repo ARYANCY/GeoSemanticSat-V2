@@ -45,6 +45,7 @@
 | **05. Desktop Intelligence Engine** | [documentation/05_desktop_engine_guide.md](documentation/05_desktop_engine_guide.md) | Desktop engine and UI reference. |
 | **06. Deployment & Security** | [documentation/06_deployment_and_security.md](documentation/06_deployment_and_security.md) | Deployment reference; actual defaults are in the implementation guide. |
 | **07. Implementation Reference** | [documentation/07_implementation_reference.md](documentation/07_implementation_reference.md) | Verified formulas, algorithms, persistence model, and limitations. |
+| **08. AI Agent & UI Studio** | [documentation/08_ai_agent_and_ui_studio.md](documentation/08_ai_agent_and_ui_studio.md) | Qwen agent orchestration, automated insight synthesis, and modern dual-theme UI studio. |
 
 ---
 
@@ -265,3 +266,5 @@ dotnet test Unified-RSanalytics/Desktop_App/Upgrahan2/src/GeoSemanticSat.Tests
 ---
 
 *UpaGraha Enterprise Geospatial Intelligence Suite. Designed for mission-critical offline operations.*
+#   G e o S e m a n t i c S a t - V 2  
+ 
