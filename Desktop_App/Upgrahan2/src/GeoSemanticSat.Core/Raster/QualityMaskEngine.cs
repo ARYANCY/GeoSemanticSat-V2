@@ -12,28 +12,25 @@ public enum QualityMaskFlags : byte
     Snow = 1 << 2,
     Water = 1 << 3,
     HighHaze = 1 << 4,
-    Saturated = 1 << 5
+    Saturated = 1 << 5,
+    NoData = 1 << 6
 }
 
 /// <summary>
 /// Quality Handling and False-Alarm Suppression Mask Engine.
 /// Detects clouds using multi-spectral Blue/NIR/SWIR thresholds,
 /// projects directional cloud shadows using solar angles (elevation + azimuth ray-casting),
-/// and detects snow vs. cloud using NDSI (Normalized Difference Snow Index).
+/// detects snow vs. cloud using NDSI, and masks nodata/boundary fill pixels.
 /// </summary>
 public class QualityMaskEngine
 {
     /// <summary>
     /// Flags that make a pixel unusable for change analysis.
-    /// Water and HighHaze are informational and deliberately excluded: dropping Water
-    /// pixels would blind water-extent detection to exactly the pixels it exists to
-    /// measure. Callers must bit-test against this. Comparing a [Flags] enum with
-    /// != Valid treated any informational flag as invalid, which is why
-    /// MultiTemporalChangeDetector and OnsetEstimator disagreed about which pixels counted.
+    /// Includes Clouds, CloudShadows, Snow, Saturated pixels, and NoData boundary fills.
     /// </summary>
     public const QualityMaskFlags UnusableForAnalysis =
         QualityMaskFlags.Cloud | QualityMaskFlags.CloudShadow |
-        QualityMaskFlags.Snow | QualityMaskFlags.Saturated;
+        QualityMaskFlags.Snow | QualityMaskFlags.Saturated | QualityMaskFlags.NoData;
 
     public static bool IsUsable(QualityMaskFlags flags) => (flags & UnusableForAnalysis) == 0;
 
@@ -52,13 +49,22 @@ public class QualityMaskEngine
 
         if (tile.Platform == SensorPlatform.Sentinel1_SAR)
         {
-            // SAR has all-weather penetration; flag extreme speckle/saturation only
+            // SAR has all-weather penetration; flag extreme speckle/saturation and nodata
             var vv = tile.GetBandOrFallback(SpectralBand.SAR_VV, SpectralBand.SAR_VV);
+            float? nodata = tile.NoDataValue.HasValue ? (float)tile.NoDataValue.Value : null;
             for (int y = 0; y < h; y++)
             {
                 for (int x = 0; x < w; x++)
                 {
-                    if (vv[y, x] >= 0.98f) mask[y, x] |= QualityMaskFlags.Saturated;
+                    float val = vv[y, x];
+                    if (float.IsNaN(val) || (nodata.HasValue && Math.Abs(val - nodata.Value) < 1e-4f))
+                    {
+                        mask[y, x] |= QualityMaskFlags.NoData;
+                    }
+                    else if (val >= 0.98f)
+                    {
+                        mask[y, x] |= QualityMaskFlags.Saturated;
+                    }
                 }
             }
             return mask;
@@ -69,8 +75,9 @@ public class QualityMaskEngine
         var red = tile.GetBandOrFallback(SpectralBand.Red, SpectralBand.Red);
         var nir = tile.GetBandOrFallback(SpectralBand.NIR, SpectralBand.Red);
         var swir = tile.GetBandOrFallback(SpectralBand.SWIR1, SpectralBand.NIR);
+        float? nodataVal = tile.NoDataValue.HasValue ? (float)tile.NoDataValue.Value : null;
 
-        // Step 1: Detect Clouds and Snow
+        // Step 1: Detect Clouds, Snow, and NoData
         for (int y = 0; y < h; y++)
         {
             for (int x = 0; x < w; x++)
@@ -80,6 +87,15 @@ public class QualityMaskEngine
                 float r = red[y, x];
                 float n = nir[y, x];
                 float s = swir[y, x];
+
+                // Check NoData or border fill
+                if (float.IsNaN(b) || float.IsNaN(g) || float.IsNaN(r) || float.IsNaN(n) ||
+                    (nodataVal.HasValue && (Math.Abs(r - nodataVal.Value) < 1e-4f || Math.Abs(b - nodataVal.Value) < 1e-4f)) ||
+                    (b == 0.0f && g == 0.0f && r == 0.0f && n == 0.0f))
+                {
+                    mask[y, x] |= QualityMaskFlags.NoData;
+                    continue;
+                }
 
                 // Check saturation
                 if (b > 0.99f && g > 0.99f && r > 0.99f)

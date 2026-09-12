@@ -106,4 +106,116 @@ public class GeoTiffAndAffineTests
             if (File.Exists(tempFile)) File.Delete(tempFile);
         }
     }
+
+    [Fact]
+    public void UtmCoordinateReprojection_ConvertsAccuratelyToWgs84()
+    {
+        // New Delhi region: UTM Zone 43N, Easting: ~716000 m, Northing: ~3167000 m
+        double easting = 716000.0;
+        double northing = 3167000.0;
+        int utm43n = 32643;
+
+        var geo = CoordinateReprojection.ProjectedToWgs84(easting, northing, utm43n);
+
+        // Expected Latitude ~ 28.61° N, Longitude ~ 77.21° E
+        Assert.InRange(geo.Latitude, 28.5, 28.7);
+        Assert.InRange(geo.Longitude, 77.1, 77.3);
+
+        // Round-trip verification
+        var (roundEasting, roundNorthing) = CoordinateReprojection.Wgs84ToProjected(geo, utm43n);
+        Assert.Equal(easting, roundEasting, 1);
+        Assert.Equal(northing, roundNorthing, 1);
+    }
+
+    [Fact]
+    public void NoDataMasking_CorrectlySuppressesBorderZerosAndNoData()
+    {
+        int w = 16, h = 16;
+        var tile = new SatelliteTile
+        {
+            TileId = "TEST_NODATA",
+            Platform = SensorPlatform.Sentinel2_Optical,
+            Width = w,
+            Height = h,
+            NoDataValue = -9999.0
+        };
+
+        var red = new float[h, w];
+        var green = new float[h, w];
+        var blue = new float[h, w];
+        var nir = new float[h, w];
+
+        for (int y = 0; y < h; y++)
+        {
+            for (int x = 0; x < w; x++)
+            {
+                if (x == 0 || y == 0)
+                {
+                    // Border zero-padding
+                    red[y, x] = 0.0f;
+                    green[y, x] = 0.0f;
+                    blue[y, x] = 0.0f;
+                    nir[y, x] = 0.0f;
+                }
+                else if (x == 1)
+                {
+                    // Explicit NoData value
+                    red[y, x] = -9999.0f;
+                    green[y, x] = -9999.0f;
+                    blue[y, x] = -9999.0f;
+                    nir[y, x] = -9999.0f;
+                }
+                else
+                {
+                    red[y, x] = 0.15f;
+                    green[y, x] = 0.20f;
+                    blue[y, x] = 0.10f;
+                    nir[y, x] = 0.45f;
+                }
+            }
+        }
+
+        tile.Bands[SpectralBand.Red] = red;
+        tile.Bands[SpectralBand.Green] = green;
+        tile.Bands[SpectralBand.Blue] = blue;
+        tile.Bands[SpectralBand.NIR] = nir;
+
+        var mask = QualityMaskEngine.GenerateQualityMask(tile);
+
+        // Border pixel (0,0) must be flagged as NoData and unusable
+        Assert.True((mask[0, 0] & QualityMaskFlags.NoData) != 0);
+        Assert.False(QualityMaskEngine.IsUsable(mask[0, 0]));
+
+        // Explicit NoData pixel (5,1) must be flagged as NoData
+        Assert.True((mask[5, 1] & QualityMaskFlags.NoData) != 0);
+        Assert.False(QualityMaskEngine.IsUsable(mask[5, 1]));
+
+        // Valid interior pixel (5,5) must be valid
+        Assert.True(QualityMaskEngine.IsUsable(mask[5, 5]));
+    }
+
+    [Fact]
+    public void ProvenanceAuditTrail_IncludesSha256InGeoJson()
+    {
+        var changes = new List<ChangeRecord>
+        {
+            new ChangeRecord
+            {
+                Id = "CHG_001",
+                TileId = "S2_NCR_2026",
+                Type = ChangeType.Construction,
+                Confidence = 0.92,
+                Bounds = new BoundingBox(77.20, 28.60, 77.25, 28.65),
+                TimestampT1 = DateTime.UtcNow.AddDays(-10),
+                TimestampT2 = DateTime.UtcNow
+            }
+        };
+
+        string testHash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+        string geoJson = GeoSemanticSat.Core.Workflow.ProvenanceAuditTrail.ExportToGeoJson(changes, "2.0.0-TEST", testHash, 0.15);
+
+        Assert.Contains(testHash, geoJson);
+        Assert.Contains("sourceImageSha256", geoJson);
+        Assert.Contains("cvaThreshold", geoJson);
+    }
 }

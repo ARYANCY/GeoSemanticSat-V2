@@ -92,16 +92,23 @@ public static class OnsetEstimator
 
         // Robust Sequential CUSUM / Change-Point Detection over usable observations
         var usableSeries = series.Where(s => s.IsUsable).ToList();
-        if (usableSeries.Count < 2)
+        // Require at least 3 usable observations for statistical onset estimation
+        if (usableSeries.Count < 3)
         {
             return series.Last().Timestamp;
         }
 
-        // Establish moving baseline statistical envelope from the initial 1/3 observations
-        int baselineCount = Math.Max(1, Math.Min(3, usableSeries.Count / 3));
+        // Establish moving baseline statistical envelope from the initial observations (at least 2 when available)
+        int baselineCount = Math.Max(2, Math.Min(4, usableSeries.Count / 3));
+        if (baselineCount >= usableSeries.Count) baselineCount = usableSeries.Count - 1;
+
         double baselineMean = usableSeries.Take(baselineCount).Average(s => s.MetricValue);
-        double baselineVar = usableSeries.Take(baselineCount).Average(s => Math.Pow(s.MetricValue - baselineMean, 2));
-        double sigma = Math.Max(0.025, Math.Sqrt(baselineVar));
+        double baselineVar = baselineCount > 1
+            ? usableSeries.Take(baselineCount).Sum(s => Math.Pow(s.MetricValue - baselineMean, 2)) / (baselineCount - 1)
+            : 0.0;
+
+        // Regularized standard deviation with variance floor protecting against zero-variance instability
+        double sigma = Math.Max(0.035, Math.Max(1e-4, Math.Sqrt(baselineVar)));
 
         // CUSUM parameters: Slack allowance K and Decision threshold H
         double slackK = 0.5 * sigma;

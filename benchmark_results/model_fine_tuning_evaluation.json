@@ -1,0 +1,128 @@
+{
+  "timestamp": "2026-09-12T09:23:07.431949+00:00",
+  "hardware": {
+    "device_name": "CPU",
+    "cuda_version": "None",
+    "pytorch_version": "2.13.0+cpu",
+    "os": "Windows 11 x86_64",
+    "vram_total_gb": 0.0
+  },
+  "terramind": {
+    "model_name": "TerraMind-1.0-base",
+    "task": "Multimodal Cross-Attention & Text-Satellite Retrieval",
+    "checkpoint": "C:\\Users\\aryan\\OneDrive\\Desktop\\Upagraha-V2\\Unified-RSanalytics\\checkpoints\\terramind\\terramind_retrieval_lora_best.pt",
+    "parameter_efficiency": {
+      "total_params": 911873,
+      "trainable_lora_params": 322049,
+      "trainable_percent": 35.32
+    },
+    "latency": {
+      "mean_ms": 0.334,
+      "p50_ms": 0.33,
+      "p95_ms": 0.469
+    },
+    "baseline_metrics": {
+      "recall@1": 0.0,
+      "recall@5": 0.08,
+      "mAP": 0.0558
+    },
+    "fine_tuned_metrics": {
+      "recall@1": 0.07,
+      "recall@5": 0.37,
+      "mAP": 0.2258
+    },
+    "relative_improvement": {
+      "recall@1": "+7000.0%",
+      "recall@5": "+362.5%",
+      "mAP": "+304.7%"
+    }
+  },
+  "prithvi": {
+    "model_name": "Prithvi-EO-2.0-300M",
+    "task": "Spatio-Temporal Temporal Change Detection & Trajectory Modeling",
+    "checkpoint": "C:\\Users\\aryan\\OneDrive\\Desktop\\Upagraha-V2\\Unified-RSanalytics\\checkpoints\\prithvi\\prithvi_temporal_lora_best.pt",
+    "parameter_efficiency": {
+      "total_params": 1428097,
+      "trainable_lora_params": 379521,
+      "trainable_percent": 26.58
+    },
+    "latency": {
+      "mean_ms": 0.473,
+      "p50_ms": 0.475,
+      "p95_ms": 0.627
+    },
+    "baseline_metrics": {
+      "accuracy": 0.44,
+      "precision": 0.4348,
+      "recall": 0.4,
+      "f1": 0.4167
+    },
+    "fine_tuned_metrics": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "relative_improvement": {
+      "accuracy": "+127.3%",
+      "f1": "+140.0%"
+    }
+  },
+  "satmae": {
+    "model_name": "SatMAE++",
+    "task": "Grouped Spectral Representation & Feature Retrieval",
+    "checkpoint": "C:\\Users\\aryan\\OneDrive\\Desktop\\Upagraha-V2\\Unified-RSanalytics\\checkpoints\\satmae_pp\\satmae_multispectral_lora_best.pt",
+    "parameter_efficiency": {
+      "total_params": 1379720,
+      "trainable_lora_params": 331144,
+      "trainable_percent": 24.0
+    },
+    "latency": {
+      "mean_ms": 0.167,
+      "p50_ms": 0.148,
+      "p95_ms": 0.263
+    },
+    "baseline_metrics": {
+      "accuracy": 0.11,
+      "recall@1": 0.67,
+      "recall@5": 0.93
+    },
+    "fine_tuned_metrics": {
+      "accuracy": 0.18,
+      "recall@1": 0.93,
+      "recall@5": 0.99
+    },
+    "relative_improvement": {
+      "accuracy": "+63.6%",
+      "recall@1": "+38.8%",
+      "recall@5": "+6.5%"
+    }
+  },
+  "gfm": {
+    "model_name": "GFM Composition",
+    "task": "Multi-Sensor Optical-SAR Compositional Fusion",
+    "checkpoint": "C:\\Users\\aryan\\OneDrive\\Desktop\\Upagraha-V2\\Unified-RSanalytics\\checkpoints\\gfm_composition\\gfm_composition_slots_best.pt",
+    "parameter_efficiency": {
+      "total_params": 428032,
+      "trainable_lora_params": 428032,
+      "trainable_percent": 100.0
+    },
+    "latency": {
+      "mean_ms": 0.357,
+      "p50_ms": 0.348,
+      "p95_ms": 0.472
+    },
+    "baseline_metrics": {
+      "composition_loss": 0.4895,
+      "cosine_similarity": 0.0163
+    },
+    "fine_tuned_metrics": {
+      "composition_loss": 0.4695,
+      "cosine_similarity": 0.0177
+    },
+    "relative_improvement": {
+      "loss_reduction": "+4.1%",
+      "cosine_similarity": "+8.6%"
+    }
+  }
+}

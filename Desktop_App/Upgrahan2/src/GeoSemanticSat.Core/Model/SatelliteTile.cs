@@ -14,8 +14,14 @@ public class SatelliteTile
     public double CloudCoverPercentage { get; set; }
     public double SunElevationDegrees { get; set; } = 45.0;
     public double SunAzimuthDegrees { get; set; } = 135.0;
+    /// <summary>Optional sensor off-nadir / view zenith in degrees when present in metadata. Not estimated.</summary>
+    public double? ViewZenithDegrees { get; set; }
+    public bool AcquisitionTimestampIsKnown { get; set; } = true;
     public int Width { get; set; }
     public int Height { get; set; }
+    public int EpsgCode { get; set; } = 4326;
+    public double? NoDataValue { get; set; }
+    public string? SourceImageSha256 { get; set; }
     public string SourceFilePath { get; set; } = string.Empty;
     public Dictionary<SpectralBand, float[,]> Bands { get; set; } = new();
 

@@ -148,3 +148,50 @@ class AnalystReview(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc)
 
     change_event: Mapped[ChangeEvent] = relationship("ChangeEvent", back_populates="reviews")
+
+
+class Mission(Base):
+    __tablename__ = "missions"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    name: Mapped[str] = mapped_column(String(255), index=True)
+    description: Mapped[str] = mapped_column(Text, default="")
+    aoi_wkt: Mapped[str] = mapped_column(Text)
+    semantic_query: Mapped[str] = mapped_column(String(512))
+    sensor_filter: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    quality_threshold: Mapped[float] = mapped_column(Float, default=0.6)
+    change_threshold: Mapped[float] = mapped_column(Float, default=0.35)
+    confidence_threshold: Mapped[float] = mapped_column(Float, default=0.65)
+    domain_pack: Mapped[str] = mapped_column(String(64), default="Defence")
+    enabled: Mapped[bool] = mapped_column(default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc)
+    last_run_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+    alerts: Mapped[list[MissionAlert]] = relationship(
+        "MissionAlert", back_populates="mission", cascade="all, delete-orphan"
+    )
+
+
+class MissionAlert(Base):
+    __tablename__ = "mission_alerts"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    mission_id: Mapped[str] = mapped_column(
+        ForeignKey("missions.id", ondelete="CASCADE"), index=True
+    )
+    change_event_id: Mapped[str | None] = mapped_column(
+        ForeignKey("change_events.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    priority: Mapped[str] = mapped_column(String(32), default="P2_HIGH", index=True)
+    change_type: Mapped[str] = mapped_column(String(64), index=True)
+    confidence: Mapped[float] = mapped_column(Float)
+    change_score: Mapped[float] = mapped_column(Float)
+    location_wkt: Mapped[str] = mapped_column(Text)
+    before_scene: Mapped[str] = mapped_column(String(255))
+    after_scene: Mapped[str] = mapped_column(String(255))
+    provenance_hash: Mapped[str] = mapped_column(String(64))
+    status: Mapped[str] = mapped_column(String(32), default="NEW", index=True)  # NEW, CONFIRMED, REJECTED
+    detected_time: Mapped[datetime] = mapped_column(DateTime, default=now_utc)
+
+    mission: Mapped[Mission] = relationship("Mission", back_populates="alerts")
+

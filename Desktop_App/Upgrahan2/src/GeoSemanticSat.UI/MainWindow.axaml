@@ -50,6 +50,14 @@
                 </StackPanel>
             </Button>
 
+            <Button x:Name="BtnQuickExportGeoJson" Classes="flat" Click="OnExportGeoJsonClicked" Padding="9,4" MinHeight="28"
+                    ToolTip.Tip="Export evidentiary W3C PROV-O compliant GeoJSON audit trail">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <lucide:Lucide Icon="{x:Static licon:LucideIconNames.Database}" Width="14" Height="14" StrokeThickness="2" StrokeBrush="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="TxtExportLabel" Text="Export GeoJSON" FontSize="{DynamicResource FontMicro}" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
             <Button x:Name="BtnQuickBenchmark" Classes="flat" Click="OnRunBenchmarkClicked" Padding="9,4" MinHeight="28"
                     ToolTip.Tip="Run the automated multi-temporal evaluation benchmark suite (F5)">
                 <StackPanel Orientation="Horizontal" Spacing="6">
@@ -103,6 +111,14 @@
                         </Border>
                     </Flyout>
                 </Button.Flyout>
+            </Button>
+
+            <Button x:Name="BtnThemeToggle" Classes="flat" Click="OnThemeToggleClicked" Padding="9,4" MinHeight="28"
+                    ToolTip.Tip="Toggle between Light and Dark interface theme">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <lucide:Lucide x:Name="IconTheme" Icon="{x:Static licon:LucideIconNames.Sun}" Width="14" Height="14" StrokeThickness="2" StrokeBrush="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="TxtThemeMode" Text="Light Mode" FontSize="{DynamicResource FontMicro}" VerticalAlignment="Center"/>
+                </StackPanel>
             </Button>
         </StackPanel>
     </suki:SukiWindow.RightWindowTitleBarControls>
@@ -199,25 +215,38 @@
                         </StackPanel>
                     </Border>
 
-                    <!-- Right: the single forward action for this stage. -->
-                    <Button Grid.Column="2" x:Name="BtnNextStage" Click="OnAdvanceWorkflowClicked" Classes="suggested"
-                            Padding="12,5" MinHeight="28" Margin="12,0,2,0" VerticalAlignment="Center"
-                            ToolTip.Tip="Advance to next workflow step">
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <TextBlock x:Name="TxtNextStageLabel" Text="Next" FontSize="{DynamicResource FontMicro}" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                            <lucide:Lucide Icon="{x:Static licon:LucideIconNames.ArrowRight}" Width="13" Height="13" StrokeThickness="2" StrokeBrush="{DynamicResource TextOnAccentBrush}" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
+                    <!-- Right: Forward action and AI panel toggle -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                        <Button x:Name="BtnNextStage" Click="OnAdvanceWorkflowClicked" Classes="suggested"
+                                Padding="12,5" MinHeight="28" Margin="12,0,2,0" VerticalAlignment="Center"
+                                ToolTip.Tip="Advance to next workflow step">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock x:Name="TxtNextStageLabel" Text="Next" FontSize="{DynamicResource FontMicro}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                <lucide:Lucide Icon="{x:Static licon:LucideIconNames.ArrowRight}" Width="13" Height="13" StrokeThickness="2" StrokeBrush="{DynamicResource TextOnAccentBrush}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="BtnToggleAiPanel" Click="OnToggleAiPanelClicked" Classes="flat"
+                                Padding="8,5" MinHeight="28" Margin="4,0,2,0" VerticalAlignment="Center"
+                                ToolTip.Tip="Toggle Qwen AI Intelligence Panel">
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <lucide:Lucide Icon="{x:Static licon:LucideIconNames.Bot}" Width="14" Height="14" StrokeThickness="2" StrokeBrush="{DynamicResource AccentBrush}" VerticalAlignment="Center"/>
+                                <TextBlock Text="AI Panel" FontSize="{DynamicResource FontMicro}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+
                 </Grid>
             </Border>
 
             <!-- ==============================================================
-                 OPERATIONAL STATIONS: CHROMELESS TAB CONTROL
+                 OPERATIONAL STATIONS: WORKSPACE & AI PANEL GRID (ROW 1)
                  ============================================================== -->
-            <TabControl x:Name="MainTabControl" Classes="chromeless" Grid.Row="1" Margin="14,12,14,12" Background="Transparent"
-                        ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                        ScrollViewer.VerticalScrollBarVisibility="Auto"
-                        SelectionChanged="OnMainTabSelectionChanged">
+            <Grid Grid.Row="1" ColumnDefinitions="*, Auto">
+                <TabControl x:Name="MainTabControl" Classes="chromeless" Margin="14,12,6,12" Background="Transparent"
+                            ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                            ScrollViewer.VerticalScrollBarVisibility="Auto"
+                            SelectionChanged="OnMainTabSelectionChanged">
+
 
                 <!-- ==========================================================
                      TAB 1: CONCEPT & SEMANTIC DISCOVERY
@@ -688,7 +717,7 @@
                                 </StackPanel>
 
                                 <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" Margin="0,2,0,2">
-                                    <Button x:Name="BtnToggleViewMode" Content="Full Scene"
+                                    <Button x:Name="BtnToggleViewMode" Content="Full Extent"
                                             Padding="9,5" FontSize="{DynamicResource FontMicro}"
                                             Click="OnToggleViewModeClicked" ToolTip.Tip="Toggle between High-Res Site Zoom and Full Scene Context" />
                                     <Button x:Name="BtnRunChangeDetection" Classes="suggested" Content="Compute Changes"
@@ -958,6 +987,44 @@
                                             </StackPanel>
                                         </Border>
 
+                                        <!-- 1b. AI Analyst Assistant & Conversational Intelligence (Qwen3-8B) -->
+                                        <Border Classes="cardCompact" Background="{DynamicResource SurfaceRaisedBrush}">
+                                            <StackPanel Spacing="6">
+                                                <Grid ColumnDefinitions="*, Auto">
+                                                    <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                                        <Border Width="16" Height="16" CornerRadius="4" Background="{DynamicResource AccentBrush}">
+                                                            <lucide:Lucide Icon="{x:Static licon:LucideIconNames.Satellite}" Width="10" Height="10" StrokeBrush="#FFFFFF" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                        </Border>
+                                                        <TextBlock Text="AI ANALYST ASSISTANT" Classes="sectionHeader" VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                    <Border Grid.Column="1" x:Name="BadgeAiSeverity" Classes="badge" Background="{DynamicResource CandidateSurfaceBrush}">
+                                                        <TextBlock x:Name="TxtAiSeverity" Text="HIGH SEVERITY" Classes="mono" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource CandidateBrush}" />
+                                                    </Border>
+                                                </Grid>
+
+                                                <!-- Quick Prompt Chips -->
+                                                <WrapPanel Orientation="Horizontal">
+                                                    <Button Classes="chip" Content="Generate SITREP" Tag="sitrep" Click="OnQuickAnalystPromptClicked" Margin="0,0,4,4" FontSize="10" />
+                                                    <Button Classes="chip" Content="Explain Cause" Tag="why" Click="OnQuickAnalystPromptClicked" Margin="0,0,4,4" FontSize="10" />
+                                                    <Button Classes="chip" Content="Verify False Alarm" Tag="false alarm" Click="OnQuickAnalystPromptClicked" Margin="0,0,4,4" FontSize="10" />
+                                                    <Button Classes="chip" Content="SAR Radar" Tag="sar" Click="OnQuickAnalystPromptClicked" Margin="0,0,4,4" FontSize="10" />
+                                                </WrapPanel>
+
+                                                <!-- Dynamic Response Display -->
+                                                <Border x:Name="BorderAnalystResponse" Background="{DynamicResource SurfaceInsetBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="{DynamicResource RadiusControl}" Padding="8" MaxHeight="180">
+                                                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                                        <TextBlock x:Name="TxtAnalystResponse" Text="Select a prompt or ask an intelligence question about this candidate..." FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" />
+                                                    </ScrollViewer>
+                                                </Border>
+
+                                                <!-- Conversational Input -->
+                                                <Grid ColumnDefinitions="*, Auto">
+                                                    <TextBox x:Name="TxtAnalystChatInput" Watermark="Ask Qwen analyst (e.g. 'Is this seasonal or structural?')..." FontSize="{DynamicResource FontMicro}" KeyDown="OnAnalystChatInputKeyDown" />
+                                                    <Button Grid.Column="1" x:Name="BtnSendAnalystChat" Classes="suggested" Content="Ask" Click="OnSendAnalystChatClicked" Margin="4,0,0,0" Padding="10,4" FontSize="{DynamicResource FontMicro}" />
+                                                </Grid>
+                                            </StackPanel>
+                                        </Border>
+
                                         <!-- 2. "Why Detected?" Evidence Rationale -->
                                         <Border Classes="cardCompact">
                                             <StackPanel Spacing="5">
@@ -1126,6 +1193,131 @@
                     </Grid>
                 </TabItem>
             </TabControl>
+
+            <!-- ==============================================================
+                 RIGHT-SIDE AI INTELLIGENCE PANEL (Qwen3-8B Agentic Orchestrator)
+                 ============================================================== -->
+            <Border Grid.Column="1" x:Name="PanelAiSidebar" Width="380" Margin="0,12,14,12"
+                    Background="{DynamicResource SurfaceCardBrush}" BorderBrush="{DynamicResource RuleStrongBrush}"
+                    BorderThickness="1" CornerRadius="{DynamicResource RadiusCard}" Padding="10">
+                <Grid RowDefinitions="Auto, *">
+                    <!-- Panel Header -->
+                    <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Margin="0,0,0,8">
+                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                            <Border Width="20" Height="20" CornerRadius="4" Background="{DynamicResource AccentBrush}">
+                                <lucide:Lucide Icon="{x:Static licon:LucideIconNames.Bot}" Width="12" Height="12" StrokeThickness="2" StrokeBrush="#FFFFFF" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="AI INTELLIGENCE ORCHESTRATOR" Classes="sectionHeader" FontSize="10" FontWeight="Bold" />
+                                <TextBlock Text="Qwen3-8B &#x2022; Sovereign Local Agent" FontSize="9" Foreground="{DynamicResource TextMutedBrush}" />
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                            <Border Classes="badge" Background="{DynamicResource VerifiedSurfaceBrush}" Padding="4,2">
+                                <TextBlock Text="OFFLINE" Classes="mono" FontSize="8" FontWeight="Bold" Foreground="{DynamicResource VerifiedBrush}" />
+                            </Border>
+                            <Button Classes="flat" Click="OnToggleAiPanelClicked" Padding="4" ToolTip.Tip="Collapse AI Panel">
+                                <lucide:Lucide Icon="{x:Static licon:LucideIconNames.PanelRightClose}" Width="14" Height="14" StrokeBrush="{DynamicResource TextSecondaryBrush}" />
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Scrollable Agent Body -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Spacing="8">
+                            <!-- Prompt Input & Action Chips -->
+                            <Border Classes="cardCompact" Background="{DynamicResource SurfaceRaisedBrush}">
+                                <StackPanel Spacing="6">
+                                    <Grid ColumnDefinitions="*, Auto">
+                                        <TextBox x:Name="TxtAgentPromptInput" Watermark="Ask agent (e.g. 'Show before &amp; after for new roads')..." FontSize="{DynamicResource FontMicro}" KeyDown="OnAgentPromptInputKeyDown" />
+                                        <Button Grid.Column="1" x:Name="BtnSendAgentPrompt" Classes="suggested" Content="Run" Click="OnSendAgentPromptClicked" Margin="4,0,0,0" Padding="8,4" FontSize="{DynamicResource FontMicro}" />
+                                    </Grid>
+                                    <!-- Quick Action Chips -->
+                                    <WrapPanel Orientation="Horizontal">
+                                        <Button Classes="chip" Content="New Roads" Tag="Show newly constructed roads in this area and display before/after imagery" Click="OnQuickAgentChipClicked" Margin="0,0,3,3" FontSize="9" />
+                                        <Button Classes="chip" Content="Before &amp; After" Tag="Show the before and after image for the biggest detected change" Click="OnQuickAgentChipClicked" Margin="0,0,3,3" FontSize="9" />
+                                        <Button Classes="chip" Content="SITREP Brief" Tag="Generate a military-standard SITREP brief for this site" Click="OnQuickAgentChipClicked" Margin="0,0,3,3" FontSize="9" />
+                                        <Button Classes="chip" Content="False Alarm Check" Tag="Verify false alarm probability and sub-pixel jitter" Click="OnQuickAgentChipClicked" Margin="0,0,3,3" FontSize="9" />
+                                    </WrapPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Agent Status & Plan Stepper -->
+                            <Border x:Name="BorderAgentProgress" Classes="cardCompact" Background="{DynamicResource SurfaceInsetBrush}">
+                                <StackPanel Spacing="4">
+                                    <Grid ColumnDefinitions="*, Auto">
+                                        <TextBlock x:Name="TxtAgentStatusStep" Text="Agent Ready &#x2022; Waiting for directive" FontSize="9" FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}" />
+                                        <TextBlock Grid.Column="1" x:Name="TxtAgentLatency" Text="&lt;15ms" Classes="mono" FontSize="8" Foreground="{DynamicResource TextMutedBrush}" />
+                                    </Grid>
+                                    <ProgressBar x:Name="ProgAgentExecution" Height="3" IsIndeterminate="False" Value="100" />
+                                    <TextBlock x:Name="TxtAgentPlanSummary" Text="Tools: spatial_filter &#x2192; change_detection &#x2192; before_after_selector" FontSize="8" Classes="mono" Foreground="{DynamicResource TextFaintBrush}" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Synchronized Before & After Viewer -->
+                            <Border x:Name="CardBeforeAfterViewer" Classes="cardCompact" Background="{DynamicResource SurfaceRaisedBrush}">
+                                <StackPanel Spacing="6">
+                                    <Grid ColumnDefinitions="*, Auto">
+                                        <TextBlock Text="BEFORE / AFTER CORROBORATION" Classes="sectionHeader" FontSize="9" />
+                                        <Border Grid.Column="1" x:Name="BadgeAgentChangeType" Classes="badge" Background="{DynamicResource CandidateSurfaceBrush}">
+                                            <TextBlock x:Name="TxtAgentChangeType" Text="CONSTRUCTION" Classes="mono" FontSize="8" FontWeight="Bold" Foreground="{DynamicResource CandidateBrush}" />
+                                        </Border>
+                                    </Grid>
+
+                                    <Grid ColumnDefinitions="*, 4, *">
+                                        <!-- Before Scene Thumbnail -->
+                                        <Border Grid.Column="0" Background="{DynamicResource SurfaceInsetBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="4" Padding="4">
+                                            <StackPanel Spacing="3">
+                                                <TextBlock Text="BEFORE (T1)" FontSize="8" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" />
+                                                <Border Height="80" Background="#111827" CornerRadius="2">
+                                                    <Image x:Name="ImgAgentBeforeThumbnail" Stretch="UniformToFill" />
+                                                </Border>
+                                                <TextBlock x:Name="TxtAgentBeforeMeta" Text="2024-01-10 &#x2022; Sentinel-2" FontSize="8" Classes="mono" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" />
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Divider -->
+                                        <Rectangle Grid.Column="1" Width="1" Fill="{DynamicResource RuleBrush}" VerticalAlignment="Stretch" />
+
+                                        <!-- After Scene Thumbnail -->
+                                        <Border Grid.Column="2" Background="{DynamicResource SurfaceInsetBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="1" CornerRadius="4" Padding="4">
+                                            <StackPanel Spacing="3">
+                                                <TextBlock Text="AFTER (T2)" FontSize="8" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Center" />
+                                                <Border Height="80" Background="#111827" CornerRadius="2">
+                                                    <Image x:Name="ImgAgentAfterThumbnail" Stretch="UniformToFill" />
+                                                </Border>
+                                                <TextBlock x:Name="TxtAgentAfterMeta" Text="2024-04-12 &#x2022; Sentinel-2" FontSize="8" Classes="mono" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" />
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Grounded Evidence & Synthesis -->
+                            <Border Classes="cardCompact" Background="{DynamicResource SurfaceInsetBrush}">
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="GROUNDED EVIDENCE DOSSIER" Classes="sectionHeader" FontSize="9" />
+                                    <TextBlock x:Name="TxtAgentEvidenceContent" Text="Select a candidate or enter an analytical query to evaluate spectral indices and onset timestamps."
+                                               FontSize="{DynamicResource FontMicro}" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Provenance & Merkle Root -->
+                            <Border Classes="cardCompact">
+                                <Grid ColumnDefinitions="*, Auto">
+                                    <StackPanel Spacing="2">
+                                        <TextBlock Text="W3C PROV-O CRYPTOGRAPHIC ROOT" Classes="sectionHeader" FontSize="8" />
+                                        <TextBlock x:Name="TxtAgentMerkleRoot" Text="PROV-EVIDENCE-VERIFIED" Classes="mono" FontSize="8" Foreground="{DynamicResource TextFaintBrush}" TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                    <Button Grid.Column="1" Classes="flat" Content="Export" Click="OnAgentExportEvidenceClicked" Padding="6,2" FontSize="8" />
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </Grid>
+
 
             <!-- ==============================================================
                  BOTTOM STATUSBAR & TELEMETRY DOCK (ROW 2)

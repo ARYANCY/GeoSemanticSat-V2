@@ -1,18 +1,18 @@
 ﻿# Reproducible Evaluation Report - Problem Statement 26227
 **Client**: Ministry of Defence (MoD) / Indian Army (DGIS)  
 **System**: GeoSemanticSat (.NET 10.0 Native Architecture)  
-**Evaluation Date**: 2026-09-08 17:54:42 UTC  
+**Evaluation Date**: 2026-09-11 16:37:14 UTC  
 **Environment**: Linux x86_64, .NET 10.0, 100% On-Premises Offline Operation  
 
 ## 1. Metric Summary
 | Metric | Value | Reference Target |
 |---|---|---|
 | **Indexed Scenes / Patches** | 128 patches (128 total) | Scale test |
-| **Initial Index Build Time** | 4 ms | < 500 ms |
-| **Incremental Ingestion Time** | 4 ms (0.06 ms/patch) | Sub-second per tile |
+| **Initial Index Build Time** | 10 ms | < 500 ms |
+| **Incremental Ingestion Time** | 5 ms (0.08 ms/patch) | Sub-second per tile |
 | **Storage Footprint** | 77.48 KB (619.9 bytes/patch) | Ultra-lightweight binary |
-| **Query Latency (P50)** | 42.6 µs (0.0043 ms) | < 10 ms |
-| **Query Latency (P95)** | 102.9 µs (0.00103 ms) | < 25 ms |
+| **Query Latency (P50)** | 232.7 µs (0.00233 ms) | < 10 ms |
+| **Query Latency (P95)** | 8572.0 µs (0.008572 ms) | < 25 ms |
 | **Change Detection Precision** | 52.4% | Precision-first (> 85%) |
 | **Change Detection Recall** | 68.8% | High analytical discovery |
 | **Change Detection F1-Score** | 0.59 | Balanced precision-recall |

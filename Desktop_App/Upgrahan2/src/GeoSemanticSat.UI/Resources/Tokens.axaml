@@ -2,126 +2,10 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
   <!-- ==============================================================
-       DESIGN TOKENS
-       Neutral-first dark theme for a professional analysis tool.
-
-       Rules this palette encodes:
-         * Hierarchy is carried by SIZE + WEIGHT + LUMINANCE, never by hue.
-         * Exactly one accent (blue). It means "interactive / selected".
-           It is never used for headings, labels, coordinates or metadata.
-         * Status hues (green / amber / red) are semantic and rare. They mark
-           verdicts and detections only, at low chroma, usually as a small
-           chip or rule rather than as body-text colour.
-         * Three elevation steps maximum. Depth comes from spacing and
-           hairlines, not from stacking bordered boxes.
+       GEOSEMANTICSAT DESIGN TOKENS
+       Ultra-clean, modern, dual-theme architecture (Dark & Light).
+       Optimized for high-precision Earth Observation analytics.
        ============================================================== -->
-
-  <!-- LAYER 1: PRIMITIVES ============================================== -->
-
-  <!-- Page fill, painted by the app itself. SukiUI's SukiBackground layer sits
-       beneath our content and defaults to a blue gradient; rather than fight its
-       template we simply cover it, which also makes the window deterministic
-       instead of dependent on an OS backdrop that never composites here. -->
-  <Color x:Key="WindowTintOpaque">#0E1116</Color>
-
-  <!-- Neutral surface ramp. Low-chroma blue-grey, ~3% steps. -->
-  <Color x:Key="Surface0">#12151B</Color>   <!-- sunken: wells, insets       -->
-  <Color x:Key="Surface1">#171B22</Color>   <!-- page / list background      -->
-  <Color x:Key="Surface2">#1C212A</Color>   <!-- card                        -->
-  <Color x:Key="Surface3">#232935</Color>   <!-- raised control / hover base -->
-  <Color x:Key="Surface4">#2B323F</Color>   <!-- hover / pressed             -->
-
-  <!-- Hairlines. Deliberately weak: if every box needs a visible border,
-       the layout is doing the wrong job. -->
-  <Color x:Key="Hairline">#1AFFFFFF</Color>
-  <Color x:Key="HairlineStrong">#2BFFFFFF</Color>
-
-  <!-- Text ramp. Near-white rather than pure white (less glare on OLED
-       and on a blurred backdrop). -->
-  <Color x:Key="Ink1">#F0F3F7</Color>
-  <Color x:Key="Ink2">#B5BDCA</Color>
-  <Color x:Key="Ink3">#87909F</Color>
-  <Color x:Key="Ink4">#616B7A</Color>
-
-  <!-- The single accent. -->
-  <Color x:Key="Accent">#3584E4</Color>
-  <Color x:Key="AccentHover">#4A94EA</Color>
-  <Color x:Key="AccentPressed">#2A6BC4</Color>
-  <Color x:Key="AccentTint">#242F44</Color>
-
-  <!-- Status hues, desaturated from the GNOME primaries so they can sit
-       next to each other without fighting. -->
-  <Color x:Key="Positive">#3FAE6E</Color>
-  <Color x:Key="PositiveTint">#16281F</Color>
-  <Color x:Key="Caution">#C8892F</Color>
-  <Color x:Key="CautionTint">#2A2118</Color>
-  <Color x:Key="Negative">#D25A56</Color>
-  <Color x:Key="NegativeTint">#2C1A1C</Color>
-
-  <!-- LAYER 2: SEMANTIC VOCABULARY ====================================== -->
-
-  <!-- Surfaces -->
-  <SolidColorBrush x:Key="FallbackBackgroundBrush" Color="{StaticResource WindowTintOpaque}"/>
-  <SolidColorBrush x:Key="SurfaceBrush"            Color="{StaticResource Surface1}"/>
-  <SolidColorBrush x:Key="SurfaceCardBrush"        Color="{StaticResource Surface2}"/>
-  <SolidColorBrush x:Key="SurfaceRaisedBrush"      Color="{StaticResource Surface3}"/>
-  <SolidColorBrush x:Key="SurfaceHoverBrush"       Color="{StaticResource Surface4}"/>
-  <SolidColorBrush x:Key="SurfaceInsetBrush"       Color="{StaticResource Surface0}"/>
-  <SolidColorBrush x:Key="SurfaceSunkenBrush"      Color="{StaticResource Surface0}"/>
-
-  <!-- Chrome sits directly on the window fill: no fill of its own. -->
-  <SolidColorBrush x:Key="ChromeBrush"             Color="#00000000"/>
-
-
-  <!--
-    Transparent-BLACK, and never the XAML keyword "Transparent" (= #00FFFFFF,
-    i.e. transparent WHITE), for any brush that a transition animates.
-    BrushTransition interpolates ARGB linearly, so animating from transparent
-    white to a dark surface passes through ~#80919A9A - a bright half-opaque
-    grey. That is what flashed over every button on pointer-enter.
-  -->
-  <SolidColorBrush x:Key="ClearBrush"              Color="#00000000"/>
-
-  <!-- Text -->
-  <SolidColorBrush x:Key="TextPrimaryBrush"    Color="{StaticResource Ink1}"/>
-  <SolidColorBrush x:Key="TextSecondaryBrush"  Color="{StaticResource Ink2}"/>
-  <SolidColorBrush x:Key="TextMutedBrush"      Color="{StaticResource Ink3}"/>
-  <SolidColorBrush x:Key="TextFaintBrush"      Color="{StaticResource Ink4}"/>
-  <SolidColorBrush x:Key="TextOnAccentBrush"   Color="#FFFFFF"/>
-
-  <!-- Rules and dividers -->
-  <SolidColorBrush x:Key="RuleBrush"           Color="{StaticResource Hairline}"/>
-  <SolidColorBrush x:Key="RuleStrongBrush"     Color="{StaticResource HairlineStrong}"/>
-
-  <!-- Accent -->
-  <SolidColorBrush x:Key="AccentBrush"         Color="{StaticResource Accent}"/>
-  <SolidColorBrush x:Key="AccentHoverBrush"    Color="{StaticResource AccentHover}"/>
-  <SolidColorBrush x:Key="AccentPressedBrush"  Color="{StaticResource AccentPressed}"/>
-  <SolidColorBrush x:Key="AccentDeepBrush"     Color="{StaticResource AccentPressed}"/>
-  <SolidColorBrush x:Key="AccentSurfaceBrush"  Color="{StaticResource AccentTint}"/>
-
-  <!-- Status / verification -->
-  <SolidColorBrush x:Key="VerifiedBrush"         Color="{StaticResource Positive}"/>
-  <SolidColorBrush x:Key="VerifiedSurfaceBrush"  Color="{StaticResource PositiveTint}"/>
-  <SolidColorBrush x:Key="CandidateBrush"        Color="{StaticResource Caution}"/>
-  <SolidColorBrush x:Key="CandidateSurfaceBrush" Color="{StaticResource CautionTint}"/>
-  <SolidColorBrush x:Key="RejectedBrush"         Color="{StaticResource Negative}"/>
-  <SolidColorBrush x:Key="RejectedSurfaceBrush"  Color="{StaticResource NegativeTint}"/>
-  <SolidColorBrush x:Key="AlertBrush"            Color="{StaticResource Negative}"/>
-
-  <!-- Change-type badge fills. Muted tints, readable with Ink1 on top.
-       Referenced from code-behind so the palette stays in one file. -->
-  <SolidColorBrush x:Key="TypeConstructionBrush" Color="#7A3B38"/>
-  <SolidColorBrush x:Key="TypeClearanceBrush"    Color="#75552A"/>
-  <SolidColorBrush x:Key="TypeWaterBrush"        Color="#2C5670"/>
-  <SolidColorBrush x:Key="TypeRoadBrush"         Color="#4F3F70"/>
-  <SolidColorBrush x:Key="TypeActivityBrush"     Color="#6E5A2E"/>
-  <SolidColorBrush x:Key="TypeNeutralBrush"      Color="{StaticResource Surface3}"/>
-
-  <!-- Map canvas -->
-  <SolidColorBrush x:Key="MapVoidBrush"        Color="#0E1116"/>
-  <SolidColorBrush x:Key="MapLandBrush"        Color="#171B22"/>
-  <SolidColorBrush x:Key="MapLandAltBrush"     Color="#1C212A"/>
 
   <!-- TYPE SCALE -->
   <x:Double x:Key="FontMicro">11</x:Double>
@@ -130,8 +14,8 @@
   <x:Double x:Key="FontTitle">18</x:Double>
   <x:Double x:Key="FontDisplay">24</x:Double>
 
-  <FontFamily x:Key="UiFont">Segoe UI Variable Text, Segoe UI, Cantarell, Inter, -apple-system, sans-serif</FontFamily>
-  <FontFamily x:Key="MonoFont">Cascadia Mono, Consolas, Source Code Pro, monospace</FontFamily>
+  <FontFamily x:Key="UiFont">Segoe UI Variable Text, Inter, Segoe UI, -apple-system, sans-serif</FontFamily>
+  <FontFamily x:Key="MonoFont">Cascadia Code, Cascadia Mono, Consolas, JetBrains Mono, monospace</FontFamily>
 
   <!-- SPACING & PADDING -->
   <x:Double x:Key="Space1">4</x:Double>
@@ -150,5 +34,250 @@
   <CornerRadius x:Key="RadiusCard">10</CornerRadius>
   <CornerRadius x:Key="RadiusPill">18</CornerRadius>
   <CornerRadius x:Key="RadiusWindow">8</CornerRadius>
+
+  <ResourceDictionary.ThemeDictionaries>
+
+    <!-- ==============================================================
+         DARK THEME (Default) - Sleek obsidian/slate high-contrast
+         ============================================================== -->
+    <ResourceDictionary x:Key="Default">
+      <Color x:Key="WindowTintOpaque">#0B0F17</Color>
+      <Color x:Key="Surface0">#0F1420</Color>
+      <Color x:Key="Surface1">#131B2A</Color>
+      <Color x:Key="Surface2">#182235</Color>
+      <Color x:Key="Surface3">#212E46</Color>
+      <Color x:Key="Surface4">#2A3A57</Color>
+
+      <Color x:Key="Hairline">#1C2B42</Color>
+      <Color x:Key="HairlineStrong">#2C4263</Color>
+
+      <Color x:Key="Ink1">#F8FAFC</Color>
+      <Color x:Key="Ink2">#CBD5E1</Color>
+      <Color x:Key="Ink3">#94A3B8</Color>
+      <Color x:Key="Ink4">#64748B</Color>
+
+      <Color x:Key="Accent">#3B82F6</Color>
+      <Color x:Key="AccentHover">#60A5FA</Color>
+      <Color x:Key="AccentPressed">#2563EB</Color>
+      <Color x:Key="AccentTint">#1E293B</Color>
+
+      <Color x:Key="Positive">#10B981</Color>
+      <Color x:Key="PositiveTint">#064E3B</Color>
+      <Color x:Key="Caution">#F59E0B</Color>
+      <Color x:Key="CautionTint">#451A03</Color>
+      <Color x:Key="Negative">#EF4444</Color>
+      <Color x:Key="NegativeTint">#450A0A</Color>
+
+      <!-- Surfaces -->
+      <SolidColorBrush x:Key="FallbackBackgroundBrush" Color="{StaticResource WindowTintOpaque}"/>
+      <SolidColorBrush x:Key="SurfaceBrush"            Color="{StaticResource Surface1}"/>
+      <SolidColorBrush x:Key="SurfaceCardBrush"        Color="{StaticResource Surface2}"/>
+      <SolidColorBrush x:Key="SurfaceRaisedBrush"      Color="{StaticResource Surface3}"/>
+      <SolidColorBrush x:Key="SurfaceHoverBrush"       Color="{StaticResource Surface4}"/>
+      <SolidColorBrush x:Key="SurfaceInsetBrush"       Color="{StaticResource Surface0}"/>
+      <SolidColorBrush x:Key="SurfaceSunkenBrush"      Color="{StaticResource Surface0}"/>
+      <SolidColorBrush x:Key="ChromeBrush"             Color="#00000000"/>
+      <SolidColorBrush x:Key="ClearBrush"              Color="#00000000"/>
+
+      <!-- Text -->
+      <SolidColorBrush x:Key="TextPrimaryBrush"        Color="{StaticResource Ink1}"/>
+      <SolidColorBrush x:Key="TextSecondaryBrush"      Color="{StaticResource Ink2}"/>
+      <SolidColorBrush x:Key="TextMutedBrush"          Color="{StaticResource Ink3}"/>
+      <SolidColorBrush x:Key="TextFaintBrush"          Color="{StaticResource Ink4}"/>
+      <SolidColorBrush x:Key="TextOnAccentBrush"       Color="#FFFFFF"/>
+
+      <!-- Rules and dividers -->
+      <SolidColorBrush x:Key="RuleBrush"               Color="{StaticResource Hairline}"/>
+      <SolidColorBrush x:Key="RuleStrongBrush"         Color="{StaticResource HairlineStrong}"/>
+
+      <!-- Accent -->
+      <SolidColorBrush x:Key="AccentBrush"             Color="{StaticResource Accent}"/>
+      <SolidColorBrush x:Key="AccentHoverBrush"        Color="{StaticResource AccentHover}"/>
+      <SolidColorBrush x:Key="AccentPressedBrush"      Color="{StaticResource AccentPressed}"/>
+      <SolidColorBrush x:Key="AccentDeepBrush"         Color="{StaticResource AccentPressed}"/>
+      <SolidColorBrush x:Key="AccentSurfaceBrush"      Color="{StaticResource AccentTint}"/>
+
+      <!-- Status -->
+      <SolidColorBrush x:Key="VerifiedBrush"           Color="{StaticResource Positive}"/>
+      <SolidColorBrush x:Key="VerifiedSurfaceBrush"    Color="{StaticResource PositiveTint}"/>
+      <SolidColorBrush x:Key="CandidateBrush"          Color="{StaticResource Caution}"/>
+      <SolidColorBrush x:Key="CandidateSurfaceBrush"   Color="{StaticResource CautionTint}"/>
+      <SolidColorBrush x:Key="RejectedBrush"           Color="{StaticResource Negative}"/>
+      <SolidColorBrush x:Key="RejectedSurfaceBrush"    Color="{StaticResource NegativeTint}"/>
+      <SolidColorBrush x:Key="AlertBrush"              Color="{StaticResource Negative}"/>
+
+      <!-- Change Badges -->
+      <SolidColorBrush x:Key="TypeConstructionBrush"   Color="#7F1D1D"/>
+      <SolidColorBrush x:Key="TypeClearanceBrush"      Color="#78350F"/>
+      <SolidColorBrush x:Key="TypeWaterBrush"          Color="#0C4A6E"/>
+      <SolidColorBrush x:Key="TypeRoadBrush"           Color="#4C1D95"/>
+      <SolidColorBrush x:Key="TypeActivityBrush"       Color="#713F12"/>
+      <SolidColorBrush x:Key="TypeNeutralBrush"        Color="{StaticResource Surface3}"/>
+
+      <!-- Map canvas -->
+      <SolidColorBrush x:Key="MapVoidBrush"            Color="#0B0F17"/>
+      <SolidColorBrush x:Key="MapLandBrush"            Color="#131B2A"/>
+      <SolidColorBrush x:Key="MapLandAltBrush"         Color="#182235"/>
+    </ResourceDictionary>
+
+    <!-- ==============================================================
+         LIGHT THEME - Clean, crisp, aesthetic slate white
+         ============================================================== -->
+    <ResourceDictionary x:Key="Light">
+      <Color x:Key="WindowTintOpaque">#F8FAFC</Color>
+      <Color x:Key="Surface0">#F1F5F9</Color>
+      <Color x:Key="Surface1">#FFFFFF</Color>
+      <Color x:Key="Surface2">#FFFFFF</Color>
+      <Color x:Key="Surface3">#F1F5F9</Color>
+      <Color x:Key="Surface4">#E2E8F0</Color>
+
+      <Color x:Key="Hairline">#E2E8F0</Color>
+      <Color x:Key="HairlineStrong">#CBD5E1</Color>
+
+      <Color x:Key="Ink1">#0F172A</Color>
+      <Color x:Key="Ink2">#334155</Color>
+      <Color x:Key="Ink3">#64748B</Color>
+      <Color x:Key="Ink4">#94A3B8</Color>
+
+      <Color x:Key="Accent">#2563EB</Color>
+      <Color x:Key="AccentHover">#1D4ED8</Color>
+      <Color x:Key="AccentPressed">#1E40AF</Color>
+      <Color x:Key="AccentTint">#EFF6FF</Color>
+
+      <Color x:Key="Positive">#059669</Color>
+      <Color x:Key="PositiveTint">#ECFDF5</Color>
+      <Color x:Key="Caution">#D97706</Color>
+      <Color x:Key="CautionTint">#FFFBEB</Color>
+      <Color x:Key="Negative">#DC2626</Color>
+      <Color x:Key="NegativeTint">#FEF2F2</Color>
+
+      <!-- Surfaces -->
+      <SolidColorBrush x:Key="FallbackBackgroundBrush" Color="{StaticResource WindowTintOpaque}"/>
+      <SolidColorBrush x:Key="SurfaceBrush"            Color="{StaticResource Surface1}"/>
+      <SolidColorBrush x:Key="SurfaceCardBrush"        Color="{StaticResource Surface2}"/>
+      <SolidColorBrush x:Key="SurfaceRaisedBrush"      Color="{StaticResource Surface3}"/>
+      <SolidColorBrush x:Key="SurfaceHoverBrush"       Color="{StaticResource Surface4}"/>
+      <SolidColorBrush x:Key="SurfaceInsetBrush"       Color="{StaticResource Surface0}"/>
+      <SolidColorBrush x:Key="SurfaceSunkenBrush"      Color="{StaticResource Surface0}"/>
+      <SolidColorBrush x:Key="ChromeBrush"             Color="#00000000"/>
+      <SolidColorBrush x:Key="ClearBrush"              Color="#00000000"/>
+
+      <!-- Text -->
+      <SolidColorBrush x:Key="TextPrimaryBrush"        Color="{StaticResource Ink1}"/>
+      <SolidColorBrush x:Key="TextSecondaryBrush"      Color="{StaticResource Ink2}"/>
+      <SolidColorBrush x:Key="TextMutedBrush"          Color="{StaticResource Ink3}"/>
+      <SolidColorBrush x:Key="TextFaintBrush"          Color="{StaticResource Ink4}"/>
+      <SolidColorBrush x:Key="TextOnAccentBrush"       Color="#FFFFFF"/>
+
+      <!-- Rules and dividers -->
+      <SolidColorBrush x:Key="RuleBrush"               Color="{StaticResource Hairline}"/>
+      <SolidColorBrush x:Key="RuleStrongBrush"         Color="{StaticResource HairlineStrong}"/>
+
+      <!-- Accent -->
+      <SolidColorBrush x:Key="AccentBrush"             Color="{StaticResource Accent}"/>
+      <SolidColorBrush x:Key="AccentHoverBrush"        Color="{StaticResource AccentHover}"/>
+      <SolidColorBrush x:Key="AccentPressedBrush"      Color="{StaticResource AccentPressed}"/>
+      <SolidColorBrush x:Key="AccentDeepBrush"         Color="{StaticResource AccentPressed}"/>
+      <SolidColorBrush x:Key="AccentSurfaceBrush"      Color="{StaticResource AccentTint}"/>
+
+      <!-- Status -->
+      <SolidColorBrush x:Key="VerifiedBrush"           Color="{StaticResource Positive}"/>
+      <SolidColorBrush x:Key="VerifiedSurfaceBrush"    Color="{StaticResource PositiveTint}"/>
+      <SolidColorBrush x:Key="CandidateBrush"          Color="{StaticResource Caution}"/>
+      <SolidColorBrush x:Key="CandidateSurfaceBrush"   Color="{StaticResource CautionTint}"/>
+      <SolidColorBrush x:Key="RejectedBrush"           Color="{StaticResource Negative}"/>
+      <SolidColorBrush x:Key="RejectedSurfaceBrush"    Color="{StaticResource NegativeTint}"/>
+      <SolidColorBrush x:Key="AlertBrush"              Color="{StaticResource Negative}"/>
+
+      <!-- Change Badges -->
+      <SolidColorBrush x:Key="TypeConstructionBrush"   Color="#FEE2E2"/>
+      <SolidColorBrush x:Key="TypeClearanceBrush"      Color="#FEF3C7"/>
+      <SolidColorBrush x:Key="TypeWaterBrush"          Color="#E0F2FE"/>
+      <SolidColorBrush x:Key="TypeRoadBrush"           Color="#EDE9FE"/>
+      <SolidColorBrush x:Key="TypeActivityBrush"       Color="#FFEDD5"/>
+      <SolidColorBrush x:Key="TypeNeutralBrush"        Color="{StaticResource Surface3}"/>
+
+      <!-- Map canvas -->
+      <SolidColorBrush x:Key="MapVoidBrush"            Color="#F1F5F9"/>
+      <SolidColorBrush x:Key="MapLandBrush"            Color="#FFFFFF"/>
+      <SolidColorBrush x:Key="MapLandAltBrush"         Color="#F8FAFC"/>
+    </ResourceDictionary>
+
+  </ResourceDictionary.ThemeDictionaries>
+
+  <!-- ==============================================================
+       TOP-LEVEL DEFAULT FALLBACKS (guarantees static resolution)
+       ============================================================== -->
+  <Color x:Key="WindowTintOpaque">#0B0F17</Color>
+  <Color x:Key="Surface0">#0F1420</Color>
+  <Color x:Key="Surface1">#131B2A</Color>
+  <Color x:Key="Surface2">#182235</Color>
+  <Color x:Key="Surface3">#212E46</Color>
+  <Color x:Key="Surface4">#2A3A57</Color>
+
+  <Color x:Key="Hairline">#1C2B42</Color>
+  <Color x:Key="HairlineStrong">#2C4263</Color>
+
+  <Color x:Key="Ink1">#F8FAFC</Color>
+  <Color x:Key="Ink2">#CBD5E1</Color>
+  <Color x:Key="Ink3">#94A3B8</Color>
+  <Color x:Key="Ink4">#64748B</Color>
+
+  <Color x:Key="Accent">#3B82F6</Color>
+  <Color x:Key="AccentHover">#60A5FA</Color>
+  <Color x:Key="AccentPressed">#2563EB</Color>
+  <Color x:Key="AccentTint">#1E293B</Color>
+
+  <Color x:Key="Positive">#10B981</Color>
+  <Color x:Key="PositiveTint">#064E3B</Color>
+  <Color x:Key="Caution">#F59E0B</Color>
+  <Color x:Key="CautionTint">#451A03</Color>
+  <Color x:Key="Negative">#EF4444</Color>
+  <Color x:Key="NegativeTint">#450A0A</Color>
+
+  <!-- Semantic Vocabulary Fallbacks -->
+  <SolidColorBrush x:Key="FallbackBackgroundBrush" Color="{StaticResource WindowTintOpaque}"/>
+  <SolidColorBrush x:Key="SurfaceBrush"            Color="{StaticResource Surface1}"/>
+  <SolidColorBrush x:Key="SurfaceCardBrush"        Color="{StaticResource Surface2}"/>
+  <SolidColorBrush x:Key="SurfaceRaisedBrush"      Color="{StaticResource Surface3}"/>
+  <SolidColorBrush x:Key="SurfaceHoverBrush"       Color="{StaticResource Surface4}"/>
+  <SolidColorBrush x:Key="SurfaceInsetBrush"       Color="{StaticResource Surface0}"/>
+  <SolidColorBrush x:Key="SurfaceSunkenBrush"      Color="{StaticResource Surface0}"/>
+  <SolidColorBrush x:Key="ChromeBrush"             Color="#00000000"/>
+  <SolidColorBrush x:Key="ClearBrush"              Color="#00000000"/>
+
+  <SolidColorBrush x:Key="TextPrimaryBrush"        Color="{StaticResource Ink1}"/>
+  <SolidColorBrush x:Key="TextSecondaryBrush"      Color="{StaticResource Ink2}"/>
+  <SolidColorBrush x:Key="TextMutedBrush"          Color="{StaticResource Ink3}"/>
+  <SolidColorBrush x:Key="TextFaintBrush"          Color="{StaticResource Ink4}"/>
+  <SolidColorBrush x:Key="TextOnAccentBrush"       Color="#FFFFFF"/>
+
+  <SolidColorBrush x:Key="RuleBrush"               Color="{StaticResource Hairline}"/>
+  <SolidColorBrush x:Key="RuleStrongBrush"         Color="{StaticResource HairlineStrong}"/>
+
+  <SolidColorBrush x:Key="AccentBrush"             Color="{StaticResource Accent}"/>
+  <SolidColorBrush x:Key="AccentHoverBrush"        Color="{StaticResource AccentHover}"/>
+  <SolidColorBrush x:Key="AccentPressedBrush"      Color="{StaticResource AccentPressed}"/>
+  <SolidColorBrush x:Key="AccentDeepBrush"         Color="{StaticResource AccentPressed}"/>
+  <SolidColorBrush x:Key="AccentSurfaceBrush"      Color="{StaticResource AccentTint}"/>
+
+  <SolidColorBrush x:Key="VerifiedBrush"           Color="{StaticResource Positive}"/>
+  <SolidColorBrush x:Key="VerifiedSurfaceBrush"    Color="{StaticResource PositiveTint}"/>
+  <SolidColorBrush x:Key="CandidateBrush"          Color="{StaticResource Caution}"/>
+  <SolidColorBrush x:Key="CandidateSurfaceBrush"   Color="{StaticResource CautionTint}"/>
+  <SolidColorBrush x:Key="RejectedBrush"           Color="{StaticResource Negative}"/>
+  <SolidColorBrush x:Key="RejectedSurfaceBrush"    Color="{StaticResource NegativeTint}"/>
+  <SolidColorBrush x:Key="AlertBrush"              Color="{StaticResource Negative}"/>
+
+  <SolidColorBrush x:Key="TypeConstructionBrush"   Color="#7F1D1D"/>
+  <SolidColorBrush x:Key="TypeClearanceBrush"      Color="#78350F"/>
+  <SolidColorBrush x:Key="TypeWaterBrush"          Color="#0C4A6E"/>
+  <SolidColorBrush x:Key="TypeRoadBrush"           Color="#4C1D95"/>
+  <SolidColorBrush x:Key="TypeActivityBrush"       Color="#713F12"/>
+  <SolidColorBrush x:Key="TypeNeutralBrush"        Color="{StaticResource Surface3}"/>
+
+  <SolidColorBrush x:Key="MapVoidBrush"            Color="#0B0F17"/>
+  <SolidColorBrush x:Key="MapLandBrush"            Color="#131B2A"/>
+  <SolidColorBrush x:Key="MapLandAltBrush"         Color="#182235"/>
 
 </ResourceDictionary>

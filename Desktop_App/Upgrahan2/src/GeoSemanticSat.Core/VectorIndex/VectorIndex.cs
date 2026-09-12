@@ -16,7 +16,10 @@ public record SearchFilter(
     DateTime? StartDate = null,
     DateTime? EndDate = null,
     SensorPlatform? Platform = null,
-    double MinQuality = 0.3
+    double MinQuality = 0.3,
+    double? MaxCloudCoverPercent = null,
+    double? MinSunElevationDegrees = null,
+    double? MaxViewZenithDegrees = null
 );
 
 /// <summary>
@@ -60,7 +63,7 @@ public class VectorIndex
         _rwLock.EnterWriteLock();
         try
         {
-            _patches.Add(patch);
+            UpsertUnlocked(patch);
         }
         finally
         {
@@ -81,7 +84,7 @@ public class VectorIndex
                 if (p.EmbeddingVector.Length != VectorDimension)
                     throw new ArgumentException($"Embedding dimension mismatch. Expected {VectorDimension}, got {p.EmbeddingVector.Length}");
                 NormalizeInPlace(p.EmbeddingVector);
-                _patches.Add(p);
+                UpsertUnlocked(p);
             }
         }
         finally
@@ -100,6 +103,20 @@ public class VectorIndex
         finally
         {
             _rwLock.ExitReadLock();
+        }
+    }
+
+    private void UpsertUnlocked(TilePatch patch)
+    {
+        if (patch == null) return;
+        int existingIdx = _patches.FindIndex(p => p.PatchId == patch.PatchId);
+        if (existingIdx >= 0)
+        {
+            _patches[existingIdx] = patch;
+        }
+        else
+        {
+            _patches.Add(patch);
         }
     }
 
@@ -167,6 +184,17 @@ public class VectorIndex
                         continue;
 
                     if (patch.QualityScore < filter.MinQuality)
+                        continue;
+
+                    if (filter.MaxCloudCoverPercent.HasValue && patch.CloudCoverPercentage > filter.MaxCloudCoverPercent.Value)
+                        continue;
+
+                    if (filter.MinSunElevationDegrees.HasValue && patch.SunElevationDegrees < filter.MinSunElevationDegrees.Value)
+                        continue;
+
+                    if (filter.MaxViewZenithDegrees.HasValue &&
+                        patch.ViewZenithDegrees.HasValue &&
+                        patch.ViewZenithDegrees.Value > filter.MaxViewZenithDegrees.Value)
                         continue;
                 }
 
@@ -237,6 +265,7 @@ public class VectorIndex
 
     /// <summary>
     /// Compact binary serialization for fast offline on-premises loading without network dependencies.
+    /// Version 2 includes optical metadata (CloudCoverPercentage, SunElevationDegrees, ViewZenithDegrees, SourceFilePath).
     /// </summary>
     public void SaveIndex(string filePath)
     {
@@ -248,7 +277,7 @@ public class VectorIndex
 
             // Header: Magic "GSSV"
             bw.Write((byte)'G'); bw.Write((byte)'S'); bw.Write((byte)'S'); bw.Write((byte)'V');
-            bw.Write((int)1); // version
+            bw.Write((int)2); // version 2
             bw.Write(VectorDimension);
             bw.Write(_patches.Count);
 
@@ -269,6 +298,16 @@ public class VectorIndex
                 bw.Write(p.QualityScore);
                 bw.Write(p.HasCloudOrShadow);
 
+                // Version 2 additions: optical & file metadata
+                bw.Write(p.CloudCoverPercentage);
+                bw.Write(p.SunElevationDegrees);
+                bw.Write(p.ViewZenithDegrees.HasValue);
+                if (p.ViewZenithDegrees.HasValue)
+                {
+                    bw.Write(p.ViewZenithDegrees.Value);
+                }
+                bw.Write(p.SourceFilePath ?? string.Empty);
+
                 for (int i = 0; i < VectorDimension; i++)
                 {
                     bw.Write(p.EmbeddingVector[i]);
@@ -283,6 +322,7 @@ public class VectorIndex
 
     /// <summary>
     /// Loads or incrementally appends an existing index file from disk.
+    /// Supports both version 1 (legacy) and version 2 binary formats.
     /// </summary>
     public static VectorIndex LoadIndex(string filePath)
     {
@@ -297,6 +337,9 @@ public class VectorIndex
             throw new InvalidDataException("Invalid index binary header.");
 
         int version = br.ReadInt32();
+        if (version != 1 && version != 2)
+            throw new InvalidDataException($"Unsupported index binary version: {version}");
+
         int dim = br.ReadInt32();
         int count = br.ReadInt32();
 
@@ -316,10 +359,19 @@ public class VectorIndex
                 PatchWidth = br.ReadInt32(),
                 PatchHeight = br.ReadInt32(),
                 QualityScore = br.ReadDouble(),
-                HasCloudOrShadow = br.ReadBoolean(),
-                EmbeddingVector = new float[dim]
+                HasCloudOrShadow = br.ReadBoolean()
             };
 
+            if (version >= 2)
+            {
+                p.CloudCoverPercentage = br.ReadDouble();
+                p.SunElevationDegrees = br.ReadDouble();
+                bool hasViewZenith = br.ReadBoolean();
+                p.ViewZenithDegrees = hasViewZenith ? br.ReadDouble() : null;
+                p.SourceFilePath = br.ReadString();
+            }
+
+            p.EmbeddingVector = new float[dim];
             for (int d = 0; d < dim; d++)
             {
                 p.EmbeddingVector[d] = br.ReadSingle();

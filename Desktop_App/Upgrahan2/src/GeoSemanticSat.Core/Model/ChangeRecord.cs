@@ -7,6 +7,11 @@ public class ChangeRecord
 {
     public string Id { get; set; } = Guid.NewGuid().ToString("N");
     public string TileId { get; set; } = string.Empty;
+    public string SceneIdT1 { get; set; } = string.Empty;
+    public string SceneIdT2 { get; set; } = string.Empty;
+    public string SourceFilePathT1 { get; set; } = string.Empty;
+    public string SourceFilePathT2 { get; set; } = string.Empty;
+    public string OnsetMethod { get; set; } = string.Empty;
     public BoundingBox Bounds { get; set; }
     public GeoCoordinate Center => Bounds.Center;
     public DateTime TimestampT1 { get; set; }

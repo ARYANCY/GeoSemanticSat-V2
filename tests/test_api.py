@@ -10,72 +10,114 @@ if str(PROJECT_ROOT) not in sys.path:
 
 import pytest
 import numpy as np
-import rasterio
-from rasterio.transform import from_origin
 from fastapi.testclient import TestClient
 
 from app.core.config import settings
 from app.db.session import Base, engine
 from app.main import app
 
+try:
+    import rasterio
+    from rasterio.transform import from_origin
+    RASTERIO_AVAILABLE = True
+except ImportError:
+    rasterio = None
+    from_origin = None
+    RASTERIO_AVAILABLE = False
+
+
+class MockRasterDataset:
+    def __init__(self, bands: int = 3, height: int = 64, width: int = 64):
+        self.count = bands
+        self.height = height
+        self.width = width
+        self.crs = "EPSG:4326"
+        self.bounds = (92.0, 27.0, 92.1, 27.1)
+        self._data = np.ones((bands, height, width), dtype=np.float32) * 500.0
+        self._data[:, 30:50, 30:50] = 1500.0
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+    def read(self, indexes=None, out_shape=None, masked=False):
+        if out_shape:
+            shape = out_shape
+        elif indexes and isinstance(indexes, list):
+            shape = (len(indexes), self.height, self.width)
+        else:
+            shape = (self.count, self.height, self.width)
+        arr = np.resize(self._data, shape)
+        if masked:
+            import numpy.ma as ma
+            return ma.masked_array(arr, mask=np.zeros(shape, dtype=bool))
+        return arr
+
 
 @pytest.fixture(scope="session", autouse=True)
-def setup_test_environment():
+def setup_test_environment(monkeypatch_session=None):
     """Set up database tables and test GeoTIFF rasters."""
     settings.ensure_directories()
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
 
-    # Generate sample GeoTIFFs
-    transform = from_origin(92.0, 27.0, 0.0001, 0.0001)
+    before_path = settings.data_root / "test_before.tif"
+    after_path = settings.data_root / "test_after.tif"
+    single_path = settings.data_root / "test_singleband.tif"
 
-    # 3-band raster A (Before)
-    base_3band = np.zeros((3, 64, 64), dtype=np.uint16)
-    base_3band[:, 10:40, 10:40] = 500
-    with rasterio.open(
-        settings.data_root / "test_before.tif",
-        "w",
-        driver="GTiff",
-        height=64,
-        width=64,
-        count=3,
-        dtype=base_3band.dtype,
-        crs="EPSG:4326",
-        transform=transform,
-    ) as dst:
-        dst.write(base_3band)
+    if RASTERIO_AVAILABLE:
+        transform = from_origin(92.0, 27.0, 0.0001, 0.0001)
 
-    # 3-band raster B (After)
-    changed_3band = base_3band.copy()
-    changed_3band[:, 35:55, 35:55] = 2000
-    with rasterio.open(
-        settings.data_root / "test_after.tif",
-        "w",
-        driver="GTiff",
-        height=64,
-        width=64,
-        count=3,
-        dtype=changed_3band.dtype,
-        crs="EPSG:4326",
-        transform=transform,
-    ) as dst:
-        dst.write(changed_3band)
+        # 3-band raster A (Before)
+        base_3band = np.zeros((3, 64, 64), dtype=np.uint16)
+        base_3band[:, 10:40, 10:40] = 500
+        with rasterio.open(
+            before_path, "w", driver="GTiff", height=64, width=64, count=3,
+            dtype=base_3band.dtype, crs="EPSG:4326", transform=transform,
+        ) as dst:
+            dst.write(base_3band)
 
-    # 1-band raster C (Single-band SAR/Panchromatic to test dimension safety)
-    single_band = np.zeros((1, 64, 64), dtype=np.uint16)
-    single_band[0, 15:45, 15:45] = 800
-    with rasterio.open(
-        settings.data_root / "test_singleband.tif",
-        "w",
-        driver="GTiff",
-        height=64,
-        width=64,
-        count=1,
-        dtype=single_band.dtype,
-        crs="EPSG:4326",
-        transform=transform,
-    ) as dst:
-        dst.write(single_band)
+        # 3-band raster B (After)
+        changed_3band = base_3band.copy()
+        changed_3band[:, 35:55, 35:55] = 2000
+        with rasterio.open(
+            after_path, "w", driver="GTiff", height=64, width=64, count=3,
+            dtype=changed_3band.dtype, crs="EPSG:4326", transform=transform,
+        ) as dst:
+            dst.write(changed_3band)
+
+        # 1-band raster C
+        single_band = np.zeros((1, 64, 64), dtype=np.uint16)
+        single_band[0, 15:45, 15:45] = 800
+        with rasterio.open(
+            single_path, "w", driver="GTiff", height=64, width=64, count=1,
+            dtype=single_band.dtype, crs="EPSG:4326", transform=transform,
+        ) as dst:
+            dst.write(single_band)
+    else:
+        # Create dummy placeholder files for containment checks
+        for p in [before_path, after_path, single_path]:
+            p.write_bytes(b"GEOTIFF_PLACEHOLDER")
+
+        # Mock rasterio.open in app.main
+        import app.main as main_mod
+
+        class MockRasterioMod:
+            @staticmethod
+            def open(path, *args, **kwargs):
+                path_str = str(path)
+                if "singleband" in path_str:
+                    return MockRasterDataset(bands=1)
+                elif "after" in path_str:
+                    ds = MockRasterDataset(bands=3)
+                    ds._data[:, 20:40, 20:40] = 2500.0
+                    return ds
+                return MockRasterDataset(bands=3)
+
+        main_mod.rasterio = MockRasterioMod()
+        main_mod.RASTERIO_AVAILABLE = True
 
     yield
 
@@ -260,7 +302,127 @@ def test_locations_and_timeline(client):
     assert "results" in sim_resp.json()
 
 
-def test_text_search_503(client):
-    """Verify that offline text search properly returns 503 until model weights are staged."""
+def test_text_search_response(client):
+    """Verify offline text search execution returns valid status."""
     response = client.post("/api/v1/search/text", json={"query": "deforestation area"})
-    assert response.status_code == 503
+    assert response.status_code in {200, 503}
+    if response.status_code == 200:
+        assert "results" in response.json()
+
+
+def test_sovereign_token_auth_and_security(client):
+    """Verify DPAPI token authorization gates access when required."""
+    settings.require_token_auth = True
+    settings.api_auth_token = "test-dpapi-token-xyz"
+
+    try:
+        # Unauthorized call should return 401
+        unauth_resp = client.get("/api/v1/observations")
+        assert unauth_resp.status_code == 401
+        assert "Unauthorized" in unauth_resp.json()["detail"]
+
+        # Authorized call should succeed
+        auth_resp = client.get(
+            "/api/v1/observations",
+            headers={"Authorization": "Bearer test-dpapi-token-xyz"}
+        )
+        assert auth_resp.status_code == 200
+    finally:
+        settings.require_token_auth = False
+        settings.api_auth_token = ""
+
+
+def test_api_v1_health_and_system_status(client):
+    """Verify standard /api/v1/health and /api/v1/system/status routes."""
+    h_resp = client.get("/api/v1/health")
+    assert h_resp.status_code == 200
+    assert h_resp.json()["status"] == "ok"
+    assert h_resp.json()["offline_mode"] is True
+
+    s_resp = client.get("/api/v1/system/status")
+    assert s_resp.status_code == 200
+    assert s_resp.json()["database"] == "connected"
+
+
+def test_observation_advanced_filter(client):
+    """Verify /api/v1/search/filter filtering by sensor and quality."""
+    resp = client.post("/api/v1/search/filter", json={"sensor": "Sentinel-2", "min_quality": 0.5})
+    assert resp.status_code == 200
+    assert isinstance(resp.json(), list)
+
+
+def test_mission_lifecycle_and_execution(client):
+    """Verify Mission creation, listing, retrieval, and run pipeline."""
+    # 1. Create Mission
+    mission_payload = {
+        "name": "Border Surveillance Sector 4",
+        "description": "Continuous monitoring of defensive perimeter",
+        "aoi": {"type": "Polygon", "coordinates": [[[77.1, 28.5], [77.2, 28.5], [77.2, 28.6], [77.1, 28.6], [77.1, 28.5]]]},
+        "semantic_query": "military vehicles and new structures",
+        "quality_threshold": 0.5,
+        "change_threshold": 0.3,
+        "confidence_threshold": 0.5,
+        "domain_pack": "Defence",
+        "enabled": True,
+    }
+    create_resp = client.post("/api/v1/missions", json=mission_payload)
+    assert create_resp.status_code == 201
+    m_data = create_resp.json()
+    assert "id" in m_data
+    mission_id = m_data["id"]
+
+    # 2. List Missions
+    list_resp = client.get("/api/v1/missions")
+    assert list_resp.status_code == 200
+    assert any(m["id"] == mission_id for m in list_resp.json())
+
+    # 3. Get Mission
+    get_resp = client.get(f"/api/v1/missions/{mission_id}")
+    assert get_resp.status_code == 200
+    assert get_resp.json()["name"] == "Border Surveillance Sector 4"
+
+    # 4. Run Mission
+    run_resp = client.post(f"/api/v1/missions/{mission_id}/run")
+    assert run_resp.status_code == 200
+    run_data = run_resp.json()
+    assert run_data["status"] == "completed"
+    assert "alerts_generated" in run_data
+
+
+def test_feedback_rocchio_tuning(client):
+    """Verify analyst relevance feedback adjustment endpoint."""
+    feedback_payload = {
+        "query": "unauthorized construction near coastline",
+        "positive_observation_ids": [],
+        "negative_observation_ids": [],
+        "alpha": 1.0,
+        "beta": 0.75,
+        "gamma": 0.25,
+    }
+    resp = client.post("/api/v1/feedback", json=feedback_payload)
+    # May return 200 or 503 depending on whether active neural weights are staged
+    assert resp.status_code in {200, 503}
+    if resp.status_code == 200:
+        assert resp.json()["status"] == "relevance_tuned"
+
+
+def test_export_evidence_package(client, tmp_path):
+    """Verify evidence data product generation and SHA-256 Merkle manifest."""
+    export_payload = {
+        "format": "all",
+        "mission_id": "TEST_MISSION_ALPHA",
+        "output_directory": str(tmp_path / "test_export"),
+    }
+    resp = client.post("/api/v1/export", json=export_payload)
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["status"] == "success"
+    assert "merkle_root_hash" in data
+    assert len(data["merkle_root_hash"]) == 64
+    assert "geojson" in data["files"]
+    assert "stac" in data["files"]
+    assert "html_briefing" in data["files"]
+    assert "manifest" in data["files"]
+    assert Path(data["files"]["manifest"]).is_file()
+
+

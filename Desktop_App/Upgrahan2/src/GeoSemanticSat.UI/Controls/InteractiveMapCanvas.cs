@@ -283,26 +283,34 @@ public class InteractiveMapCanvas : Control
         return Math.Pow(2.0, _zoomLevel) * 0.5;
     }
 
+    public double GetLonScaleFactor()
+    {
+        double latRad = Math.Clamp(_centerLat, -85.0, 85.0) * Math.PI / 180.0;
+        return Math.Max(0.1, Math.Cos(latRad));
+    }
+
     private Point GeoToScreen(double lat, double lon)
     {
-        double scale = GetPixelsPerDegree();
+        double scaleY = GetPixelsPerDegree();
+        double scaleX = scaleY * GetLonScaleFactor();
         double cx = Bounds.Width * 0.5;
         double cy = Bounds.Height * 0.5;
 
-        double x = cx + (lon - _centerLon) * scale;
-        double y = cy - (lat - _centerLat) * scale;
+        double x = cx + (lon - _centerLon) * scaleX;
+        double y = cy - (lat - _centerLat) * scaleY;
 
         return new Point(x, y);
     }
 
     private GeoCoordinate ScreenToGeo(Point pt)
     {
-        double scale = GetPixelsPerDegree();
+        double scaleY = GetPixelsPerDegree();
+        double scaleX = scaleY * GetLonScaleFactor();
         double cx = Bounds.Width * 0.5;
         double cy = Bounds.Height * 0.5;
 
-        double lon = _centerLon + (pt.X - cx) / scale;
-        double lat = _centerLat - (pt.Y - cy) / scale;
+        double lon = _centerLon + (pt.X - cx) / scaleX;
+        double lat = _centerLat - (pt.Y - cy) / scaleY;
 
         return new GeoCoordinate(lat, lon);
     }
@@ -476,11 +484,12 @@ public class InteractiveMapCanvas : Control
         var centerPt = GeoToScreen(_searchCenterLat.Value, _searchCenterLon.Value);
 
         double pixelsPerKm = GetPixelsPerDegree() / 111.32;
-        double radiusPx = _searchRadiusKm * pixelsPerKm;
+        double radiusPxY = _searchRadiusKm * pixelsPerKm;
+        double radiusPxX = radiusPxY * GetLonScaleFactor();
 
         var circleFill = new SolidColorBrush(Color.FromArgb(18, 59, 130, 246));
         var circleStroke = new Pen(new SolidColorBrush(Color.FromArgb(160, 59, 130, 246)), 1.5, DashStyle.Dash);
-        context.DrawEllipse(circleFill, circleStroke, centerPt, radiusPx, radiusPx);
+        context.DrawEllipse(circleFill, circleStroke, centerPt, radiusPxX, radiusPxY);
 
         var centerStroke = new Pen(new SolidColorBrush(Color.Parse("#38BDF8")), 2.0);
         context.DrawEllipse(new SolidColorBrush(Color.Parse("#38BDF8")), null, centerPt, 5, 5);
@@ -561,7 +570,7 @@ public class InteractiveMapCanvas : Control
         var strokePen = new Pen(new SolidColorBrush(Color.FromArgb(140, 56, 189, 248)), 1.5, DashStyle.Dash);
         context.DrawRectangle(fillBrush, strokePen, rect);
 
-        string label = SceneFootprintLabel ?? "Sentinel-2 Multi-Temporal AOI (T1: 2024-01-10 / T2: 2024-03-20 • 10m GSD)";
+        string label = SceneFootprintLabel ?? "Sentinel-2 Multi-Temporal AOI (T1: 2024-01-10 / T2: 2024-03-20 | 10m GSD)";
         var ft = new FormattedText(label, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, TypefaceSans, 9.5, new SolidColorBrush(Color.Parse("#38BDF8")));
         context.DrawText(ft, new Point(Math.Max(10, pTopLeft.X + 8), Math.Max(10, pTopLeft.Y + 6)));
     }
@@ -659,7 +668,7 @@ public class InteractiveMapCanvas : Control
             var onsetText = new FormattedText(onsetStr, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, TypefaceSans, 8.5, new SolidColorBrush(Color.Parse("#F59E0B")));
             context.DrawText(onsetText, new Point(detailX, thumbY + 2));
 
-            var provText = new FormattedText("Sentinel-2 MSI • 10m GSD", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, TypefaceRegular, 8.0, new SolidColorBrush(Color.Parse("#A1A1AA")));
+            var provText = new FormattedText("Sentinel-2 MSI | 10m GSD", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, TypefaceRegular, 8.0, new SolidColorBrush(Color.Parse("#A1A1AA")));
             context.DrawText(provText, new Point(detailX, thumbY + 16));
 
             var auditText = new FormattedText("W3C PROV-O Lineage", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, TypefaceRegular, 8.0, new SolidColorBrush(Color.Parse("#10B981")));

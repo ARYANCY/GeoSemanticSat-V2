@@ -1,104 +1,93 @@
-# 03. Remote Sensing & Sensor Calibration Guide
+# 03. Remote Sensing & Sensor Specifications
 
-> For the current implementation boundary, use
-> [07_implementation_reference.md](07_implementation_reference.md). Sensor
-> support and quality-mask behavior on this page should be treated as reference
-> material unless confirmed by the source.
-
-**Module:** Multispectral Band Mapping, Quality Masking & Earth Observation Formulas  
-**Status:** Production Standard (September 2026)
+**Project**: GeoSemanticSat / UPAGRAHA-V2 Sovereign Architecture  
+**Document**: Sensor Physics & Quality Masking Specification  
+**Classification**: EARTH OBSERVATION / SENSOR EXPLOITATION  
 
 ---
 
-## 1. Satellite Sensor Band Alignment Matrix
+## 1. Sentinel-2 Multi-Spectral Instrument (MSI)
 
-| Sensor Platform | Native Bands & Wavelengths | Spatial Resolution | UpaGraha Logical Channel Mapping |
-| :--- | :--- | :---: | :--- |
-| **Sentinel-2 MSI** | B2 (Blue 490nm), B3 (Green 560nm), B4 (Red 665nm), B8 (NIR 842nm), B11 (SWIR1 1610nm), B12 (SWIR2 2190nm) | 10m / 20m | $\text{Blue}=2, \text{Green}=3, \text{Red}=4, \text{NIR}=8, \text{SWIR1}=11, \text{SWIR2}=12$ |
-| **Landsat-8/9 OLI**| B2 (Blue 482nm), B3 (Green 561nm), B4 (Red 655nm), B5 (NIR 865nm), B6 (SWIR1 1609nm), B7 (SWIR2 2201nm) | 30m | $\text{Blue}=2, \text{Green}=3, \text{Red}=4, \text{NIR}=5, \text{SWIR1}=6, \text{SWIR2}=7$ |
-| **PlanetScope** | B1 (Blue), B2 (Green), B3 (Red), B4 (NIR) | 3.0m | $\text{Blue}=1, \text{Green}=2, \text{Red}=3, \text{NIR}=4$ |
-| **Sentinel-1 SAR** | C-Band (VV Polarization, VH Cross-Polarization) | 10m | $\text{SAR\_VV}=1, \text{SAR\_VH}=2$ |
-| **Standard RGB** | Red (Band 1), Green (Band 2), Blue (Band 3) | Sub-meter / Variable | $\text{Red}=1, \text{Green}=2, \text{Blue}=3$ |
+UPAGRAHA ingests Sentinel-2 Level-2A Bottom-Of-Atmosphere (BOA) surface reflectance imagery. Reflectance values are scaled to the physical range $[0.0, 1.0]$.
+
+| Band ID | Spectral Region | Central Wavelength ($\lambda$) | Bandwidth ($\Delta\lambda$) | Native GSD | Primary GEOINT & Physical Utility |
+|---|---|---|---|---|---|
+| **B01** | Coastal Aerosol | 443 nm | 20 nm | 60 m | Atmospheric correction, coastal water clarity, aerosol loading. |
+| **B02** | Blue | 490 nm | 65 nm | **10 m** | Deep water penetration, soil differentiation, cloud screening. |
+| **B03** | Green | 560 nm | 35 nm | **10 m** | Vegetation vigor assessment, surface water contrast (NDWI). |
+| **B04** | Red | 665 nm | 30 nm | **10 m** | Chlorophyll absorption, built-up contrast, boundary definition. |
+| **B05** | Red Edge 1 | 705 nm | 15 nm | 20 m | Plant chlorophyll status, early vegetative stress indication. |
+| **B06** | Red Edge 2 | 740 nm | 15 nm | 20 m | Leaf area index (LAI), structural canopy density. |
+| **B07** | Red Edge 3 | 783 nm | 20 nm | 20 m | Forest biomass and canopy nitrogen differentiation. |
+| **B08** | Broad NIR | 842 nm | 115 nm | **10 m** | High NIR plateau, water-land interface delineation (NDVI). |
+| **B8A** | Narrow NIR | 865 nm | 20 nm | 20 m | Water vapor absorption correction, atmospheric normalization. |
+| **B09** | Water Vapor | 945 nm | 20 nm | 60 m | Atmospheric water vapor column estimation. |
+| **B10** | Cirrus | 1375 nm | 30 nm | 60 m | High-altitude thin cirrus cloud detection. |
+| **B11** | SWIR-1 | 1610 nm | 90 nm | 20 m | Soil and vegetation moisture, snow-cloud separation, NDBI. |
+| **B12** | SWIR-2 | 2190 nm | 180 nm | 20 m | Geology, burnt scars, concrete structural signature, BSI. |
 
 ---
 
-## 2. Standard Spectral Index Formulations
+## 2. Sentinel-1 C-Band Synthetic Aperture Radar (SAR)
+
+UPAGRAHA ingests Sentinel-1 Level-1 Ground Range Detected (GRD) products:
+- **Radar Frequency**: $5.405\text{ GHz}$ (C-Band, $\lambda \approx 5.55\text{ cm}$).
+- **Polarizations**: Dual-polarization $\text{VV}$ (Vertical transmit / Vertical receive) and $\text{VH}$ (Vertical transmit / Horizontal receive).
+- **Spatial Resolution**: $10\text{ m}$ pixel spacing (IW mode).
+- **All-Weather Capability**: Operates through persistent monsoon cloud cover, haze, smoke, and total night conditions.
+- **Physical Signature**:
+  - $\text{VV}$: Sensitive to surface roughness, water boundary capillary waves, and direct urban dihedral returns.
+  - $\text{VH}$: Sensitive to volume scattering in vegetation and complex metallic structures.
+  - Cross-Ratio $\gamma = \text{VH} / \text{VV}$: Identifies structural geometry changes independent of radar incidence angle.
+
+---
+
+## 3. Optical Quality Mask Engine (`QualityMaskEngine.cs`)
+
+The quality engine computes pixel-level bitmasks to isolate and exclude confounding atmospheric artifacts.
 
 ```mermaid
 graph TD
-    subgraph Multi-Spectral Input Channels
-        B[Blue]
-        G[Green]
-        R[Red]
-        N[Near-Infrared - NIR]
-        S[Shortwave-Infrared - SWIR1]
+    A["Input Multispectral Raster (B02, B03, B04, B08, B11)"] --> B["Cloud Detection (B02 > 0.22 and NDVI < 0.15)"]
+    A --> C["Snow Detection (NDSI = (Green - SWIR1)/(Green + SWIR1) > 0.42)"]
+    A --> D["Saturation Detection (Pixel DN == 65535 or Raw > 1.0)"]
+    B --> E["Solar Ray Casting for Cloud Shadow"]
+    
+    subgraph "Solar Ray Casting Geometry"
+        E --> F["Read Solar Azimuth (θ_az) & Sun Elevation (θ_el)"]
+        F --> G["Project Shadow Vector L = h_cloud / tan(θ_el) along (180° + θ_az)"]
+        G --> H["Flag Shadow Candidate Pixels if NIR < 0.12"]
     end
-
-    subgraph Mathematical Index Calculators
-        NDVI["NDVI: (NIR - Red) / (NIR + Red)"]
-        NDWI["NDWI: (Green - NIR) / (Green + NIR)"]
-        MNDWI["MNDWI: (Green - SWIR) / (Green + SWIR)"]
-        NDBI["NDBI: (SWIR - NIR) / (SWIR + NIR)"]
-        BSI["BSI: [(SWIR + Red) - (NIR + Blue)] / [(SWIR + Red) + (NIR + Blue)]"]
-        NDSI["NDSI: (Green - SWIR) / (Green + SWIR)"]
-    end
-
-    R --> NDVI
-    N --> NDVI
-    G --> NDWI
-    N --> NDWI
-    G --> MNDWI
-    S --> MNDWI
-    S --> NDBI
-    N --> NDBI
-    S --> BSI
-    R --> BSI
-    N --> BSI
-    B --> BSI
-    G --> NDSI
-    S --> NDSI
+    
+    B --> I["Quality Mask Bit-Packing"]
+    C --> I
+    D --> I
+    H --> I
+    I --> J["Output Usability Score U = N_valid / N_total"]
+    J --> K{"Usability >= 40%?"}
+    K -->|"Yes"| L["Approved for CVA and Sequential CUSUM"]
+    K -->|"No"| M["Rejected (Excluded from Temporal Sequence)"]
 ```
 
-### Mathematical Formulations:
-
-1. **Normalized Difference Vegetation Index (NDVI):**
-   $$\text{NDVI} = \frac{\rho_{\text{NIR}} - \rho_{\text{Red}}}{\rho_{\text{NIR}} + \rho_{\text{Red}} + 10^{-6}}$$
-   *Domain:* $[-1.0, 1.0]$. Values $> 0.40$ indicate healthy dense vegetation; values $< 0.15$ indicate bare ground or built structures.
-
-2. **Normalized Difference Water Index (NDWI):**
-   $$\text{NDWI} = \frac{\rho_{\text{Green}} - \rho_{\text{NIR}}}{\rho_{\text{Green}} + \rho_{\text{NIR}} + 10^{-6}}$$
-   *Domain:* $[-1.0, 1.0]$. Values $> 0.0$ indicate open water surface or active inundation.
-
-3. **Modified Normalized Difference Water Index (MNDWI):**
-   $$\text{MNDWI} = \frac{\rho_{\text{Green}} - \rho_{\text{SWIR1}}}{\rho_{\text{Green}} + \rho_{\text{SWIR1}} + 10^{-6}}$$
-   *Domain:* $[-1.0, 1.0]$. Enhances water bodies in urban landscapes while suppressing built-up noise.
-
-4. **Normalized Difference Built-Up Index (NDBI):**
-   $$\text{NDBI} = \frac{\rho_{\text{SWIR1}} - \rho_{\text{NIR}}}{\rho_{\text{SWIR1}} + \rho_{\text{NIR}} + 10^{-6}}$$
-   *Domain:* $[-1.0, 1.0]$. Values $> 0.10$ indicate concrete, asphalt, building roofs, and structural assets.
-
-5. **Bare Soil Index (BSI):**
-   $$\text{BSI} = \frac{(\rho_{\text{SWIR1}} + \rho_{\text{Red}}) - (\rho_{\text{NIR}} + \rho_{\text{Blue}})}{(\rho_{\text{SWIR1}} + \rho_{\text{Red}}) + (\rho_{\text{NIR}} + \rho_{\text{Blue}}) + 10^{-6}}$$
-   *Domain:* $[-1.0, 1.0]$. Distinguishes cleared soil / ground excavations from asphalt and gravel.
-
-6. **Normalized Difference Snow Index (NDSI):**
-   $$\text{NDSI} = \frac{\rho_{\text{Green}} - \rho_{\text{SWIR1}}}{\rho_{\text{Green}} + \rho_{\text{SWIR1}} + 10^{-6}}$$
-   *Domain:* $[-1.0, 1.0]$. Values $> 0.42$ with $\rho_{\text{SWIR1}} < 0.08$ distinguish high-altitude snow/ice from clouds.
+### Quality Bitmask Layout:
+- `Bit 0 (0x01)`: Valid Data (Not NoData)
+- `Bit 1 (0x02)`: Cloud Detected (Opaque or Cirrus)
+- `Bit 2 (0x04)`: Cloud Shadow (Solar Geometry Ray-Cast)
+- `Bit 3 (0x08)`: Snow / Ice (NDSI Verified)
+- `Bit 4 (0x10)`: Sensor Detector Saturation
+- `Bit 5 (0x20)`: High Registration Uncertainty ($> 0.75\text{ px}$)
 
 ---
 
-## 3. Directional Cloud Shadow Ray-Casting & Cloud Fringe Dilation
+## 4. Spectral Index Formulations
 
-```mermaid
-flowchart LR
-    A[Sun Position: Azimuth phi_s, Elevation theta_s] --> B[Calculate Shadow Ray Angle: (phi_s + 180 deg) % 360 deg]
-    B --> C[Compute Horizontal Shadow Distance in Pixels: (H_cloud / tan theta_s) / GSD]
-    C --> D[Cast Directional Search Ray for Low-NIR Pixels]
-    D --> E[Flag Shadow Pixels]
-    E --> F[Apply 1-Pixel Morphological Dilation on Cloud Edges]
-```
+UPAGRAHA computes calibrated physical spectral indices used across the CVA classification and UI heatmaps:
 
-### Formulation:
-- **Shadow Direction Angle:** $\theta_{\text{shadow}} = (\text{SunAzimuth} + 180^{\circ}) \pmod{360^{\circ}}$
-- **Horizontal Distance:** $D_{\text{pixels}} = \frac{H_{\text{cloud}}}{\tan(\theta_{\text{elev}} \cdot \frac{\pi}{180})} \cdot \frac{1}{\text{GSD}}$
-- **Cloud Fringe Dilation:** A $3 \times 3$ structuring element dilates detected thick cloud masks by 1 pixel to eliminate semi-transparent aerosol edge noise.
+1. **Normalized Difference Vegetation Index (NDVI)**:
+   $$\text{NDVI} = \frac{\rho_{\text{NIR}} - \rho_{\text{Red}}}{\rho_{\text{NIR}} + \rho_{\text{Red}}} = \frac{\text{B08} - \text{B04}}{\text{B08} + \text{B04}}$$
+2. **Normalized Difference Built-up Index (NDBI)**:
+   $$\text{NDBI} = \frac{\rho_{\text{SWIR1}} - \rho_{\text{NIR}}}{\rho_{\text{SWIR1}} + \rho_{\text{NIR}}} = \frac{\text{B11} - \text{B08}}{\text{B11} + \text{B08}}$$
+3. **Normalized Difference Water Index (NDWI)**:
+   $$\text{NDWI} = \frac{\rho_{\text{Green}} - \rho_{\text{NIR}}}{\rho_{\text{Green}} + \rho_{\text{NIR}}} = \frac{\text{B03} - \text{B08}}{\text{B03} + \text{B08}}$$
+4. **Bare Soil Index (BSI)**:
+   $$\text{BSI} = \frac{(\rho_{\text{SWIR1}} + \rho_{\text{Red}}) - (\rho_{\text{NIR}} + \rho_{\text{Blue}})}{(\rho_{\text{SWIR1}} + \rho_{\text{Red}}) + (\rho_{\text{NIR}} + \rho_{\text{Blue}})} = \frac{(\text{B11} + \text{B04}) - (\text{B08} + \text{B02})}{(\text{B11} + \text{B04}) + (\text{B08} + \text{B02})}$$

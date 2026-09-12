@@ -1,0 +1,20 @@
+{
+  "status": "completed",
+  "model": "Prithvi-EO-2.0-300M",
+  "method": "IBM peft-geofm LoRA (r=16, alpha=16) + Contrastive Change Head",
+  "checkpoint_path": "C:\\Users\\aryan\\OneDrive\\Desktop\\Upagraha-V2\\Unified-RSanalytics\\checkpoints\\prithvi\\prithvi_temporal_lora_best.pt",
+  "training_time_sec": 1.33,
+  "baseline_metrics": {
+    "accuracy": 0.5,
+    "precision": 0.5,
+    "recall": 1.0,
+    "f1": 0.6667
+  },
+  "fine_tuned_metrics": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0
+  },
+  "improvement_f1_pct": 49.99
+}

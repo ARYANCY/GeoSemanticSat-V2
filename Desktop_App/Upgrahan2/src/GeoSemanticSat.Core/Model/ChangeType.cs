@@ -7,5 +7,9 @@ public enum ChangeType
     Clearance,
     WaterExtentVariation,
     RoadDevelopment,
-    ActivityConcentration
+    ActivityConcentration,
+    Appearance,
+    Disappearance,
+    Expansion,
+    Contraction
 }

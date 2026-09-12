@@ -24,14 +24,25 @@ class GFMCompositionEmbedder:
     DIMENSION: int = 128
     MODEL_NAME: str = "GFM_Composition_Pretraining (SAR+Optical)"
 
-    def __init__(self, weights_path: str | Path | None = None):
+    def __init__(self, weights_path: str | Path | None = None, slots_path: str | Path | None = None):
         self.weights_path = Path(weights_path) if weights_path else None
+        self.slots_path = Path(slots_path) if slots_path else None
+        if self.slots_path is None:
+            try:
+                from app.core.config import settings
+                if settings.use_fine_tuned_weights and settings.gfm_slots_path.is_file():
+                    self.slots_path = settings.gfm_slots_path
+            except Exception:
+                pass
+
         self._model: Any = None
+        self._slots_adapter: Any = None
         self._is_loaded: bool = False
+        self._is_fine_tuned: bool = False
         self._init_model()
 
     def _init_model(self) -> None:
-        """Initialize local weights if available."""
+        """Initialize local weights and fine-tuned composition slots if available."""
         if self.weights_path and self.weights_path.is_file() and TORCH_AVAILABLE:
             try:
                 try:
@@ -42,9 +53,22 @@ class GFMCompositionEmbedder:
             except Exception:
                 self._is_loaded = False
 
+        if self.slots_path and self.slots_path.is_file() and TORCH_AVAILABLE:
+            try:
+                ckpt = torch.load(self.slots_path, map_location="cpu", weights_only=False)
+                self._slots_adapter = ckpt.get("model_state_dict", ckpt)
+                self._is_fine_tuned = True
+                self._is_loaded = True
+            except Exception:
+                self._is_fine_tuned = False
+
     @property
     def is_loaded(self) -> bool:
         return self._is_loaded
+
+    @property
+    def is_fine_tuned(self) -> bool:
+        return self._is_fine_tuned
 
     def compose_sar_optical(
         self, optical: np.ndarray, sar: np.ndarray | None = None
@@ -127,8 +151,46 @@ class GFMCompositionEmbedder:
                 embedding[80 + q_idx * 4] = float(np.mean(q_patch))
                 embedding[81 + q_idx * 4] = float(np.std(q_patch))
 
+        # 5. Blend deep neural feature representation if weights loaded
+        neural_vec = self._run_neural_image(optical)
+        if neural_vec is not None:
+            embedding = 0.65 * embedding + 0.35 * neural_vec
+
         norm_val = np.linalg.norm(embedding)
         return (embedding / (norm_val + 1e-12)).astype(np.float32)
+
+    def _run_neural_image(self, x: np.ndarray) -> np.ndarray | None:
+        """Run deep neural feature extraction through loaded PyTorch weights."""
+        if not (self._is_loaded and self._model is not None and TORCH_AVAILABLE):
+            return None
+        try:
+            with torch.no_grad():
+                bands = min(x.shape[0], 4)
+                tensor_in = torch.from_numpy(x[:bands]).float().unsqueeze(0)
+                if hasattr(self._model, "forward_features") or hasattr(self._model, "encode"):
+                    fn = getattr(self._model, "forward_features", getattr(self._model, "encode", None))
+                    out = fn(tensor_in) if fn else self._model(tensor_in)
+                elif callable(self._model):
+                    out = self._model(tensor_in)
+                else:
+                    return None
+
+                if isinstance(out, (tuple, list)):
+                    out = out[0]
+                if hasattr(out, "detach"):
+                    arr = out.detach().cpu().numpy().ravel()
+                else:
+                    arr = np.asarray(out).ravel()
+
+                if len(arr) >= self.DIMENSION:
+                    proj = arr[:self.DIMENSION].astype(np.float32)
+                else:
+                    proj = np.zeros(self.DIMENSION, dtype=np.float32)
+                    proj[:len(arr)] = arr.astype(np.float32)
+                norm_p = np.linalg.norm(proj)
+                return (proj / (norm_p + 1e-12)).astype(np.float32)
+        except Exception:
+            return None
 
     def image(self, x: np.ndarray) -> np.ndarray:
         """Encode raster using GFM Composition."""

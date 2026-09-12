@@ -1,111 +1,148 @@
 # 01. System Architecture & Engineering Blueprint
 
-> For implementation-aligned architecture and runtime boundaries, use
-> [00_developer_guide.md](00_developer_guide.md) and
-> [07_implementation_reference.md](07_implementation_reference.md). This page
-> contains historical design material and may describe planned components.
-
-**Platform:** UpaGraha Enterprise Geospatial Intelligence & Satellite Analytics Platform  
-**Operational Environment:** 100% Air-Gapped, Zero-Internet, On-Premises / Tactical Edge  
-**Document Version:** 2.0 (September 2026)
+**Project**: GeoSemanticSat / UPAGRAHA-V2 Sovereign Architecture  
+**Document**: System Architecture Specification  
+**Classification**: 100% AIR-GAPPED / SOVEREIGN TACTICAL  
 
 ---
 
-## 1. High-Level System Architecture
+## 1. High-Level Architectural Decomposition
 
-UpaGraha implements a decoupled, high-performance architecture comprising an asynchronous **Python/FastAPI Analytics Backend** and a high-throughput **.NET Core C# Desktop Intelligence Engine** with SIMD AVX2 vector acceleration.
+UPAGRAHA-V2 is architected around a decoupled, two-pillar design that separates high-throughput client-side interactive rendering from heavy deep learning inference and relational persistence.
 
 ```mermaid
-graph TD
-    subgraph Client Tier
-        UI[Avalonia / Web Intelligence UI]
-        Map[MapLibre GL Offline Canvas]
+graph TB
+    subgraph "Desktop Native Tier (.NET 10.0 / Avalonia UI)"
+        UI["MainWindow (SukiUI 5-Stage Stepper)"]
+        Inspector["3-Panel Synchronized View<br/>(TrueColor, FalseColor, Calibrated Heatmaps)"]
+        Map["Hardware MapCanvas (SkiaSharp Pan/Zoom/Pins)"]
+        CoreEngine["GeoSemanticSat.Core Engine"]
+        
+        UI --> Inspector
+        UI --> Map
+        UI --> CoreEngine
     end
 
-    subgraph Service Tier - Python Backend
-        API[FastAPI Gateway :8000]
-        RasterService[Raster & COG Service]
-        CVAService[Multi-Band CVA Engine]
-        EmbService[Foundation Model Registry & Embedders<br/>• TerraMind-1.0-base (Any-to-Any)<br/>• SatMAE++ (Grouped MSI)<br/>• GFM Composition (SAR+Optical)<br/>• Prithvi-EO-2.0 (Temporal ViT)]
+    subgraph "Pure C# Mathematical Kernels (GeoSemanticSat.Core)"
+        GeoTiffReader["GeoTiffReader (Pure C# Little/Big Endian COG Decoder)"]
+        QualityEngine["QualityMaskEngine (Ray Casting, Snow NDSI, Saturation)"]
+        Normalizer["RadiometricNormalizer (Tukey Biweight Robust PIF)"]
+        JitterFilter["RegistrationJitterFilter (9-Point Parabolic Surface)"]
+        CVAEngine["MultiTemporalChangeDetector (CVA ||Δρ||_2 & Trajectory θ)"]
+        CUSUM["OnsetEstimator (Sequential CUSUM Onset Detector)"]
+        DBSCAN["SpatialSemanticClusterer (DBSCAN ε=0.22 + Spatial Hash)"]
+        VIndex["VectorIndex (128-d Cosine SIMD + GSSV v2 Binary Persistence)"]
+        Review["ReviewQueue & ProvenanceAuditTrail (W3C PROV-O GeoJSON)"]
+        
+        CoreEngine --> GeoTiffReader
+        CoreEngine --> QualityEngine
+        CoreEngine --> Normalizer
+        CoreEngine --> JitterFilter
+        CoreEngine --> CVAEngine
+        CoreEngine --> CUSUM
+        CoreEngine --> DBSCAN
+        CoreEngine --> VIndex
+        CoreEngine --> Review
     end
 
-    subgraph Core Engine - C# GeoSemanticSat
-        CliEngine[GeoSemanticSat Core Engine]
-        SIMD[SIMD AVX2 Dot-Product Kernel]
-        CUSUM[Sequential CUSUM Onset Estimator]
-        DBSCAN[Spatial Hash Grid DBSCAN]
-        Jitter[Sub-Pixel Phase Correlation]
-        Tukey[Tukey Biweight PIF Normalizer]
+    subgraph "Loopback IPC Boundary (127.0.0.1:8000)"
+        AgentClient["AgentClientService.cs"]
+        AnalystChat["AnalystChatService.cs"]
     end
 
-    subgraph Persistence Tier
-        DB[(PostgreSQL 16 + PostGIS 3.4)]
-        FaissIdx[FAISS / GSSV Vector Store]
-        LocalRasters[Local Data Root / COG Pyramids]
+    subgraph "Python Analytics Backend (FastAPI)"
+        Gateway["FastAPI Gateway (47 REST Endpoints)"]
+        Synthesizer["Automated Insight Synthesizer"]
+        Dossier["Grounded GEOINT Dossier Compiler"]
+        DB[(SQLite satintel.db)]
+        FAISS[(FAISS 128-d FlatIP Index)]
+        
+        Gateway --> Synthesizer
+        Gateway --> Dossier
+        Gateway --> DB
+        Gateway --> FAISS
     end
 
-    UI --> API
-    UI --> CliEngine
-    Map --> RasterService
-    API --> RasterService
-    API --> CVAService
-    API --> EmbService
-    API --> DB
-    CliEngine --> SIMD
-    CliEngine --> CUSUM
-    CliEngine --> DBSCAN
-    CliEngine --> Jitter
-    CliEngine --> Tukey
-    CliEngine --> FaissIdx
-    RasterService --> LocalRasters
-    CliEngine --> LocalRasters
+    subgraph "Foundation Model Registry & In-Process Inference"
+        TM["TerraMind-1.0-base (Text & Cross-Modal Retrieval LoRA)"]
+        PR["Prithvi-EO-2.0-300M (Temporal Sequence LoRA)"]
+        SM["SatMAE++ (Multispectral Grouped Bands LoRA)"]
+        GFM["GFM Composition (SAR+Optical Slots)"]
+        QWEN["Frozen Qwen3-8B Orchestrator (Deterministic Tool Calls)"]
+        
+        Gateway --> TM
+        Gateway --> PR
+        Gateway --> SM
+        Gateway --> GFM
+        Gateway --> QWEN
+    end
+
+    UI --> AgentClient
+    UI --> AnalystChat
+    AgentClient --> Gateway
+    AnalystChat --> Gateway
 ```
 
 ---
 
-## 2. Layer-by-Layer Architectural Breakdown
+## 2. Desktop Application Architecture (`Desktop_App/Upgrahan2`)
 
-| Architectural Tier | Primary Responsibilities | Core Technologies | Scalability & Latency Targets |
-| :--- | :--- | :--- | :--- |
-| **Presentation Tier** | High-performance raster canvas, split-screen swipe comparison, temporal timeline graph, analyst review workflows. | Avalonia UI (.NET 10), MapLibre GL, Apache ECharts | 60 FPS UI rendering, $< 16\text{ms}$ frame time |
-| **API Gateway Tier** | RESTful endpoints, request validation, spatial bounds transformations, task dispatch, session management. | FastAPI, Pydantic v2, Uvicorn, Starlette | $< 15\text{ms}$ endpoint response (p95) |
-| **Geospatial Processing** | Multi-band GeoTIFF decoding, WGS84 CRS reprojection, spectral index computation, COG pyramid streaming. | Rasterio, GDAL C++ Core, rio-tiler, Shapely 2.0 | Multi-gigabyte COG sub-region streaming in $< 50\text{ms}$ |
-| **Algorithmic Core** | Bi-temporal Change Vector Analysis (CVA), CUSUM onset estimation, sub-pixel jitter filtering, Tukey PIF normalization. | .NET Core C#, NumPy, SciPy | Sub-second multi-temporal time-series evaluation |
-| **Foundation Models Layer** | Any-to-Any multimodal embeddings (TerraMind-1.0-base), grouped multi-spectral encoding (SatMAE++), SAR+Optical composition (GFM), spatio-temporal sequence modeling (Prithvi-EO-2.0-600M-TL). | PyTorch CPU, TorchScript, ONNX Runtime | Zero-cloud offline edge inference $< 50\text{ms}$ |
-| **Vector Retrieval** | Spatiotemporal candidate pre-filtering, AVX2 SIMD dot-product matrix search, active learning Rocchio re-ranking. | HNSW, FAISS, SIMD Vector256 | $< 1.0\text{ms}$ search across 1,000,000 vectors |
-| **Storage & Persistence** | Relational data, geometry indexing, spatial joins (`ST_Intersects`), binary index snapshots. | PostGIS 3.4, SQLite WAL, Binary GSSV | Zero-copy memory-mapped file access |
+The desktop application is divided into three focused assemblies:
+1. **`GeoSemanticSat.Core`**:
+   - Zero external binary dependencies. Contains pure C# implementations of the entire raster decoding and mathematical processing pipeline.
+   - Built with SIMD hardware intrinsics (`System.Numerics.Vector<float>`) for vector cosine similarity and raster map arithmetic.
+   - Thread-safe memory index (`VectorIndex.cs`) using `System.Threading.ReaderWriterLockSlim`.
+2. **`GeoSemanticSat.Engine`**:
+   - Coordinates retrieval workflows, client-side embedding generation, and integration with the backend service.
+   - `AgentClientService.cs` communicates over `127.0.0.1:8000` to execute natural-language geospatial tasks.
+   - `AnalystChatService.cs` formats GEOINT conversational queries and retrieves automated situational intelligence briefs.
+   - Resilient design: If the Python service is offline, the desktop engine automatically falls back to in-process deterministic analysis without throwing unhandled exceptions.
+3. **`GeoSemanticSat.UI`**:
+   - Modern, military-grade interface styled using SukiUI dark/light theme tokens.
+   - Features a 5-stage workflow stepper (`Find Images` $\rightarrow$ `Pick Location` $\rightarrow$ `Check Changes` $\rightarrow$ `Group Places` $\rightarrow$ `Review & Export`).
+   - Hardware-accelerated map canvas rendering pins, AOI bounding boxes, and clustering polygons.
+   - 3-panel split inspection view synchronizing True-Color RGB, False-Color NIR, and calibrated spectral index heatmaps (NDVI, NDBI, NDWI, BSI).
 
 ---
 
-## 3. Data Ingestion & Transformation Pipeline
+## 3. Python Foundation Model Analytics Architecture (`app/`)
+
+The Python backend provides enterprise Earth Observation microservices:
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Analyst
-    participant API as FastAPI Ingestion
-    participant GDAL as Rasterio / GDAL
-    participant Embedder as Visual Embedder
-    participant DB as PostGIS / Database
+    participant Client as Desktop UI / Agent Client
+    participant API as FastAPI Gateway
+    participant Orchestrator as Local Qwen3-8B Agent
+    participant Models as EO Model Registry (LoRA)
+    participant FAISS as 128-d Vector Index
+    participant DB as SQLite (satintel.db)
 
-    Analyst->>API: POST /api/v1/ingest (GeoTIFF Path, Sensor, Date)
-    API->>API: Path containment validation under DATA_ROOT
-    API->>GDAL: Open raster & inspect CRS / Bounds
-    GDAL-->>API: Native bounds (e.g., UTM Zone 44N meters)
-    API->>GDAL: transform_bounds(ds.crs, "EPSG:4326")
-    GDAL-->>API: WGS84 Lat/Lon Polygon
-    API->>Embedder: Extract multi-spectral bands & compute 96-dim vector
-    Embedder-->>API: L2-normalized feature vector
-    API->>DB: Persist Location, Observation, Footprint WKT & Embedding
-    DB-->>API: Observation ID & Transaction Commit
-    API-->>Analyst: HTTP 201 Created (Observation ID, Job ID)
+    Client->>API: POST /api/v1/ai/agent (Task: "Find runway extension")
+    API->>Orchestrator: Parse intent & bind to structured tool schema
+    Orchestrator-->>API: Tool Call: search_text("runway construction concrete")
+    API->>Models: TerraMind.encode_text() -> 128-d vector (semantic axes)
+    Models-->>API: Normalized 128-d vector
+    API->>FAISS: Cosine search (minSimilarity > 0.0)
+    FAISS-->>API: Top candidate patches
+    API->>DB: Query chronological observation stack for candidate AOI
+    DB-->>API: T1 Baseline, T2 Target, T3/T4 passes
+    API->>Orchestrator: Present grounded observations
+    Orchestrator-->>API: Synthesize military SITREP & evidence dossier
+    API-->>Client: Complete candidate dossier with GeoJSON geometry & audit trail
 ```
 
 ---
 
-## 4. Air-Gapped Operational Guarantees
+## 4. Hardware Sizing & Sovereign Air-Gap Boundaries
 
-1. **Zero External Network Dependencies:** The platform operates strictly in an isolated enclave with no runtime external HTTP, CDN, or DNS requests.
-2. **Local Model Ingestion:** Vision-language models (RemoteCLIP, Prithvi) run via local ONNX Runtime execution providers without calling Hugging Face or cloud APIs.
-3. **Local Vector Tile Serving:** Basemap layers (OpenStreetMap / Natural Earth) are streamed locally from pre-packaged `.mbtiles` files via local tile server engines.
-4. **Resilient Local Persistence:** SQLite databases automatically execute in Write-Ahead Logging (`PRAGMA journal_mode=WAL`) mode with synchronous normal settings to withstand sudden hardware power interrupts.
+- **Target Workstation Environment**:
+  - Operating System: Windows 11 Enterprise (x64) / Rocky Linux 9 (Air-gapped)
+  - Memory: 16 GB to 32 GB DDR5 RAM
+  - GPU: NVIDIA GeForce RTX 5070 Laptop GPU (8 GB VRAM) / RTX 4080 Desktop
+  - Storage: NVMe PCIe 4.0 SSD for rapid COG raster caching
+- **Air-Gap Enforcement**:
+  - `HF_HUB_OFFLINE=1`, `TRANSFORMERS_OFFLINE=1`
+  - Zero outbound connections; loopback binding only (`127.0.0.1:8000`)
+  - No telemetry, analytics pings, or cloud API integrations

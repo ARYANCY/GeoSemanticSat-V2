@@ -66,5 +66,46 @@ def build_faiss_index() -> None:
         print(f"Successfully wrote {index.ntotal} vectors (dim={expected_dim}) to {index_file}")
 
 
+def add_vector_to_faiss(
+    index_file: Path | str | None = None,
+    ids_file: Path | str | None = None,
+    vector: np.ndarray | list[float] | None = None,
+    observation_id: str | None = None,
+) -> bool:
+    """Incrementally appends a single 128-d L2-normalized vector and observation ID to FAISS index."""
+    if vector is None or observation_id is None:
+        return False
+
+    index_path = Path(index_file) if index_file else settings.index_root / "observations.faiss"
+    ids_path = Path(ids_file) if ids_file else settings.index_root / "observation_ids.txt"
+    index_path.parent.mkdir(parents=True, exist_ok=True)
+
+    vec = np.asarray(vector, dtype=np.float32).reshape(1, -1)
+    faiss.normalize_L2(vec)
+    dim = vec.shape[1]
+
+    if index_path.exists():
+        index = faiss.read_index(str(index_path))
+        if index.d != dim:
+            logger.error(f"Dimension mismatch: index has {index.d}, new vector has {dim}")
+            return False
+    else:
+        index = faiss.IndexFlatIP(dim)
+
+    # Read existing IDs if present
+    existing_ids = ids_path.read_text(encoding="utf-8").splitlines() if ids_path.exists() else []
+    if observation_id in existing_ids:
+        # Already indexed
+        return True
+
+    index.add(vec)
+    existing_ids.append(observation_id)
+
+    faiss.write_index(index, str(index_path))
+    ids_path.write_text("\n".join(existing_ids), encoding="utf-8")
+    logger.info(f"Incrementally indexed {observation_id}. Total vectors: {index.ntotal}")
+    return True
+
+
 if __name__ == "__main__":
     build_faiss_index()

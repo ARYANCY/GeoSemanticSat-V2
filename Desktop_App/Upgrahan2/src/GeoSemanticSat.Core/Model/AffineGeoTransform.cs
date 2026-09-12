@@ -14,18 +14,18 @@ namespace GeoSemanticSat.Core.Model;
 /// E = 0 (rotation)
 /// F = -PixelResolutionY (dy < 0, negative for north-up)
 /// </summary>
-public record AffineGeoTransform(double A, double B, double C, double D, double E, double F)
+public record AffineGeoTransform(double A, double B, double C, double D, double E, double F, int EpsgCode = 4326)
 {
-    public static AffineGeoTransform NorthUp(double topLeftLon, double topLeftLat, double pixelSizeLon, double pixelSizeLat)
+    public static AffineGeoTransform NorthUp(double topLeftLon, double topLeftLat, double pixelSizeLon, double pixelSizeLat, int epsgCode = 4326)
     {
-        return new AffineGeoTransform(topLeftLon, pixelSizeLon, 0.0, topLeftLat, 0.0, -pixelSizeLat);
+        return new AffineGeoTransform(topLeftLon, pixelSizeLon, 0.0, topLeftLat, 0.0, -pixelSizeLat, epsgCode);
     }
 
     public GeoCoordinate PixelToGeo(double pixelX, double pixelY)
     {
-        double lon = A + pixelX * B + pixelY * C;
-        double lat = D + pixelX * E + pixelY * F;
-        return new GeoCoordinate(lat, lon);
+        double x = A + pixelX * B + pixelY * C;
+        double y = D + pixelX * E + pixelY * F;
+        return CoordinateReprojection.ProjectedToWgs84(x, y, EpsgCode);
     }
 
     public (double PixelX, double PixelY) GeoToPixel(GeoCoordinate coord)
@@ -34,8 +34,10 @@ public record AffineGeoTransform(double A, double B, double C, double D, double 
         if (Math.Abs(det) < 1e-12)
             throw new InvalidOperationException("Singular affine transform matrix cannot be inverted.");
 
-        double dx = coord.Longitude - A;
-        double dy = coord.Latitude - D;
+        var (projX, projY) = CoordinateReprojection.Wgs84ToProjected(coord, EpsgCode);
+
+        double dx = projX - A;
+        double dy = projY - D;
 
         double pixelX = (dx * F - dy * C) / det;
         double pixelY = (dy * B - dx * E) / det;

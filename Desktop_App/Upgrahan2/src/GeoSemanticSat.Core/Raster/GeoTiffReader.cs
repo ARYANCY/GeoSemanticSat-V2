@@ -44,6 +44,11 @@ public class GeoTiffReader
         int compression = 1;  // 1 = Uncompressed, 5 = LZW, 8 = Deflate
         List<uint> stripOffsets = new();
         List<uint> stripByteCounts = new();
+        int tileWidth = 0;
+        int tileHeight = 0;
+        List<uint> tileOffsets = new();
+        List<uint> tileByteCounts = new();
+        double? noDataValue = null;
         double[]? pixelScale = null;
         double[]? tiepoints = null;
         int epsgCode = 4326;
@@ -83,6 +88,18 @@ public class GeoTiffReader
                 case 279: // StripByteCounts
                     stripByteCounts = ReadOffsetsArray(fs, reader, isLittleEndian, valueOrOffset, count, type);
                     break;
+                case 322: // TileWidth (for Cloud-Optimized GeoTIFFs)
+                    tileWidth = (int)valueOrOffset;
+                    break;
+                case 323: // TileLength (for Cloud-Optimized GeoTIFFs)
+                    tileHeight = (int)valueOrOffset;
+                    break;
+                case 324: // TileOffsets
+                    tileOffsets = ReadOffsetsArray(fs, reader, isLittleEndian, valueOrOffset, count, type);
+                    break;
+                case 325: // TileByteCounts
+                    tileByteCounts = ReadOffsetsArray(fs, reader, isLittleEndian, valueOrOffset, count, type);
+                    break;
                 case 33550: // ModelPixelScaleTag (3 doubles: ScaleX, ScaleY, ScaleZ)
                     pixelScale = ReadDoubleArray(fs, reader, isLittleEndian, valueOrOffset, count);
                     break;
@@ -91,6 +108,9 @@ public class GeoTiffReader
                     break;
                 case 34735: // GeoKeyDirectoryTag
                     epsgCode = ReadGeoKeyEpsg(fs, reader, isLittleEndian, valueOrOffset, count);
+                    break;
+                case 42113: // GDAL_NODATA (ASCII string, e.g. "-9999" or "0")
+                    noDataValue = ReadGdalNoData(fs, reader, valueOrOffset, count);
                     break;
             }
 
@@ -123,23 +143,23 @@ public class GeoTiffReader
                 double dy = double.Parse(lines[3].Trim(), System.Globalization.CultureInfo.InvariantCulture);
                 double x0 = double.Parse(lines[4].Trim(), System.Globalization.CultureInfo.InvariantCulture);
                 double y0 = double.Parse(lines[5].Trim(), System.Globalization.CultureInfo.InvariantCulture);
-                transform = new AffineGeoTransform(x0, dx, rotX, y0, rotY, dy);
+                transform = new AffineGeoTransform(x0, dx, rotX, y0, rotY, dy, epsgCode);
             }
             else
             {
-                transform = AffineGeoTransform.NorthUp(77.0, 28.0, 0.0001, 0.0001);
+                transform = AffineGeoTransform.NorthUp(77.0, 28.0, 0.0001, 0.0001, epsgCode);
             }
         }
         else if (tiepoints != null && tiepoints.Length >= 6 && pixelScale != null && pixelScale.Length >= 2)
         {
             double originX = tiepoints[3] - tiepoints[0] * pixelScale[0];
             double originY = tiepoints[4] + tiepoints[1] * pixelScale[1];
-            transform = AffineGeoTransform.NorthUp(originX, originY, pixelScale[0], pixelScale[1]);
+            transform = AffineGeoTransform.NorthUp(originX, originY, pixelScale[0], pixelScale[1], epsgCode);
         }
         else
         {
             // Default georeference fallback (New Delhi / NCR test coordinate origin: 28.61° N, 77.20° E)
-            transform = AffineGeoTransform.NorthUp(77.20, 28.61, 0.0001, 0.0001);
+            transform = AffineGeoTransform.NorthUp(77.20, 28.61, 0.0001, 0.0001, epsgCode);
         }
 
         var topLeft = transform.PixelToGeo(0, 0);
@@ -151,7 +171,7 @@ public class GeoTiffReader
             Math.Max(topLeft.Latitude, bottomRight.Latitude)
         );
 
-        // Read pixel data strips into multi-band matrices
+        // Read pixel data strips or tiles into multi-band matrices
         Dictionary<SpectralBand, float[,]> bands = new();
         var bandList = AssignBandsForPlatform(platform, samplesPerPixel);
 
@@ -207,6 +227,68 @@ public class GeoTiffReader
                 currentY += rowsInStrip;
             }
         }
+        else if (tileOffsets.Count > 0 && tileWidth > 0 && tileHeight > 0)
+        {
+            int tilesAcross = (width + tileWidth - 1) / tileWidth;
+            int tilesDown = (height + tileHeight - 1) / tileHeight;
+
+            for (int ty = 0; ty < tilesDown; ty++)
+            {
+                for (int tx = 0; tx < tilesAcross; tx++)
+                {
+                    int tileIndex = ty * tilesAcross + tx;
+                    if (tileIndex >= tileOffsets.Count) break;
+
+                    uint offset = tileOffsets[tileIndex];
+                    uint byteCount = tileIndex < tileByteCounts.Count ? tileByteCounts[tileIndex] : 0;
+                    if (offset == 0 || byteCount == 0) continue;
+
+                    fs.Seek(offset, SeekOrigin.Begin);
+                    byte[] raw = reader.ReadBytes((int)byteCount);
+
+                    int byteIndex = 0;
+                    int startY = ty * tileHeight;
+                    int startX = tx * tileWidth;
+
+                    for (int y = startY; y < startY + tileHeight && y < height; y++)
+                    {
+                        for (int x = startX; x < startX + tileWidth && x < width; x++)
+                        {
+                            for (int b = 0; b < samplesPerPixel; b++)
+                            {
+                                float val = 0.0f;
+                                if (bitsPerSample == 8 && byteIndex < raw.Length)
+                                {
+                                    val = raw[byteIndex++] / 255.0f;
+                                }
+                                else if (bitsPerSample == 16 && byteIndex + 1 < raw.Length)
+                                {
+                                    ushort rawU16 = isLittleEndian ? (ushort)(raw[byteIndex] | (raw[byteIndex + 1] << 8)) : (ushort)((raw[byteIndex] << 8) | raw[byteIndex + 1]);
+                                    val = rawU16 / 65535.0f;
+                                    byteIndex += 2;
+                                }
+                                else if (bitsPerSample == 32 && sampleFormat == 3 && byteIndex + 3 < raw.Length)
+                                {
+                                    val = BitConverter.ToSingle(raw, byteIndex);
+                                    byteIndex += 4;
+                                }
+
+                                if (b < bandList.Count)
+                                {
+                                    bands[bandList[b]][y, x] = val;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Cryptographic SHA-256 digest of the ingested raster payload
+        fs.Seek(0, SeekOrigin.Begin);
+        using var sha256 = System.Security.Cryptography.SHA256.Create();
+        byte[] hashBytes = sha256.ComputeHash(fs);
+        string sourceSha256 = Convert.ToHexString(hashBytes).ToLowerInvariant();
 
         string tileId = Path.GetFileNameWithoutExtension(filePath);
         DateTime dt = acquisitionTime ?? DateTime.UtcNow;
@@ -220,6 +302,9 @@ public class GeoTiffReader
             Transform = transform,
             Width = width,
             Height = height,
+            EpsgCode = epsgCode,
+            NoDataValue = noDataValue,
+            SourceImageSha256 = sourceSha256,
             SourceFilePath = filePath,
             Bands = bands,
             GroundSamplingDistanceMeters = 10.0
@@ -334,5 +419,32 @@ public class GeoTiffReader
             // fallback
         }
         return 4326;
+    }
+
+    private static double? ReadGdalNoData(FileStream fs, BinaryReader r, uint valueOrOffset, uint count)
+    {
+        try
+        {
+            byte[] bytes;
+            if (count <= 4)
+            {
+                bytes = BitConverter.GetBytes(valueOrOffset);
+            }
+            else
+            {
+                fs.Seek(valueOrOffset, SeekOrigin.Begin);
+                bytes = r.ReadBytes((int)count);
+            }
+            string s = Encoding.ASCII.GetString(bytes).Trim('\0', ' ', '\r', '\n');
+            if (double.TryParse(s, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double nd))
+            {
+                return nd;
+            }
+        }
+        catch
+        {
+            // fallback
+        }
+        return null;
     }
 }

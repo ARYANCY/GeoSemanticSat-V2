@@ -1,0 +1,18 @@
+{
+  "status": "completed",
+  "model": "SatMAE++ (Transformers)",
+  "method": "Grouped Multi-Spectral LoRA (r=16, alpha=16) + SupCon Head",
+  "checkpoint_path": "C:\\Users\\aryan\\OneDrive\\Desktop\\Upagraha-V2\\Unified-RSanalytics\\checkpoints\\satmae_pp\\satmae_multispectral_lora_best.pt",
+  "training_time_sec": 0.51,
+  "baseline_metrics": {
+    "accuracy": 0.1,
+    "recall@1": 0.6625,
+    "recall@5": 0.9625
+  },
+  "fine_tuned_metrics": {
+    "accuracy": 0.125,
+    "recall@1": 0.9625,
+    "recall@5": 0.9875
+  },
+  "improvement_recall@5_pct": 2.6
+}

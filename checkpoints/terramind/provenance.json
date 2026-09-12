@@ -1,0 +1,18 @@
+{
+  "status": "completed",
+  "model": "TerraMind-1.0-base",
+  "method": "LoRA (r=16, alpha=16) + Contrastive 128d Head",
+  "checkpoint_path": "C:\\Users\\aryan\\OneDrive\\Desktop\\Upagraha-V2\\Unified-RSanalytics\\checkpoints\\terramind\\terramind_retrieval_lora_best.pt",
+  "training_time_sec": 1.2,
+  "baseline_metrics": {
+    "recall@1": 0.0125,
+    "recall@5": 0.075,
+    "mAP": 0.0668
+  },
+  "fine_tuned_metrics": {
+    "recall@1": 0.075,
+    "recall@5": 0.4625,
+    "mAP": 0.2633
+  },
+  "improvement_recall@5_pct": 516.66
+}

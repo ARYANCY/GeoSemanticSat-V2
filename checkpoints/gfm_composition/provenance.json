@@ -1,0 +1,8 @@
+{
+  "status": "completed",
+  "model": "GFM_Composition_Pretraining",
+  "method": "QuerySlotDecoder (QSACL) + CompositionAwareLoss",
+  "checkpoint_path": "C:\\Users\\aryan\\OneDrive\\Desktop\\Upagraha-V2\\Unified-RSanalytics\\checkpoints\\gfm_composition\\gfm_composition_slots_best.pt",
+  "best_loss": 0.4678,
+  "training_time_sec": 1.22
+}

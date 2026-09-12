@@ -18,4 +18,8 @@ public class TilePatch
     public Dictionary<string, double> StatisticalFeatures { get; set; } = new();
     public double QualityScore { get; set; } = 1.0;
     public bool HasCloudOrShadow { get; set; }
+    public double CloudCoverPercentage { get; set; }
+    public double SunElevationDegrees { get; set; } = 45.0;
+    public double? ViewZenithDegrees { get; set; }
+    public string SourceFilePath { get; set; } = string.Empty;
 }

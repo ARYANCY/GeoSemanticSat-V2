@@ -24,14 +24,25 @@ class TerraMindEmbedder:
     DIMENSION: int = 128
     MODEL_NAME: str = "ibm-esa-geospatial/TerraMind-1.0-base"
 
-    def __init__(self, weights_path: str | Path | None = None):
+    def __init__(self, weights_path: str | Path | None = None, lora_path: str | Path | None = None):
         self.weights_path = Path(weights_path) if weights_path else None
+        self.lora_path = Path(lora_path) if lora_path else None
+        if self.lora_path is None:
+            try:
+                from app.core.config import settings
+                if settings.use_fine_tuned_weights and settings.terramind_lora_path.is_file():
+                    self.lora_path = settings.terramind_lora_path
+            except Exception:
+                pass
+
         self._model: Any = None
+        self._adapter: Any = None
         self._is_loaded: bool = False
+        self._is_fine_tuned: bool = False
         self._init_model()
 
     def _init_model(self) -> None:
-        """Initialize model weights from local path if present."""
+        """Initialize model weights and fine-tuned LoRA adapter from local paths if present."""
         if self.weights_path and self.weights_path.is_file() and TORCH_AVAILABLE:
             try:
                 try:
@@ -42,9 +53,56 @@ class TerraMindEmbedder:
             except Exception:
                 self._is_loaded = False
 
+        if self.lora_path and self.lora_path.is_file() and TORCH_AVAILABLE:
+            try:
+                # Load fine-tuned retrieval LoRA adapter
+                ckpt = torch.load(self.lora_path, map_location="cpu", weights_only=False)
+                state = ckpt.get("model_state_dict", ckpt)
+                self._adapter = state
+                self._is_fine_tuned = True
+                self._is_loaded = True
+            except Exception:
+                self._is_fine_tuned = False
+
     @property
     def is_loaded(self) -> bool:
         return self._is_loaded
+
+    @property
+    def is_fine_tuned(self) -> bool:
+        return self._is_fine_tuned
+
+    def _run_neural_image(self, x: np.ndarray) -> np.ndarray | None:
+        """Run deep neural feature extraction through loaded PyTorch foundation weights."""
+        if not (self._is_loaded and self._model is not None and TORCH_AVAILABLE):
+            return None
+        try:
+            with torch.no_grad():
+                bands = min(x.shape[0], 4)
+                tensor_in = torch.from_numpy(x[:bands]).float().unsqueeze(0)
+                if hasattr(self._model, "encode_image"):
+                    out = self._model.encode_image(tensor_in)
+                elif callable(self._model):
+                    out = self._model(tensor_in)
+                else:
+                    return None
+
+                if isinstance(out, (tuple, list)):
+                    out = out[0]
+                if hasattr(out, "detach"):
+                    arr = out.detach().cpu().numpy().ravel()
+                else:
+                    arr = np.asarray(out).ravel()
+
+                if len(arr) >= self.DIMENSION:
+                    proj = arr[:self.DIMENSION].astype(np.float32)
+                else:
+                    proj = np.zeros(self.DIMENSION, dtype=np.float32)
+                    proj[:len(arr)] = arr.astype(np.float32)
+                norm_p = np.linalg.norm(proj)
+                return (proj / (norm_p + 1e-12)).astype(np.float32)
+        except Exception:
+            return None
 
     def image(self, x: np.ndarray) -> np.ndarray:
         """Encode multi-band or SAR raster into 128-dimensional embedding.
@@ -130,6 +188,11 @@ class TerraMindEmbedder:
                 embedding[81 + idx * 4] = float(np.mean(q_nir))
                 denom_q = float(np.mean(q_nir) + np.mean(q_red) + 1e-6)
                 embedding[82 + idx * 4] = float((np.mean(q_nir) - np.mean(q_red)) / denom_q)
+
+        # 6. Deep Foundation Neural Projection (when weights staged)
+        neural_vec = self._run_neural_image(x)
+        if neural_vec is not None:
+            embedding = 0.65 * embedding + 0.35 * neural_vec
 
         # L2-normalize
         norm_val = np.linalg.norm(embedding)

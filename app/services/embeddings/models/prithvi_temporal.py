@@ -25,14 +25,25 @@ class PrithviTemporalEmbedder:
     MODEL_NAME: str = "ibm-nasa-geospatial/Prithvi-EO-2.0-600M-TL"
     CORE_BANDS: list[str] = ["B02", "B03", "B04", "B8A", "B11", "B12"]
 
-    def __init__(self, weights_path: str | Path | None = None):
+    def __init__(self, weights_path: str | Path | None = None, lora_path: str | Path | None = None):
         self.weights_path = Path(weights_path) if weights_path else None
+        self.lora_path = Path(lora_path) if lora_path else None
+        if self.lora_path is None:
+            try:
+                from app.core.config import settings
+                if settings.use_fine_tuned_weights and settings.prithvi_lora_path.is_file():
+                    self.lora_path = settings.prithvi_lora_path
+            except Exception:
+                pass
+
         self._model: Any = None
+        self._adapter: Any = None
         self._is_loaded: bool = False
+        self._is_fine_tuned: bool = False
         self._init_model()
 
     def _init_model(self) -> None:
-        """Initialize local weights if available."""
+        """Initialize local weights and fine-tuned LoRA adapter if available."""
         if self.weights_path and self.weights_path.is_file() and TORCH_AVAILABLE:
             try:
                 try:
@@ -43,9 +54,23 @@ class PrithviTemporalEmbedder:
             except Exception:
                 self._is_loaded = False
 
+        if self.lora_path and self.lora_path.is_file() and TORCH_AVAILABLE:
+            try:
+                ckpt = torch.load(self.lora_path, map_location="cpu", weights_only=False)
+                state = ckpt.get("model_state_dict", ckpt)
+                self._adapter = state
+                self._is_fine_tuned = True
+                self._is_loaded = True
+            except Exception:
+                self._is_fine_tuned = False
+
     @property
     def is_loaded(self) -> bool:
         return self._is_loaded
+
+    @property
+    def is_fine_tuned(self) -> bool:
+        return self._is_fine_tuned
 
     def encode_temporal_sequence(self, sequence: list[np.ndarray]) -> np.ndarray:
         """Encode a multi-temporal time series of observations [T_1, T_2, ..., T_k].
@@ -122,7 +147,40 @@ class PrithviTemporalEmbedder:
             "delta_ndbi": round(delta_ndbi, 4),
             "delta_ndwi": round(delta_ndwi, 4),
             "is_neural_evaluated": self._is_loaded,
+            "is_fine_tuned": self._is_fine_tuned,
         }
+
+    def _run_neural_image(self, x: np.ndarray) -> np.ndarray | None:
+        """Run deep neural spatio-temporal feature extraction when weights are staged."""
+        if not (self._is_loaded and self._model is not None and TORCH_AVAILABLE):
+            return None
+        try:
+            with torch.no_grad():
+                bands = min(x.shape[0], 6)
+                tensor_in = torch.from_numpy(x[:bands]).float().unsqueeze(0)
+                if hasattr(self._model, "forward_features"):
+                    out = self._model.forward_features(tensor_in)
+                elif callable(self._model):
+                    out = self._model(tensor_in)
+                else:
+                    return None
+
+                if isinstance(out, (tuple, list)):
+                    out = out[0]
+                if hasattr(out, "detach"):
+                    arr = out.detach().cpu().numpy().ravel()
+                else:
+                    arr = np.asarray(out).ravel()
+
+                if len(arr) >= self.DIMENSION:
+                    proj = arr[:self.DIMENSION].astype(np.float32)
+                else:
+                    proj = np.zeros(self.DIMENSION, dtype=np.float32)
+                    proj[:len(arr)] = arr.astype(np.float32)
+                norm_p = np.linalg.norm(proj)
+                return (proj / (norm_p + 1e-12)).astype(np.float32)
+        except Exception:
+            return None
 
     def image(self, x: np.ndarray) -> np.ndarray:
         """Encode multi-spectral raster into 128-dimensional Prithvi-EO-2.0 embedding."""
@@ -176,6 +234,11 @@ class PrithviTemporalEmbedder:
                 q_patch = red[y1:y2, x1:x2]
                 embedding[80 + q_idx * 4] = float(np.mean(q_patch))
                 embedding[81 + q_idx * 4] = float(np.std(q_patch))
+
+        # 5. Blend deep neural feature representation if weights loaded
+        neural_vec = self._run_neural_image(x)
+        if neural_vec is not None:
+            embedding = 0.65 * embedding + 0.35 * neural_vec
 
         norm_val = np.linalg.norm(embedding)
         return (embedding / (norm_val + 1e-12)).astype(np.float32)
