@@ -9,6 +9,8 @@ class Program
     [STAThread]
     public static int Main(string[] args)
     {
+        var logPath = Path.Combine(AppContext.BaseDirectory, "ui_startup.log");
+        File.AppendAllText(logPath, $"[{DateTime.UtcNow:O}] Main entered with args: {string.Join(" ", args)}\n");
         // Check for explicit CLI invocation or standard CLI commands
         if (args.Length > 0)
         {
@@ -47,11 +49,22 @@ class Program
         using var mutex = new System.Threading.Mutex(true, mutexName, out bool createdNew);
         if (!createdNew)
         {
+            File.AppendAllText(logPath, "[GeoSemanticSat] Another instance is already running via mutex.\n");
             Console.WriteLine("[GeoSemanticSat] Another instance is already running.");
             return 0;
         }
 
-        return BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+        try
+        {
+            File.WriteAllText(Path.Combine(AppContext.BaseDirectory, "ui_startup.log"), "Starting Avalonia application...\n");
+            return BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+        }
+        catch (Exception ex)
+        {
+            File.AppendAllText(Path.Combine(AppContext.BaseDirectory, "ui_startup.log"), $"CRASH: {ex}\n");
+            Console.Error.WriteLine($"[GeoSemanticSat] Crash: {ex}");
+            throw;
+        }
     }
 
     public static AppBuilder BuildAvaloniaApp()
