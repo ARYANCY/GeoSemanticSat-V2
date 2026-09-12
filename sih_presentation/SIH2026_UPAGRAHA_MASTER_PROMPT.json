@@ -1,0 +1,130 @@
+{
+  "project": {
+    "name": "UPAGRAHA / GeoSemanticSat",
+    "type": "SIH 2026 Idea Presentation",
+    "objective": "Create a competition-grade, evaluator-oriented SIH 2026 Idea Presentation and six slide-specific Markdown source files for UPAGRAHA / GeoSemanticSat.",
+    "core_positioning": "A sovereign, locally deployable Earth-observation intelligence workflow that combines semantic imagery discovery, multi-temporal change analysis, quality-aware processing, analyst verification and provenance tracking."
+  },
+  "source_hierarchy": {
+    "priority_1": {
+      "source": "Official SIH 2026 Idea Presentation template supplied by the user",
+      "rule": "Use the supplied official template only. Do not redesign the presentation structure."
+    },
+    "priority_2": {
+      "source": "Official SIH 2026 problem statement supplied by the user",
+      "rule": "Treat the supplied problem statement as authoritative for the problem background, required capabilities, constraints and expected evaluation."
+    },
+    "priority_3": {
+      "source": "Verified UPAGRAHA / GeoSemanticSat implementation facts supplied by the user",
+      "rule": "Use only capabilities that have been explicitly verified. Never infer implementation merely because the problem statement requires a capability."
+    },
+    "priority_4": {
+      "source": "User-provided mentor/transcription material",
+      "rule": "Use mentor guidance to improve evaluator alignment, clarity and presentation strategy, but never override factual project constraints."
+    },
+    "priority_5": {
+      "source": "Credible external research",
+      "rule": "Use NASA, USGS, ESA, CEOS, peer-reviewed literature, reputable academic preprints and official model repositories to substantiate technical rationale and background claims."
+    }
+  },
+  "official_problem_statement": {
+    "background": "Earth-observation archives are expanding rapidly and increasingly contain multi-temporal, multi-spectral and multi-sensor imagery. Conventional catalogues are effective for searching by metadata such as coordinates, acquisition date, platform and product type, but analysts may still need to know where and when to look before they can examine the imagery itself. Recent advances in multimodal and remote-sensing foundation models have improved semantic representation of Earth-observation data, creating the possibility of searching imagery by meaning as well as metadata. Translating those advances into a reliable operational system remains challenging, particularly when the system must work on-premises, ingest new acquisitions incrementally, preserve geospatial provenance, and suppress false change caused by season, atmosphere, viewing geometry, registration error or sensor differences.",
+    "detailed_description": {
+      "overall_requirement": "Build a system that makes a satellite-imagery archive queryable by semantic content and by change over time, while retaining conventional spatial, temporal and sensor filters.",
+      "analyst_discovery_requirement": "The solution should support analyst discovery rather than require the analyst to identify every location of interest in advance.",
+      "core_capabilities": {
+        "semantic_and_multimodal_retrieval": {
+          "required": true,
+          "requirements": [
+            "Free-text search over imagery tiles using natural-language queries.",
+            "Image-to-image search for visually and semantically similar locations.",
+            "Ranked retrieval results.",
+            "Refinement using area-of-interest, date-range, sensor and other metadata filters."
+          ],
+          "example_queries": [
+            "newly built structures near a river",
+            "large vehicle concentrations on open ground"
+          ]
+        },
+        "multi_temporal_change_analysis": {
+          "required": true,
+          "requirements": [
+            "Analyze a specified area and time window.",
+            "Identify meaningful appearance, disappearance, expansion or contraction of features.",
+            "Classify supported change types such as construction, clearance, water-extent variation or road development.",
+            "Estimate the earliest available observation at which the change is supported by usable imagery."
+          ]
+        },
+        "false_alarm_suppression_and_quality_handling": {
+          "required": true,
+          "confounders": [
+            "seasonal variation",
+            "illumination differences",
+            "view-angle differences",
+            "cloud",
+            "haze",
+            "snow",
+            "shadows",
+            "radiometric inconsistency",
+            "imperfect co-registration",
+            "sensor differences"
+          ],
+          "required_strategy": [
+            "Use quality masks, normalization, confidence estimates or equivalent mechanisms.",
+            "Treat environmental, atmospheric, radiometric and geometric effects as confounders rather than automatically reporting them as change.",
+            "Prefer analytically useful precision over indiscriminate change recall."
+          ]
+        },
+        "discovery_and_clustering": {
+          "required": true,
+          "requirements": [
+            "Support unsupervised or embedding-based grouping of similar sites across a wider area.",
+            "Allow analysts to discover locations comparable to an identified site.",
+            "Reduce the need to manually construct a separate query for every site."
+          ]
+        },
+        "analyst_workflow_and_provenance": {
+          "required": true,
+          "requirements": [
+            "Provide a ranked review queue.",
+            "Show before-and-after evidence.",
+            "Show location.",
+            "Show acquisition time.",
+            "Show sensor or source information.",
+            "Show confidence.",
+            "Show relevant processing history.",
+            "Allow analyst confirmation or rejection of candidates.",
+            "Preserve analyst decisions in the audit trail.",
+            "Support subsequent reranking or refinement where the selected approach permits it.",
+            "Preserve source-scene and processing provenance in exported results."
+          ]
+        },
+        "scale_incremental_ingestion_and_sovereignty": {
+          "required": true,
+          "requirements": [
+            "Efficient vector or equivalent indexing.",
+            "Incremental addition of newly acquired imagery without complete index rebuilding.",
+            "Complete on-premises operation.",
+            "No cloud services or external APIs during evaluation.",
+            "Preserve georeferencing and acquisition metadata.",
+            "Support organiser-defined common geospatial formats including GeoTIFF and Cloud Optimized GeoTIFF (COG)."
+          ]
+        }
+      },
+      "constraints": {
+        "network": "The complete demonstration must run with network access disabled after all approved models, libraries and datasets have been staged locally.",
+        "pretrained_models": "Pretrained public models may be used if their origin and licence are declared and required weights are packaged for offline use.",
+        "evaluation_data": "Evaluation uses publicly available or organiser-generated imagery only.",
+        "classified_data": "No classified, operational or service-generated imagery will be included."
+      }
+    }
+  },
+  "slide_mapping": {
+    "1": "Title Page",
+    "2": "Idea Title / Proposed Solution",
+    "3": "Technical Approach",
+    "4": "Feasibility and Viability",
+    "5": "Impact and Benefits",
+    "6": "Research and References"
+  }
+}
