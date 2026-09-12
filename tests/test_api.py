@@ -1,6 +1,7 @@
 """Comprehensive integration and smoke tests for offline satellite intelligence API."""
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -424,5 +425,114 @@ def test_export_evidence_package(client, tmp_path):
     assert "html_briefing" in data["files"]
     assert "manifest" in data["files"]
     assert Path(data["files"]["manifest"]).is_file()
+    geojson_path = Path(data["files"]["geojson"])
+    geo = json.loads(geojson_path.read_text(encoding="utf-8"))
+    for feat in geo.get("features", []):
+        if feat.get("properties", {}).get("before_raster"):
+            assert feat["geometry"]["coordinates"] != [0.0, 0.0]
+
+
+def test_text_search_filters_and_spec_queries(client):
+    """Semantic-axis text search plus date/sensor/AOI filters (not catalogue keyword match)."""
+    river = client.post(
+        "/api/v1/search/text",
+        json={"query": "Newly built structures near a river", "top_k": 5},
+    )
+    assert river.status_code == 200
+    assert isinstance(river.json()["results"], list)
+
+    vehicles = client.post(
+        "/api/v1/search/text",
+        json={"query": "Large vehicle concentrations on open ground", "top_k": 5},
+    )
+    assert vehicles.status_code == 200
+
+    dated = client.post(
+        "/api/v1/search/text",
+        json={
+            "query": "new road construction",
+            "top_k": 10,
+            "sensor": "Sentinel-2",
+            "date_from": "2025-01-01",
+            "date_to": "2025-01-31",
+        },
+    )
+    assert dated.status_code == 200
+    for item in dated.json()["results"]:
+        assert item["sensor"] == "Sentinel-2"
+        assert item["acquisition_date"] <= "2025-01-31"
+
+    bad_range = client.post(
+        "/api/v1/search/text",
+        json={"query": "water", "date_from": "2026-01-01", "date_to": "2025-01-01"},
+    )
+    assert bad_range.status_code == 400
+
+    aoi = client.post(
+        "/api/v1/search/text",
+        json={
+            "query": "recently cleared land",
+            "aoi": {"min_lon": 91.9, "min_lat": 26.9, "max_lon": 92.2, "max_lat": 27.2},
+        },
+    )
+    assert aoi.status_code == 200
+
+    miss = client.post(
+        "/api/v1/search/text",
+        json={
+            "query": "expanded water body",
+            "aoi": {"min_lon": 0.0, "min_lat": 0.0, "max_lon": 0.1, "max_lat": 0.1},
+        },
+    )
+    assert miss.status_code == 200
+    assert miss.json()["results"] == []
+
+
+def test_invalid_aoi_fails_safely(client):
+    resp = client.post("/api/v1/search/text", json={"query": "river", "aoi": "not-a-geometry"})
+    assert resp.status_code == 400
+
+
+def test_duplicate_ingest_does_not_rebuild(client):
+    first = client.post(
+        "/api/v1/ingest",
+        json={
+            "path": "test_before.tif",
+            "sensor": "Sentinel-2",
+            "acquisition_date": "2025-01-01",
+            "location_name": "Test Site Alpha",
+            "source": "ESA",
+        },
+    )
+    assert first.status_code == 201
+    assert first.json()["status"] == "duplicate"
+    obs_id = first.json()["observation_id"]
+
+    ids_file = settings.index_root / "observation_ids.txt"
+    if ids_file.is_file():
+        ids = ids_file.read_text(encoding="utf-8").splitlines()
+        assert ids.count(obs_id) <= 1
+
+
+def test_change_evidence_includes_ndwi_and_onset(client):
+    obs_list = client.get("/api/v1/observations").json()
+    loc_groups: dict[str, list[str]] = {}
+    for obs in obs_list:
+        loc_groups.setdefault(obs["location_id"], []).append(obs["id"])
+    same_loc_obs = next(ids for ids in loc_groups.values() if len(ids) >= 2)
+    resp = client.post(
+        "/api/v1/change/analyze",
+        json={
+            "before_observation_id": same_loc_obs[1],
+            "after_observation_id": same_loc_obs[0],
+            "use_temporal_sequence": True,
+        },
+    )
+    assert resp.status_code == 201
+    evidence = resp.json()["evidence"]
+    assert "delta_ndwi" in evidence
+    assert "onset" in evidence
+    assert "observations_used" in evidence["onset"]
+    assert evidence["mask_available"] is True
 
 

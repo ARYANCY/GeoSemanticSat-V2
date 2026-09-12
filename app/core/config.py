@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -6,6 +7,22 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 # Strict sovereign offline assurance: disable external Hugging Face and telemetry calls
 os.environ["HF_HUB_OFFLINE"] = "1"
 os.environ["TRANSFORMERS_OFFLINE"] = "1"
+
+
+def _pin_bundled_proj_data() -> None:
+    """Prefer rasterio/pyproj PROJ grids over a stale PostGIS PROJ_LIB on PATH."""
+    candidates = [
+        Path(sys.prefix) / "Lib" / "site-packages" / "rasterio" / "proj_data",
+        Path(sys.prefix) / "Lib" / "site-packages" / "pyproj" / "proj_dir" / "share" / "proj",
+    ]
+    for candidate in candidates:
+        if (candidate / "proj.db").is_file():
+            os.environ["PROJ_LIB"] = str(candidate)
+            os.environ["PROJ_DATA"] = str(candidate)
+            return
+
+
+_pin_bundled_proj_data()
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 

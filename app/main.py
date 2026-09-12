@@ -1,8 +1,10 @@
 """FastAPI application for offline satellite intelligence."""
 from __future__ import annotations
 
+from app.core.config import settings  # pins PROJ_LIB before rasterio import
+
 from contextlib import asynccontextmanager
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 import hashlib
 import json
 import time
@@ -38,7 +40,6 @@ SENSOR_PROFILES: dict[str, dict[str, int]] = {
     "PlanetScope": {"Blue": 1, "Green": 2, "Red": 3, "NIR": 4},
 }
 
-from app.core.config import settings
 from app.core.logging import logger
 from app.db.session import Base, engine, get_db
 from app.models.entities import (
@@ -117,6 +118,13 @@ from app.services.embeddings.service import (
 from app.services.llm.geoint_grounding import GeointGroundingEngine
 from app.services.llm.qwen_service import get_qwen_service
 from app.services.llm.insight_generator import InsightGenerator
+from app.services.geo_filters import (
+    centroid_from_wkt,
+    observation_in_aoi,
+    validate_date_range,
+)
+from app.services.quality import estimate_quality_score
+from app.services.onset import estimate_onset
 
 
 
@@ -173,8 +181,13 @@ def search_vectors(
     sensor: str | None = None,
     exclude_observation_id: str | None = None,
     similarity_mode: str = "full",  # "full" for image-to-image, "semantic" for text-to-image
+    date_from: date | None = None,
+    date_to: date | None = None,
+    min_quality: float | None = None,
+    aoi: dict | str | None = None,
 ) -> list[SearchResultItem]:
-    """Execute efficient cosine similarity search over stored observation embeddings."""
+    """Cosine similarity over stored embeddings, with metadata/AOI filters applied before ranking."""
+    validate_date_range(date_from, date_to)
     q_norm = norm(query_vector)
 
     query = db.query(Embedding, Observation).join(
@@ -185,8 +198,16 @@ def search_vectors(
         query = query.filter(Observation.sensor == sensor)
     if exclude_observation_id:
         query = query.filter(Observation.id != exclude_observation_id)
+    if date_from:
+        query = query.filter(Observation.acquisition_date >= date_from)
+    if date_to:
+        query = query.filter(Observation.acquisition_date <= date_to)
+    if min_quality is not None:
+        query = query.filter(Observation.quality_score >= min_quality)
 
     pairs = query.all()
+    if aoi is not None:
+        pairs = [(emb, obs) for emb, obs in pairs if observation_in_aoi(obs.footprint_wkt, aoi)]
     if not pairs:
         return []
 
@@ -303,7 +324,7 @@ def ingest_geotiff(request: IngestRequest, db: Session = Depends(get_db)):
             if not ds.crs or ds.count < 1 or (ds.width * ds.height) > settings.max_ingest_raster_pixels:
                 raise ValueError("Raster has invalid CRS, no bands, or exceeds max ingest pixel size limit")
 
-            read_bands = min(ds.count, 3)
+            read_bands = min(ds.count, 12)
             out_shape = (read_bands, min(256, ds.height), min(256, ds.width))
             raster_data = ds.read(out_shape=out_shape, masked=True).filled(0).astype(np.float32)
 
@@ -328,7 +349,33 @@ def ingest_geotiff(request: IngestRequest, db: Session = Depends(get_db)):
             except Exception:
                 footprint_wkt = fallback_wkt
 
-            # Upsert or associate Location
+            raster_path_rel = str(target_path.relative_to(root)).replace("\\", "/")
+            duplicate = (
+                db.query(Observation)
+                .filter_by(
+                    raster_path=raster_path_rel,
+                    acquisition_date=request.acquisition_date,
+                    sensor=request.sensor,
+                )
+                .first()
+            )
+            if duplicate:
+                run.status = "completed"
+                run.completed_at = datetime.now(timezone.utc)
+                run.provenance = {
+                    **(run.provenance or {}),
+                    "duplicate": True,
+                    "existing_observation_id": duplicate.id,
+                }
+                db.commit()
+                return IngestResponse(
+                    job_id=run.id,
+                    status="duplicate",
+                    observation_id=duplicate.id,
+                    location_id=duplicate.location_id,
+                )
+
+            quality_info = estimate_quality_score(raster_data)
             location = db.query(Location).filter_by(name=request.location_name).first()
             if not location:
                 location = Location(name=request.location_name, geometry_wkt=footprint_wkt)
@@ -348,14 +395,17 @@ def ingest_geotiff(request: IngestRequest, db: Session = Depends(get_db)):
                 source_id=source.id,
                 acquisition_date=request.acquisition_date,
                 sensor=request.sensor,
-                raster_path=str(target_path.relative_to(root)).replace("\\", "/"),
+                raster_path=raster_path_rel,
                 footprint_wkt=footprint_wkt,
-                quality_score=1.0,
+                quality_score=float(quality_info["quality_score"]),
                 metadata_json={
                     "crs": str(ds.crs),
                     "shape": [ds.height, ds.width],
                     "bands": ds.count,
                     "preprocessing": "minmax-v1",
+                    "quality": quality_info,
+                    "geotransform": list(ds.transform) if ds.transform else None,
+                    "nodata": ds.nodata,
                 },
             )
             db.add(observation)
@@ -372,6 +422,13 @@ def ingest_geotiff(request: IngestRequest, db: Session = Depends(get_db)):
                 run_id=run.id,
             )
             db.add(embedding)
+
+            try:
+                from scripts.build_index import add_vector_to_faiss
+
+                add_vector_to_faiss(vector=vector, observation_id=observation.id)
+            except Exception as idx_exc:
+                logger.warning(f"Incremental FAISS insert skipped: {idx_exc}")
 
         run.status = "completed"
         run.completed_at = datetime.now(timezone.utc)
@@ -480,6 +537,10 @@ def search_by_image(request: ImageSearchRequest, db: Session = Depends(get_db)):
         query_vector=embedding.vector,
         top_k=request.top_k,
         exclude_observation_id=request.observation_id,
+        sensor=request.sensor,
+        date_from=request.date_from,
+        date_to=request.date_to,
+        aoi=request.aoi,
     )
     return SearchResponse(results=results)
 
@@ -519,6 +580,10 @@ def search_by_text(request: SearchRequest, db: Session = Depends(get_db)):
         top_k=request.top_k,
         sensor=request.sensor,
         similarity_mode="semantic",
+        date_from=request.date_from,
+        date_to=request.date_to,
+        min_quality=request.min_quality,
+        aoi=request.aoi,
     )
     return SearchResponse(results=results)
 
@@ -694,10 +759,13 @@ def analyze_change(request: ChangeRequest, db: Session = Depends(get_db)):
             nir_idx_b = min(prof_before.get("NIR", min(2, data_before.shape[0])) - 1, data_before.shape[0] - 1)
             red_idx_a = min(prof_after.get("Red", 1) - 1, data_after.shape[0] - 1)
             nir_idx_a = min(prof_after.get("NIR", min(2, data_after.shape[0])) - 1, data_after.shape[0] - 1)
+            green_idx_b = min(prof_before.get("Green", 2) - 1, data_before.shape[0] - 1)
+            green_idx_a = min(prof_after.get("Green", 2) - 1, data_after.shape[0] - 1)
 
             red_b, nir_b = data_before[red_idx_b], data_before[nir_idx_b]
             red_a, nir_a = data_after[red_idx_a], data_after[nir_idx_a]
-            
+            green_b, green_a = data_before[green_idx_b], data_after[green_idx_a]
+
             denom_b = nir_b + red_b + 1e-6
             denom_a = nir_a + red_a + 1e-6
             ndvi_b = (nir_b - red_b) / denom_b
@@ -706,30 +774,72 @@ def analyze_change(request: ChangeRequest, db: Session = Depends(get_db)):
             drift_ndvi = float(np.median(raw_diff_ndvi))
             delta_ndvi = float(np.mean(raw_diff_ndvi)) - drift_ndvi
 
-            # NDBI proxy or real
-            delta_ndbi = float(np.mean(red_a - red_b))
+            swir_idx_b = min(prof_before.get("SWIR1", max(1, data_before.shape[0])) - 1, data_before.shape[0] - 1)
+            swir_idx_a = min(prof_after.get("SWIR1", max(1, data_after.shape[0])) - 1, data_after.shape[0] - 1)
+            swir_b, swir_a = data_before[swir_idx_b], data_after[swir_idx_a]
+            ndbi_b = (swir_b - nir_b) / (swir_b + nir_b + 1e-6)
+            ndbi_a = (swir_a - nir_a) / (swir_a + nir_a + 1e-6)
+            delta_ndbi = float(np.mean(ndbi_a - ndbi_b))
+
+            ndwi_b = (green_b - nir_b) / (green_b + nir_b + 1e-6)
+            ndwi_a = (green_a - nir_a) / (green_a + nir_a + 1e-6)
+            delta_ndwi = float(np.mean(ndwi_a - ndwi_b))
 
         # Trajectory Angle theta = atan2(Delta NDBI, Delta NDVI)
         trajectory_angle_rad = float(np.arctan2(delta_ndbi, delta_ndvi))
         trajectory_angle_deg = float(np.degrees(trajectory_angle_rad))
 
         # Classification heuristics based on spectral vector trajectory and CVA score
-        quality_factor = max(0.1, min(obs_before.quality_score, obs_after.quality_score))
+        q_before = estimate_quality_score(data_before)
+        q_after = estimate_quality_score(data_after)
+        quality_factor = max(
+            0.1,
+            min(obs_before.quality_score, obs_after.quality_score, float(q_before["quality_score"]), float(q_after["quality_score"])),
+        )
         confidence = min(0.98, (score / (score + 1.2)) * quality_factor)
+
+        change_mask = spectral_magnitude > 0.35
+        changed_frac = float(np.mean(change_mask))
 
         if score < 0.20:
             change_class = "NO_CHANGE"
             confidence = max(0.88, 1.0 - score)
+        elif delta_ndwi > 0.12 and score > 0.25:
+            change_class = "WATER_EXTENT_VARIATION"
         elif delta_ndvi < -0.15 and score > 0.35:
             change_class = "CLEARANCE"
-        elif delta_ndbi > 0.15 or (score > 0.55 and delta_ndvi < 0.05):
+        elif delta_ndbi > 0.12 and delta_ndvi < -0.05:
             change_class = "CONSTRUCTION"
+        elif delta_ndbi > 0.08 and changed_frac > 0.12:
+            change_class = "EXPANSION"
+        elif delta_ndbi < -0.08 and changed_frac > 0.12:
+            change_class = "CONTRACTION"
+        elif delta_ndbi > 0.10 and score > 0.40:
+            change_class = "APPEARANCE"
+        elif delta_ndbi < -0.10 and score > 0.40:
+            change_class = "DISAPPEARANCE"
+        elif float(np.clip(np.max([abs(delta_ndbi), score]), 0.0, 1.0)) > 0.45 and delta_ndvi < 0:
+            change_class = "ROAD_DEVELOPMENT"
         elif delta_ndvi > 0.15 and score > 0.35:
             change_class = "VEGETATION_GROWTH"
-        elif delta_ndwi > 0.15:
-            change_class = "WATER_EXTENT_VARIATION"
         else:
             change_class = "ACTIVITY_CONCENTRATION" if score > 0.40 else "OTHER"
+
+        # Sequential CUSUM onset using all observations at this location when requested
+        onset_info: dict = {"change_detected": False, "reason": "pair_only"}
+        if request.use_temporal_sequence:
+            loc_obs = (
+                db.query(Observation)
+                .filter_by(location_id=obs_before.location_id)
+                .order_by(Observation.acquisition_date.asc())
+                .all()
+            )
+            dated_vectors: list[tuple[str, date, list[float]]] = []
+            for o in loc_obs:
+                emb_row = db.query(Embedding).filter_by(observation_id=o.id).first()
+                if emb_row and emb_row.vector and o.quality_score >= 0.40:
+                    dated_vectors.append((o.id, o.acquisition_date, emb_row.vector))
+            onset_info = estimate_onset(dated_vectors)
 
         run = ProcessingRun(
             operation="change_analysis",
@@ -766,7 +876,11 @@ def analyze_change(request: ChangeRequest, db: Session = Depends(get_db)):
                 "quality_factor": quality_factor,
                 "false_alarm_risk": round(1.0 - quality_factor, 4),
                 "evaluated_bands": num_eval_bands,
-                "mask_available": False,
+                "mask_available": True,
+                "changed_fraction": round(changed_frac, 4),
+                "quality_before": q_before,
+                "quality_after": q_after,
+                "onset": onset_info,
                 "prithvi_temporal_metrics": prithvi_metrics,
             },
             run_id=run.id,
@@ -1028,6 +1142,7 @@ def load_foundation_model(request: ModelLoadRequest):
 )
 def filter_observations(request: SearchFilterRequest, db: Session = Depends(get_db)):
     """Advanced metadata filtering over satellite observations."""
+    validate_date_range(request.date_from, request.date_to)
     query = db.query(Observation)
     if request.sensor:
         query = query.filter(Observation.sensor == request.sensor)
@@ -1039,6 +1154,8 @@ def filter_observations(request: SearchFilterRequest, db: Session = Depends(get_
         query = query.filter(Observation.acquisition_date <= request.date_to)
 
     results = query.order_by(Observation.acquisition_date.desc()).offset(request.offset).limit(request.limit).all()
+    if request.aoi is not None:
+        results = [obs for obs in results if observation_in_aoi(obs.footprint_wkt, request.aoi)]
     return [
         ObservationItem(
             id=obs.id,
@@ -1338,16 +1455,26 @@ def export_evidence_package(request: ExportRequest, db: Session = Depends(get_db
     # 1. Generate W3C PROV-O GeoJSON
     features = []
     for c in changes:
+        loc = db.get(Location, c.location_id)
+        lon, lat = centroid_from_wkt(loc.geometry_wkt if loc else None)
+        before_obs = db.get(Observation, c.before_observation_id)
+        after_obs = db.get(Observation, c.after_observation_id)
         features.append({
             "type": "Feature",
             "id": c.id,
-            "geometry": {"type": "Point", "coordinates": [0.0, 0.0]},
+            "geometry": {"type": "Point", "coordinates": [lon, lat]},
             "properties": {
                 "change_type": c.change_class,
                 "confidence": c.confidence,
                 "evidence": c.evidence,
                 "prov:wasDerivedFrom": [c.before_observation_id, c.after_observation_id],
                 "prov:generatedAtTime": c.created_at.isoformat(),
+                "before_acquisition_date": before_obs.acquisition_date.isoformat() if before_obs else None,
+                "after_acquisition_date": after_obs.acquisition_date.isoformat() if after_obs else None,
+                "before_sensor": before_obs.sensor if before_obs else None,
+                "after_sensor": after_obs.sensor if after_obs else None,
+                "before_raster": before_obs.raster_path if before_obs else None,
+                "after_raster": after_obs.raster_path if after_obs else None,
             }
         })
     geojson_path = out_dir / "evidence_prov_o.geojson"
@@ -1528,6 +1655,10 @@ def search_unified(request: UnifiedSearchRequest, db: Session = Depends(get_db))
                 query_vector=q_vec,
                 top_k=needed,
                 sensor=sensor_target or request.sensor,
+                date_from=request.date_from,
+                date_to=request.date_to,
+                aoi=request.aoi,
+                similarity_mode="semantic",
             )
 
             for item in obs_matches:

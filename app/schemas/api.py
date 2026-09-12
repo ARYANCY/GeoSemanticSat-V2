@@ -33,6 +33,10 @@ class SearchRequest(BaseModel):
     query: str = Field(..., min_length=1, max_length=512, description="Text search query")
     top_k: int = Field(default=10, ge=1, le=100)
     sensor: str | None = Field(default=None, max_length=64)
+    date_from: date | None = None
+    date_to: date | None = None
+    min_quality: float | None = Field(default=None, ge=0.0, le=1.0)
+    aoi: dict | str | None = None
 
 
 class ImageSearchRequest(BaseModel):
@@ -40,6 +44,10 @@ class ImageSearchRequest(BaseModel):
 
     observation_id: str = Field(..., min_length=1)
     top_k: int = Field(default=10, ge=1, le=100)
+    sensor: str | None = Field(default=None, max_length=64)
+    date_from: date | None = None
+    date_to: date | None = None
+    aoi: dict | str | None = None
 
 
 class ChangeRequest(BaseModel):
@@ -47,6 +55,7 @@ class ChangeRequest(BaseModel):
 
     before_observation_id: str = Field(..., min_length=1)
     after_observation_id: str = Field(..., min_length=1)
+    use_temporal_sequence: bool = True
 
 
 class ReviewRequest(BaseModel):
@@ -247,6 +256,7 @@ class SearchFilterRequest(BaseModel):
     min_quality: float | None = Field(default=None, ge=0.0, le=1.0)
     date_from: date | None = None
     date_to: date | None = None
+    aoi: dict | str | None = None
     limit: int = Field(default=50, ge=1, le=500)
     offset: int = Field(default=0, ge=0)
 

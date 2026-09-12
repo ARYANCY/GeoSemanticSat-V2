@@ -1,0 +1,74 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>UPAGRAHA Intelligence Briefing</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 30px; background: #0f172a; color: #f8fafc; }
+    .header { border-bottom: 2px solid #38bdf8; padding-bottom: 15px; margin-bottom: 25px; }
+    h1 { margin: 0; color: #38bdf8; font-size: 24px; text-transform: uppercase; letter-spacing: 1px; }
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; background: #0369a1; color: white; margin-top: 6px; }
+    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 15px; }
+    .card-label { font-size: 11px; text-transform: uppercase; color: #94a3b8; margin-bottom: 5px; }
+    .card-value { font-size: 20px; font-weight: bold; color: #f1f5f9; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #1e293b; border-radius: 8px; overflow: hidden; }
+    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #334155; font-size: 13px; }
+    th { background: #0f172a; color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 11px; }
+    .type-tag { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+    .construction { background: #b45309; color: #fef3c7; }
+    .clearance { background: #15803d; color: #dcfce7; }
+    .water { background: #0369a1; color: #e0f2fe; }
+    .road { background: #6d28d9; color: #ede9fe; }
+    .footer { margin-top: 40px; font-size: 11px; color: #64748b; border-top: 1px solid #334155; padding-top: 15px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>UPAGRAHA Sovereign EO Intelligence Briefing: UI_MISSION_MANUAL</h1>
+    <div class="badge">AIR-GAPPED SOVEREIGN RECORD // STRICT PROVENANCE PRESERVED</div>
+  </div>
+  <div class="grid">
+    <div class="card"><div class="card-label">Total Change Detections</div><div class="card-value">22</div></div>
+    <div class="card"><div class="card-label">Confirmed by Analyst</div><div class="card-value">0</div></div>
+    <div class="card"><div class="card-label">Baseline Epoch (T1)</div><div class="card-value" style="font-size:14px;"> UTC</div></div>
+    <div class="card"><div class="card-label">Target Epoch (T2)</div><div class="card-value" style="font-size:14px;"> UTC</div></div>
+  </div>
+  <div class="card" style="margin-bottom: 25px;">
+    <div class="card-label">Analyst Assessment Notes</div>
+    <div style="font-size: 14px; color: #e2e8f0; margin-top: 5px;">Standard sovereign intelligence review</div>
+  </div>
+  <table>
+    <thead><tr><th>ID</th><th>Type</th><th>Confidence</th><th>Area (m²)</th><th>Bounding Coordinates</th><th>Status</th></tr></thead>
+    <tbody>
+    <tr><td>c02f0d12747849208ef0865aba2534c0</td><td><span class="type-tag construction">Construction</span></td><td>99%</td><td>27,750</td><td>28.6036°N, 77.2160°E</td><td><span style='color:#94a3b8;'>PENDING</span></td></tr>
+    <tr><td>392dda7bed364aba8ca485e7a1518c5d</td><td><span class="type-tag construction">Construction</span></td><td>99%</td><td>27,750</td><td>28.6036°N, 77.2176°E</td><td><span style='color:#94a3b8;'>PENDING</span></td></tr>
+    <tr><td>761ff71a5048404498fe45ec771ad3c0</td><td><span class="type-tag construction">Construction</span></td><td>99%</td><td>27,751</td><td>28.6020°N, 77.2064°E</td><td><span style='color:#94a3b8;'>PENDING</span></td></tr>
+    <tr><td>c530c86fbf724ca7be73a8767e2b20fd</td><td><span class="type-tag construction">Construction</span></td><td>99%</td><td>27,751</td><td>28.6020°N, 77.2080°E</td><td><span style='color:#94a3b8;'>PENDING</span></td></tr>
+    <tr><td>16b046559df44e6db10ca2b9f15c5c26</td><td><span class="type-tag construction">Construction</span></td><td>99%</td><td>27,751</td><td>28.6020°N, 77.2160°E</td><td><span style='color:#94a3b8;'>PENDING</span></td></tr>
+    <tr><td>85200bfd11fe4be589de884fcf183c65</td><td><span class="type-tag construction">Construction</span></td><td>99%</td><td>27,751</td><td>28.6020°N, 77.2176°E</td><td><span style='color:#94a3b8;'>PENDING</span></td></tr>
+    <tr><td>efb02b9c18e247b89e30be8090e08dd2</td><td><span class="type-tag construction">Construction</span></td><td>99%</td><td>27,751</td><td>28.6004°N, 77.2064°E</td><td><span style='color:#94a3b8;'>PENDING</span></td></tr>
+    <tr><td>de1de24e5db449fbae70dcaf0773ecdb</td><td><span class="type-tag construction">Construction</span></td><td>99%</td><td>27,751</td><td>28.6004°N, 77.2080°E</td><td><span style='color:#94a3b8;'>PENDING</span></td></tr>
+    <tr><td>b5000e9def9e42e78a00bdbb17b75a77</td><td><span class="type-tag water">WaterExtentVariation</span></td><td>99%</td><td>27,753</td><td>28.5924°N, 77.2032°E</td><td><span style='color:#94a3b8;'>PENDING</span></td></tr>
+    <tr><td>ea4a754e1c1d40099a78f3adae83a967</td><td><span class="type-tag water">WaterExtentVariation</span></td><td>99%</td><td>27,754</td><td>28.5908°N, 77.2032°E</td><td><span style='color:#94a3b8;'>PENDING</span></td></tr>
+    <tr><td>43413de24b96480fbac96b5c45e3b8f2</td><td><span class="type-tag water">WaterExtentVariation</span></td><td>85%</td><td>27,754</td><td>28.5892°N, 77.2032°E</td><td><span style='color:#94a3b8;'>PENDING</span></td></tr>
+    <tr><td>260002be8cb440e782bbca2eea03fe6d</td><td><span class="type-tag construction">Construction</span></td><td>99%</td><td>27,750</td><td>28.6036°N, 77.2160°E</td><td><span style='color:#f87171;'>REJECTED</span></td></tr>
+    <tr><td>48543f7d53c64d4692f0af897d4a39c6</td><td><span class="type-tag construction">Construction</span></td><td>99%</td><td>27,750</td><td>28.6036°N, 77.2176°E</td><td><span style='color:#94a3b8;'>PENDING</span></td></tr>
+    <tr><td>138797b57467446cbd0225427c08f2b0</td><td><span class="type-tag construction">Construction</span></td><td>99%</td><td>27,751</td><td>28.6020°N, 77.2064°E</td><td><span style='color:#94a3b8;'>PENDING</span></td></tr>
+    <tr><td>38fa68ff372f4936b5e699c252cf52f2</td><td><span class="type-tag construction">Construction</span></td><td>99%</td><td>27,751</td><td>28.6020°N, 77.2080°E</td><td><span style='color:#94a3b8;'>PENDING</span></td></tr>
+    <tr><td>b81d4545283e4c2a97242aa62064ce29</td><td><span class="type-tag construction">Construction</span></td><td>99%</td><td>27,751</td><td>28.6020°N, 77.2160°E</td><td><span style='color:#94a3b8;'>PENDING</span></td></tr>
+    <tr><td>edfae1972ab446d6884ff5946da2366b</td><td><span class="type-tag construction">Construction</span></td><td>99%</td><td>27,751</td><td>28.6020°N, 77.2176°E</td><td><span style='color:#94a3b8;'>PENDING</span></td></tr>
+    <tr><td>93690be2f93746a085db6935bc697271</td><td><span class="type-tag construction">Construction</span></td><td>99%</td><td>27,751</td><td>28.6004°N, 77.2064°E</td><td><span style='color:#94a3b8;'>PENDING</span></td></tr>
+    <tr><td>c19df331ee3647158c665b138a64e50f</td><td><span class="type-tag construction">Construction</span></td><td>99%</td><td>27,751</td><td>28.6004°N, 77.2080°E</td><td><span style='color:#94a3b8;'>PENDING</span></td></tr>
+    <tr><td>92d0f5b7059e4e8ca950502926df081d</td><td><span class="type-tag water">WaterExtentVariation</span></td><td>99%</td><td>27,753</td><td>28.5924°N, 77.2032°E</td><td><span style='color:#94a3b8;'>PENDING</span></td></tr>
+    <tr><td>95754072cc924bc28b67a5d2a9d02dc8</td><td><span class="type-tag water">WaterExtentVariation</span></td><td>99%</td><td>27,754</td><td>28.5908°N, 77.2032°E</td><td><span style='color:#94a3b8;'>PENDING</span></td></tr>
+    <tr><td>5d554a2b516048a790288b7235787195</td><td><span class="type-tag water">WaterExtentVariation</span></td><td>85%</td><td>27,754</td><td>28.5892°N, 77.2032°E</td><td><span style='color:#94a3b8;'>PENDING</span></td></tr>
+    </tbody>
+  </table>
+  <div class="footer">
+    Generated by UPAGRAHA / GeoSemanticSat v2.0 on 2026-09-12 11:34:49 UTC.<br>
+    T1 SHA-256: <code>N/A</code> | T2 SHA-256: <code>N/A</code><br>
+    Certified Air-Gapped Decision Support Artifact — Zero External Telemetry.
+  </div>
+</body>
+</html>

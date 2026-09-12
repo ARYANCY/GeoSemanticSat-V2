@@ -1,0 +1,64 @@
+﻿{
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/processing/v1.1.0/schema.json"
+  ],
+  "type": "Feature",
+  "id": "UPAGRAHA-UI_MISSION_MANUAL-697a343908e545e78abfe159777b9ea6",
+  "bbox": [
+    77.20320000000001,
+    28.589199999999998,
+    77.2192,
+    28.6052
+  ],
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          77.20320000000001,
+          28.589199999999998
+        ],
+        [
+          77.2192,
+          28.589199999999998
+        ],
+        [
+          77.2192,
+          28.6052
+        ],
+        [
+          77.20320000000001,
+          28.6052
+        ],
+        [
+          77.20320000000001,
+          28.589199999999998
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "title": "UPAGRAHA Intelligence Product: UI_MISSION_MANUAL",
+    "description": "Evidence-grade multi-temporal change detection and semantic attribution record.",
+    "datetime": "2026-09-12T11:34:49Z",
+    "start_datetime": "2026-08-29T11:34:49Z",
+    "end_datetime": "2026-09-12T11:34:49Z",
+    "processing:software": "UPAGRAHA / GeoSemanticSat Sovereign Engine v2.0",
+    "processing:facility": "Air-Gapped Sovereign Facility",
+    "upagraha:total_changes": 22,
+    "upagraha:confirmed_changes": 0,
+    "upagraha:t1_sha256": "N/A",
+    "upagraha:t2_sha256": "N/A"
+  },
+  "assets": {
+    "evidence_geojson": {
+      "href": "./evidence.geojson",
+      "type": "application/geo\u002Bjson",
+      "roles": [
+        "data",
+        "change-vectors"
+      ]
+    }
+  }
+}

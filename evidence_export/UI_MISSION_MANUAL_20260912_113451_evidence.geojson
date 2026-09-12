@@ -7,7 +7,7 @@
     }
   },
   "metadata": {
-    "systemVersion": "1.0.0-PROV",
+    "systemVersion": "2.0.0-PROV",
     "generatedAt": "2026-09-12T11:34:51Z",
     "sourceImageSha256": "N/A",
     "cvaThreshold": 0.05
@@ -57,9 +57,10 @@
         "rejectedByAnalyst": false,
         "analystNotes": "",
         "provenance": {
-          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-2.0.0-PROV",
           "prov:generatedAtTime": "2026-09-12T11:34:51Z",
-          "prov:primarySource": "S2_20240320_T3"
+          "prov:primarySource": "S2_20240320_T3",
+          "prov:sourceImageSha256": "N/A"
         },
         "DeltaNDVI": -0.6065,
         "DeltaNDBI": 0.6091,
@@ -120,9 +121,10 @@
         "rejectedByAnalyst": false,
         "analystNotes": "",
         "provenance": {
-          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-2.0.0-PROV",
           "prov:generatedAtTime": "2026-09-12T11:34:51Z",
-          "prov:primarySource": "S2_20240320_T3"
+          "prov:primarySource": "S2_20240320_T3",
+          "prov:sourceImageSha256": "N/A"
         },
         "DeltaNDVI": -0.6065,
         "DeltaNDBI": 0.6091,
@@ -183,9 +185,10 @@
         "rejectedByAnalyst": false,
         "analystNotes": "",
         "provenance": {
-          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-2.0.0-PROV",
           "prov:generatedAtTime": "2026-09-12T11:34:51Z",
-          "prov:primarySource": "S2_20240320_T3"
+          "prov:primarySource": "S2_20240320_T3",
+          "prov:sourceImageSha256": "N/A"
         },
         "DeltaNDVI": -0.7523,
         "DeltaNDBI": 0.716,
@@ -246,9 +249,10 @@
         "rejectedByAnalyst": false,
         "analystNotes": "",
         "provenance": {
-          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-2.0.0-PROV",
           "prov:generatedAtTime": "2026-09-12T11:34:51Z",
-          "prov:primarySource": "S2_20240320_T3"
+          "prov:primarySource": "S2_20240320_T3",
+          "prov:sourceImageSha256": "N/A"
         },
         "DeltaNDVI": -0.7523,
         "DeltaNDBI": 0.716,
@@ -309,9 +313,10 @@
         "rejectedByAnalyst": false,
         "analystNotes": "",
         "provenance": {
-          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-2.0.0-PROV",
           "prov:generatedAtTime": "2026-09-12T11:34:51Z",
-          "prov:primarySource": "S2_20240320_T3"
+          "prov:primarySource": "S2_20240320_T3",
+          "prov:sourceImageSha256": "N/A"
         },
         "DeltaNDVI": -0.6065,
         "DeltaNDBI": 0.6091,
@@ -372,9 +377,10 @@
         "rejectedByAnalyst": false,
         "analystNotes": "",
         "provenance": {
-          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-2.0.0-PROV",
           "prov:generatedAtTime": "2026-09-12T11:34:51Z",
-          "prov:primarySource": "S2_20240320_T3"
+          "prov:primarySource": "S2_20240320_T3",
+          "prov:sourceImageSha256": "N/A"
         },
         "DeltaNDVI": -0.6065,
         "DeltaNDBI": 0.6091,
@@ -435,9 +441,10 @@
         "rejectedByAnalyst": false,
         "analystNotes": "",
         "provenance": {
-          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-2.0.0-PROV",
           "prov:generatedAtTime": "2026-09-12T11:34:51Z",
-          "prov:primarySource": "S2_20240320_T3"
+          "prov:primarySource": "S2_20240320_T3",
+          "prov:sourceImageSha256": "N/A"
         },
         "DeltaNDVI": -0.7523,
         "DeltaNDBI": 0.716,
@@ -498,9 +505,10 @@
         "rejectedByAnalyst": false,
         "analystNotes": "",
         "provenance": {
-          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-2.0.0-PROV",
           "prov:generatedAtTime": "2026-09-12T11:34:51Z",
-          "prov:primarySource": "S2_20240320_T3"
+          "prov:primarySource": "S2_20240320_T3",
+          "prov:sourceImageSha256": "N/A"
         },
         "DeltaNDVI": -0.7523,
         "DeltaNDBI": 0.716,
@@ -561,9 +569,10 @@
         "rejectedByAnalyst": false,
         "analystNotes": "",
         "provenance": {
-          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-2.0.0-PROV",
           "prov:generatedAtTime": "2026-09-12T11:34:51Z",
-          "prov:primarySource": "S2_20240320_T3"
+          "prov:primarySource": "S2_20240320_T3",
+          "prov:sourceImageSha256": "N/A"
         },
         "DeltaNDVI": -0.1172,
         "DeltaNDBI": -0.3173,
@@ -624,9 +633,10 @@
         "rejectedByAnalyst": false,
         "analystNotes": "",
         "provenance": {
-          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-2.0.0-PROV",
           "prov:generatedAtTime": "2026-09-12T11:34:51Z",
-          "prov:primarySource": "S2_20240320_T3"
+          "prov:primarySource": "S2_20240320_T3",
+          "prov:sourceImageSha256": "N/A"
         },
         "DeltaNDVI": -0.1172,
         "DeltaNDBI": -0.3173,
@@ -687,9 +697,10 @@
         "rejectedByAnalyst": false,
         "analystNotes": "",
         "provenance": {
-          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-2.0.0-PROV",
           "prov:generatedAtTime": "2026-09-12T11:34:51Z",
-          "prov:primarySource": "S2_20240320_T3"
+          "prov:primarySource": "S2_20240320_T3",
+          "prov:sourceImageSha256": "N/A"
         },
         "DeltaNDVI": -0.0583,
         "DeltaNDBI": -0.159,
@@ -750,9 +761,10 @@
         "rejectedByAnalyst": true,
         "analystNotes": "Rejected false alarm by analyst.",
         "provenance": {
-          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-2.0.0-PROV",
           "prov:generatedAtTime": "2026-09-12T11:34:51Z",
-          "prov:primarySource": "S2_20240320_T3"
+          "prov:primarySource": "S2_20240320_T3",
+          "prov:sourceImageSha256": "N/A"
         }
       }
     },
@@ -800,9 +812,10 @@
         "rejectedByAnalyst": false,
         "analystNotes": "",
         "provenance": {
-          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-2.0.0-PROV",
           "prov:generatedAtTime": "2026-09-12T11:34:51Z",
-          "prov:primarySource": "S2_20240320_T3"
+          "prov:primarySource": "S2_20240320_T3",
+          "prov:sourceImageSha256": "N/A"
         }
       }
     },
@@ -850,9 +863,10 @@
         "rejectedByAnalyst": false,
         "analystNotes": "",
         "provenance": {
-          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-2.0.0-PROV",
           "prov:generatedAtTime": "2026-09-12T11:34:51Z",
-          "prov:primarySource": "S2_20240320_T3"
+          "prov:primarySource": "S2_20240320_T3",
+          "prov:sourceImageSha256": "N/A"
         }
       }
     },
@@ -900,9 +914,10 @@
         "rejectedByAnalyst": false,
         "analystNotes": "",
         "provenance": {
-          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-2.0.0-PROV",
           "prov:generatedAtTime": "2026-09-12T11:34:51Z",
-          "prov:primarySource": "S2_20240320_T3"
+          "prov:primarySource": "S2_20240320_T3",
+          "prov:sourceImageSha256": "N/A"
         }
       }
     },
@@ -950,9 +965,10 @@
         "rejectedByAnalyst": false,
         "analystNotes": "",
         "provenance": {
-          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-2.0.0-PROV",
           "prov:generatedAtTime": "2026-09-12T11:34:51Z",
-          "prov:primarySource": "S2_20240320_T3"
+          "prov:primarySource": "S2_20240320_T3",
+          "prov:sourceImageSha256": "N/A"
         }
       }
     },
@@ -1000,9 +1016,10 @@
         "rejectedByAnalyst": false,
         "analystNotes": "",
         "provenance": {
-          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-2.0.0-PROV",
           "prov:generatedAtTime": "2026-09-12T11:34:51Z",
-          "prov:primarySource": "S2_20240320_T3"
+          "prov:primarySource": "S2_20240320_T3",
+          "prov:sourceImageSha256": "N/A"
         }
       }
     },
@@ -1050,9 +1067,10 @@
         "rejectedByAnalyst": false,
         "analystNotes": "",
         "provenance": {
-          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-2.0.0-PROV",
           "prov:generatedAtTime": "2026-09-12T11:34:51Z",
-          "prov:primarySource": "S2_20240320_T3"
+          "prov:primarySource": "S2_20240320_T3",
+          "prov:sourceImageSha256": "N/A"
         }
       }
     },
@@ -1100,9 +1118,10 @@
         "rejectedByAnalyst": false,
         "analystNotes": "",
         "provenance": {
-          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-2.0.0-PROV",
           "prov:generatedAtTime": "2026-09-12T11:34:51Z",
-          "prov:primarySource": "S2_20240320_T3"
+          "prov:primarySource": "S2_20240320_T3",
+          "prov:sourceImageSha256": "N/A"
         }
       }
     },
@@ -1150,9 +1169,10 @@
         "rejectedByAnalyst": false,
         "analystNotes": "",
         "provenance": {
-          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-2.0.0-PROV",
           "prov:generatedAtTime": "2026-09-12T11:34:51Z",
-          "prov:primarySource": "S2_20240320_T3"
+          "prov:primarySource": "S2_20240320_T3",
+          "prov:sourceImageSha256": "N/A"
         }
       }
     },
@@ -1200,9 +1220,10 @@
         "rejectedByAnalyst": false,
         "analystNotes": "",
         "provenance": {
-          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-2.0.0-PROV",
           "prov:generatedAtTime": "2026-09-12T11:34:51Z",
-          "prov:primarySource": "S2_20240320_T3"
+          "prov:primarySource": "S2_20240320_T3",
+          "prov:sourceImageSha256": "N/A"
         }
       }
     },
@@ -1250,9 +1271,10 @@
         "rejectedByAnalyst": false,
         "analystNotes": "",
         "provenance": {
-          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-1.0.0-PROV",
+          "prov:wasGeneratedBy": "GeoSemanticSat-Engine-2.0.0-PROV",
           "prov:generatedAtTime": "2026-09-12T11:34:51Z",
-          "prov:primarySource": "S2_20240320_T3"
+          "prov:primarySource": "S2_20240320_T3",
+          "prov:sourceImageSha256": "N/A"
         }
       }
     }
